@@ -2,8 +2,8 @@
 /// <reference path="../../levelup.d.ts" />
 
 import levelup = require("levelup");
-import Bus = require("./Bus.ts");
-import {DBRequestMessage, Message, SettingsMessage} from "./Bus.ts";
+import * as Bus from "./Bus"
+import {DBRequestMessage, Message, SettingsMessage} from "./Bus";
 
 // The entry types that are to be written to the database:
 
@@ -181,6 +181,7 @@ class LevelDBAccess {
         return listOfEntries;
     }
 
+    //calls levelup to find the config entry for a certain driver
     public getDriverEntry(driver: String) {
         return this.db.get(driver, function(err, value) {
             if(err.notFound) {
@@ -193,10 +194,12 @@ class LevelDBAccess {
     }
 }
 
+//the BusDevice for the Database. makes the db accessible and decodes messages to db requests
 class DBBusDevice extends Bus.BusDevice {
 
     private dbAccess: LevelDBAccess;
 
+    //initialises the BusDevice with a new instance of the LevelDBAccess and subscribes to all relevant topics.
     constructor() {
         super();
         this.dbAccess = new LevelDBAccess(this);
@@ -205,7 +208,9 @@ class DBBusDevice extends Bus.BusDevice {
         //TODO: subscribe to all relevant Topics available
     }
 
+    //the overriden handleMessage-function. depending on the type of the message, a different action is performed.
     public handleMessage(m: Bus.Message): void {
+        //If the given message
         if(m instanceof DBRequestMessage) {
             if(m.getRequest() instanceof  DBValueRequest) {
                 var dbValueReq = <DBValueRequest> m.getRequest();
@@ -301,3 +306,4 @@ class DBSettingsRequest extends DBRequest {
 }
 
 export {DBRequest, DBValueRequest, DBDriverInfoRequest, DBSettingsRequest, DemoMessage, DBBusDevice};
+
