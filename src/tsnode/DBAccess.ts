@@ -1,3 +1,4 @@
+/// <reference path="C:\Program Files (x86)\JetBrains\WebStorm 11.0.3\plugins\JavaScriptLanguage\typescriptCompiler\external\lib.es6.d.ts" />
 /// <reference path="../../levelup.d.ts" />
 
 import levelup = require("levelup");
@@ -8,6 +9,7 @@ import {DBRequestMessage, Message, SettingsMessage} from "./Bus.ts";
 
 // Abstract class for all Entry types
 abstract class DBEntry {
+
 }
 
 // Entry class for Sensor values
@@ -102,15 +104,15 @@ class LevelDBAccess {
     }
 
     //puts a new sensor value to the database
-    putSensorValue(topic: number, value: any) {
-        this.db.put(new SensorValueEntry(value), this.dateToKey());
+    putSensorValue(topicID: number, value: any) {
+        this.db.put(LevelDBAccess.dateToKey(new Date()), new SensorValueEntry(value));
         this.incrementSize();
         this.deleteOnMaxCapacity();
     }
 
     //helping method converting the current date to a number, to serve as a key for the database
-    private dateToKey(): number {
-        return Date.now();
+    public static dateToKey(date: Date): number {
+        return date.getTime();
     }
 
     //puts a new driver's information to the database
@@ -158,12 +160,6 @@ class LevelDBAccess {
     //returns all entries of a specific topic, optionally sorted by a specific timeframe
     public getEntries(topic: number, beginDate: number, endDate: number): SensorValueEntry[] {
         // if there is no begin date or end date, the values are set to 0 and accordingly "now".
-        if(beginDate === undefined) {
-            beginDate = 0;
-        }
-        if(endDate === undefined) {
-            endDate = Date.now();
-        }
         var listOfKeys: number[];
         var listOfEntries: SensorValueEntry[];
 
@@ -212,11 +208,13 @@ class DBBusDevice extends Bus.BusDevice {
     public handleMessage(m: Bus.Message): void {
         if(m instanceof DBRequestMessage) {
             if(m.getRequest() instanceof  DBValueRequest) {
+                var dbValueReq = <DBValueRequest> m.getRequest();
                 DemoMessage.demooutput( //demo; delete the "demooutput"-part later
-                    this.dbAccess.getEntries(m.getRequest().getTopic(), m.getRequest().getBeginDate(), m.getRequest().getEndDate())
+                    this.dbAccess.getEntries(dbValueReq.getTopic().getID(), LevelDBAccess.dateToKey(dbValueReq.getBeginDate()), LevelDBAccess.dateToKey(dbValueReq.getEndDate()))
                 )
             } else if (m.getRequest() instanceof DBDriverInfoRequest) {
-                this.dbAccess.getDriverEntry(m.getRequest().getDriver());
+                var n = <DBDriverInfoRequest>m.getRequest();
+                this.dbAccess.getDriverEntry(n.getDriver());
             }
             //TODO: Send Message containing the information required
         } //TODO: ELSE get sensor value from message and write to db / get config from message, ...
@@ -230,6 +228,10 @@ class DBBusDevice extends Bus.BusDevice {
 
 class DemoMessage extends Bus.Message {
     public value: any;
+    constructor(value: any) {
+        super(new Bus.Topic(5037, "5037"));
+        this.value = value;
+    }
     public static demooutput(out: SensorValueEntry[]) {
         var output: String = "The values put to the Database in this demonstration were: ";
         for(var entry of out) {

@@ -1,8 +1,8 @@
-///<reference path="/Applications/WebStorm.app/Contents/plugins/JavaScriptLanguage/typescriptCompiler/external/lib.es6.d.ts"/>
+///<reference path="C:\Program Files (x86)\JetBrains\WebStorm 11.0.3\plugins\JavaScriptLanguage\typescriptCompiler\external\lib.es6.d.ts"/>
 
 import Value from "./Utils";
-import DBReqest from "./Utils";
-import Value from "./Utils";
+import * as DBAccess from "./DBAccess";
+
 class Topic {
     private id:number;
     private name:string;
@@ -143,15 +143,15 @@ class ValueMessage extends Message {
 }
 
 class DBRequestMessage extends Message {
-    private req: DBReqest;
+    private req: DBAccess.DBRequest;
     static TOPIC = new Topic(10, "Database request message");
 
-    constructor(pReq: DBReqest) {
+    constructor(pReq: DBAccess.DBRequest) {
         super(DBRequestMessage.TOPIC);
         this.req = pReq;
     }
 
-    public getRequest():DBReqest {
+    public getRequest(): DBAccess.DBRequest {
         return this.req
     }
 
