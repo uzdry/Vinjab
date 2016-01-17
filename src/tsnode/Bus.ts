@@ -2,8 +2,7 @@
 
 import Value from "./Utils";
 import DBReqest from "./Utils";
-import {IterableIterator} from "../../../../../../../Applications/WebStorm.app/Contents/plugins/JavaScriptLanguage/typescriptCompiler/external/lib.es6";
-
+import Value from "./Utils";
 class Topic {
     private id:number;
     private name:string;
@@ -39,7 +38,7 @@ class Message {
 }
 
 class BusDevice {
-    private broker:Broker;
+    protected broker:Broker;
     private id:number;
     static cnt:number = 0;
 
@@ -129,6 +128,16 @@ class Broker {
     }
 }
 
+class ValueMessage extends Message {
+    static TOPIC = new Topic(30, "Value message")
+    private value: Value;
+    constructor(pValue: Value) {
+        super(ValueMessage.TOPIC);
+        this.value = pValue;
+
+    }
+}
+
 class DBRequestMessage extends Message {
     private req: DBReqest;
     static TOPIC = new Topic(10, "Database request message");
@@ -137,6 +146,11 @@ class DBRequestMessage extends Message {
         super(DBRequestMessage.TOPIC);
         this.req = pReq;
     }
+
+    public getRequest():DBReqest {
+        return this.req
+    }
+
 }
 
 class SettingsMessage extends Message {
@@ -154,4 +168,4 @@ class SettingsMessage extends Message {
 
 }
 
-export {BusDevice, Topic, Message, DBRequestMessage};
+export {BusDevice, Topic, Message, ValueMessage, DBRequestMessage, SettingsMessage};
