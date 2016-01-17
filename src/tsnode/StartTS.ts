@@ -12,13 +12,16 @@ sources.add(new Source());
 sources.add(new Source());
 sources.add(new Source());
 
-var iter = sources.entries();
-var x;
-while ((x = iter.next().value) != null) {
-    x[0].subscribe(t);
+for (var i = 0; i < 4; i++) {
+    sources.add(new Source());
 }
 
+var iter = sources.entries();
+var x;
 
+while ((x = iter.next().value) != null) {
+    x[0].publish();
+}
 
 
 //process.exit(1);

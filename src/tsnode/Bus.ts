@@ -101,12 +101,6 @@ class Broker {
 
         this.subscribers.get(topic).add(sub);
 
-        var iter = this.subscribers.get(topic).entries();
-        var x;
-        while ((x = iter.next().value) != null) {
-            console.log(x[0]);
-        }
-
 
     }
 
@@ -114,15 +108,19 @@ class Broker {
 
         this.subscribers.get(topic).delete(sub);
 
-
-
     }
 
     private distribute(m:Message) {
 
-        for (var i in this.subscribers.get(m.getTopic()).values()) {
-            i.handleMessage();
+
+
+        var iter = this.subscribers.get(m.getTopic()).entries();
+
+        var x;
+        while((x = iter.next().value) != null) {
+            x[0].handleMessage(m);
         }
+
 
     }
 }
