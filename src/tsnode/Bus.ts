@@ -1,7 +1,7 @@
-///<reference path="/Applications/WebStorm.app/Contents/plugins/JavaScriptLanguage/typescriptCompiler/external/lib.es6.d.ts"/>
 
 import Value from "./Utils";
-import DBReqest from "./Utils";
+import DBRequest from "./DBAccess"
+import DBAccess = require("./DBAccess");
 
 class Topic {
     private id:number;
@@ -125,15 +125,15 @@ class Broker {
 }
 
 class DBRequestMessage extends Message {
-    private req: DBAccess.DBReqest;
+    private req: DBRequest;
     static TOPIC = new Topic(10, "Database request message");
 
-    constructor(pReq: DBReqest) {
+    constructor(pReq: DBRequest) {
         super(DBRequestMessage.TOPIC);
         this.req = pReq;
     }
 
-    public getRequest(): DBAccess.DBReqest {
+    public getRequest(): DBRequest {
         return this.req;
     }
 }

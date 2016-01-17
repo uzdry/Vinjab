@@ -4,8 +4,6 @@ import levelup = require("levelup");
 import Bus = require("./Bus.ts");
 import {DBRequestMessage, Message, SettingsMessage} from "./Bus.ts";
 
-export module DBAccess {
-
     // The entry types that are to be written to the database:
 
     // Abstract class for all Entry types
@@ -79,7 +77,7 @@ export module DBAccess {
         }
     }
 
-    export class LevelDBAccess {
+    class LevelDBAccess {
         private currentDriver: String;
         private maxCapacity: number;
         private db;
@@ -239,7 +237,7 @@ export module DBAccess {
     }
 
 
-    abstract class DBRequest {
+    class DBRequest {
 
     }
 
@@ -296,4 +294,5 @@ export module DBAccess {
     class DBSettingsRequest extends DBRequest {
 
     }
-}
+
+export {DBRequest, DBValueRequest, DBDriverInfoRequest, DBSettingsRequest, DemoMessage, DBBusDevice}
