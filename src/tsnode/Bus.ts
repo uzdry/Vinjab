@@ -2,7 +2,6 @@
 
 import Value from "./Utils";
 import DBReqest from "./Utils";
-import Value from "./Utils";
 class Topic {
     private id:number;
     private name:string;
