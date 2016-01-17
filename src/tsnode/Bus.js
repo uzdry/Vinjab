@@ -95,6 +95,9 @@ var DBRequestMessage = (function (_super) {
         _super.call(this, DBRequestMessage.TOPIC);
         this.req = pReq;
     }
+    DBRequestMessage.prototype.getRequest = function () {
+        return this.req;
+    };
     DBRequestMessage.TOPIC = new Topic(10, "Database request message");
     return DBRequestMessage;
 })(Message);
@@ -111,3 +114,4 @@ var SettingsMessage = (function (_super) {
     SettingsMessage.TOPIC = new Topic(20, "Settings message");
     return SettingsMessage;
 })(Message);
+exports.SettingsMessage = SettingsMessage;

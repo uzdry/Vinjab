@@ -125,12 +125,16 @@ class Broker {
 }
 
 class DBRequestMessage extends Message {
-    private req: DBReqest;
+    private req: DBAccess.DBReqest;
     static TOPIC = new Topic(10, "Database request message");
 
     constructor(pReq: DBReqest) {
         super(DBRequestMessage.TOPIC);
         this.req = pReq;
+    }
+
+    public getRequest(): DBAccess.DBReqest {
+        return this.req;
     }
 }
 
@@ -149,4 +153,4 @@ class SettingsMessage extends Message {
 
 }
 
-export {BusDevice, Topic, Message, DBRequestMessage};
+export {BusDevice, Topic, Message, DBRequestMessage, SettingsMessage};
