@@ -1,3 +1,4 @@
+///<reference path="/Applications/WebStorm.app/Contents/plugins/JavaScriptLanguage/typescriptCompiler/external/lib.es6.d.ts"/>
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
@@ -57,6 +58,7 @@ exports.BusDevice = BusDevice;
 var Broker = (function () {
     function Broker() {
         this.subs = [];
+        this.subscribers = new Map();
     }
     Broker.get = function () {
         if (this.instance == null) {
@@ -68,19 +70,22 @@ var Broker = (function () {
         this.distribute(m);
     };
     Broker.prototype.subscribe = function (topic, sub) {
-        if (!this.subs[topic.getID()]) {
-            this.subs[topic.getID()] = new Array();
+        if (this.subscribers.get(topic) == null) {
+            this.subscribers.set(topic, new Set());
+            console.log('Set created');
         }
-        this.subs[topic.getID()].push(sub);
+        this.subscribers.get(topic).add(sub);
+        var iter = this.subscribers.get(topic).entries();
+        var x;
+        while ((x = iter.next().value) != null) {
+            console.log(x[0]);
+        }
     };
     Broker.prototype.unsubscribe = function (topic, sub) {
-        var index = this.subs[topic.getID()].indexOf(sub, 0);
-        if (index != undefined) {
-            this.subs[topic.getID()].splice(index, 1);
-        }
+        this.subscribers.get(topic).delete(sub);
     };
     Broker.prototype.distribute = function (m) {
-        for (var i in this.subs[m.getTopic().getID()]) {
+        for (var i in this.subscribers.get(m.getTopic()).values()) {
             i.handleMessage();
         }
     };
@@ -92,9 +97,6 @@ var DBRequestMessage = (function (_super) {
         _super.call(this, DBRequestMessage.TOPIC);
         this.req = pReq;
     }
-    DBRequestMessage.prototype.getRequest = function () {
-        return this.req;
-    };
     DBRequestMessage.TOPIC = new Topic(10, "Database request message");
     return DBRequestMessage;
 })(Message);
@@ -103,8 +105,11 @@ var SettingsMessage = (function (_super) {
     __extends(SettingsMessage, _super);
     function SettingsMessage() {
         _super.call(this, SettingsMessage.TOPIC);
+        this.configs = new Map();
     }
+    SettingsMessage.prototype.getConfigs = function () {
+        return this.configs;
+    };
     SettingsMessage.TOPIC = new Topic(20, "Settings message");
     return SettingsMessage;
 })(Message);
-exports.SettingsMessage = SettingsMessage;

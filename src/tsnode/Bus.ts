@@ -2,6 +2,7 @@
 
 import Value from "./Utils";
 import DBReqest from "./Utils";
+import {IterableIterator} from "../../../../../../../Applications/WebStorm.app/Contents/plugins/JavaScriptLanguage/typescriptCompiler/external/lib.es6";
 
 class Topic {
     private id:number;
@@ -99,11 +100,15 @@ class Broker {
             console.log('Set created');
         }
 
-        console.log(this.subscribers.get(topic));
 
         this.subscribers.get(topic).add(sub);
 
-        console.log(this.subscribers.get(topic).values());
+        var iter = this.subscribers.get(topic).entries();
+        var x;
+        while ((x = iter.next().value) != null) {
+            console.log(x[0]);
+        }
+
 
     }
 
@@ -111,7 +116,7 @@ class Broker {
 
         this.subscribers.get(topic).delete(sub);
 
-        console.log(this.subscribers.get(topic).values());
+
 
     }
 

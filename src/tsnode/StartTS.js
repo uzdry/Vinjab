@@ -4,4 +4,14 @@ var Bus_1 = require("./Bus");
 var s = new Source_1.Source();
 var t = new Bus_1.Topic(0, "test");
 s.subscribe(new Bus_1.Topic(0, "aaa"));
+var sources = new Set();
+sources.add(new Source_1.Source());
+sources.add(new Source_1.Source());
+sources.add(new Source_1.Source());
+sources.add(new Source_1.Source());
+var iter = sources.entries();
+var x;
+while ((x = iter.next().value) != null) {
+    x[0].subscribe(t);
+}
 //process.exit(1);
