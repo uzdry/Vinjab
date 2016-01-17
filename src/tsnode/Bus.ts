@@ -2,6 +2,7 @@
 
 import Value from "./Utils";
 import DBReqest from "./Utils";
+import Value from "./Utils";
 class Topic {
     private id:number;
     private name:string;
@@ -112,7 +113,9 @@ class Broker {
 
     private distribute(m:Message) {
 
-
+        if (this.subscribers.get(m.getTopic()) == null) {
+            return;
+        }
 
         var iter = this.subscribers.get(m.getTopic()).entries();
 
@@ -128,10 +131,14 @@ class Broker {
 class ValueMessage extends Message {
     static TOPIC = new Topic(30, "Value message")
     private value: Value;
-    constructor(pValue: Value) {
-        super(ValueMessage.TOPIC);
+    constructor(pTopic: Topic, pValue: Value) {
+        super(pTopic);
         this.value = pValue;
 
+    }
+
+    public getValue(): Value {
+        return this.value;
     }
 }
 

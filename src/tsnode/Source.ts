@@ -1,6 +1,7 @@
 
-import Value from "./Utils";
 import {BusDevice, Message, ValueMessage}  from "./Bus";
+import Value from "./Utils";
+import Topic from "./Bus";
 /**
  * Created by valentin on 12/01/16.
  */
@@ -18,8 +19,10 @@ class Source extends BusDevice {
 
     }
 
-    private publish() {
-        super.broker.handleMessage(new ValueMessage(new Value(1,"a")));
+    public publish(t: Topic) {
+        var m: Message;
+        m = new ValueMessage(t, new Value(1,"a"));
+        this.broker.handleMessage(m);
     }
 
 }
