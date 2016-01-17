@@ -1,4 +1,3 @@
-///<reference path="/Applications/WebStorm.app/Contents/plugins/JavaScriptLanguage/typescriptCompiler/external/lib.es6.d.ts"/>
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
@@ -58,7 +57,6 @@ exports.BusDevice = BusDevice;
 var Broker = (function () {
     function Broker() {
         this.subs = [];
-        this.subscribers = new Map();
     }
     Broker.get = function () {
         if (this.instance == null) {
@@ -70,20 +68,19 @@ var Broker = (function () {
         this.distribute(m);
     };
     Broker.prototype.subscribe = function (topic, sub) {
-        if (this.subscribers.get(topic) == null) {
-            this.subscribers.set(topic, new Set());
-            console.log('Set created');
+        if (!this.subs[topic.getID()]) {
+            this.subs[topic.getID()] = new Array();
         }
-        console.log(this.subscribers.get(topic));
-        this.subscribers.get(topic).add(sub);
-        console.log(this.subscribers.get(topic).values());
+        this.subs[topic.getID()].push(sub);
     };
     Broker.prototype.unsubscribe = function (topic, sub) {
-        this.subscribers.get(topic).delete(sub);
-        console.log(this.subscribers.get(topic).values());
+        var index = this.subs[topic.getID()].indexOf(sub, 0);
+        if (index != undefined) {
+            this.subs[topic.getID()].splice(index, 1);
+        }
     };
     Broker.prototype.distribute = function (m) {
-        for (var i in this.subscribers.get(m.getTopic()).values()) {
+        for (var i in this.subs[m.getTopic().getID()]) {
             i.handleMessage();
         }
     };
@@ -103,11 +100,7 @@ var SettingsMessage = (function (_super) {
     __extends(SettingsMessage, _super);
     function SettingsMessage() {
         _super.call(this, SettingsMessage.TOPIC);
-        this.configs = new Map();
     }
-    SettingsMessage.prototype.getConfigs = function () {
-        return this.configs;
-    };
     SettingsMessage.TOPIC = new Topic(20, "Settings message");
     return SettingsMessage;
 })(Message);

@@ -1,5 +1,3 @@
-///<reference path="/Applications/WebStorm.app/Contents/plugins/JavaScriptLanguage/typescriptCompiler/external/lib.es6.d.ts"/>
-
 import Value from "./Utils";
 import DBReqest from "./Utils";
 
@@ -75,11 +73,8 @@ class Broker {
     private subs:{[tid: number]:Array<BusDevice>} = <any>[];
     private static instance:Broker;
 
-    bds: Set<BusDevice>;
-    private subscribers: Map<Topic, Set<BusDevice>>;
 
     constructor() {
-        this.subscribers = new Map<Topic, Set<BusDevice>>();
     }
 
     public static get():Broker {
@@ -94,30 +89,26 @@ class Broker {
     }
 
     public subscribe(topic:Topic, sub:BusDevice):void {
-        if (this.subscribers.get(topic) == null) {
-            this.subscribers.set(topic, new Set<BusDevice>());
-            console.log('Set created');
+        if (!this.subs[topic.getID()]) {
+            this.subs[topic.getID()] = new Array<BusDevice>();
         }
 
-        console.log(this.subscribers.get(topic));
-
-        this.subscribers.get(topic).add(sub);
-
-        console.log(this.subscribers.get(topic).values());
+        this.subs[topic.getID()].push(sub);
 
     }
 
     public unsubscribe(topic:Topic, sub:BusDevice):void {
 
-        this.subscribers.get(topic).delete(sub);
-
-        console.log(this.subscribers.get(topic).values());
+        var index =  this.subs[topic.getID()].indexOf(sub, 0);
+        if (index != undefined) {
+            this.subs[topic.getID()].splice(index, 1);
+        }
 
     }
 
     private distribute(m:Message) {
 
-        for (var i in this.subscribers.get(m.getTopic()).values()) {
+        for (var i in this.subs[m.getTopic().getID()]) {
             i.handleMessage();
         }
 
@@ -135,18 +126,12 @@ class DBRequestMessage extends Message {
 }
 
 class SettingsMessage extends Message {
-    private configs: Map<Topic, Value>;
     static TOPIC = new Topic(20, "Settings message");
 
     constructor() {
         super(SettingsMessage.TOPIC);
-        this.configs = new Map<Topic, Value>();
-    }
 
-    getConfigs(): Map<Topic,Value> {
-        return this.configs;
     }
-
 }
 
 export {BusDevice, Topic, Message, DBRequestMessage};
