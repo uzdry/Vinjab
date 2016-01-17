@@ -94,7 +94,8 @@ class LevelDBAccess {
         var infoEntry = this.db.get("INFO", function (err, value) { //If there is no DBInfoEntry, it will be created.
             if(err) {
                 if(err.notFound) {
-                    this.db.put(new DBInfoEntry(2000), "INFO");
+                    infoEntry = new DBInfoEntry(2000);
+                    this.db.put(infoEntry, "INFO");
                 } else {
                 }
             } return value;
@@ -307,3 +308,12 @@ class DBSettingsRequest extends DBRequest {
 
 export {DBRequest, DBValueRequest, DBDriverInfoRequest, DBSettingsRequest, DemoMessage, DBBusDevice};
 
+
+function test() {
+    var x: number = 0;
+    var dbbd: DBBusDevice = new DBBusDevice();
+    while (x < 500) {
+        dbbd.handleMessage(new DemoMessage(x));
+    }
+    dbbd.handleMessage(new DBRequestMessage(new DBValueRequest(new Bus.Topic(5037, "5037"), new Date(2013,12,1), new Date())));
+}
