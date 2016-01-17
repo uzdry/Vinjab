@@ -1,11 +1,12 @@
+/// <reference path="../../levelup.d.ts" />
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
-/// <reference path="../../../levelup.d.ts" />
 var levelup = require("levelup");
-var Bus_1 = require("../Bus");
+var Bus = require("./Bus.ts");
+var Bus_ts_1 = require("./Bus.ts");
 var DBAccess;
 (function (DBAccess) {
     // The entry types that are to be written to the database:
@@ -23,30 +24,16 @@ var DBAccess;
             _super.call(this);
             this.value = value;
         }
+        //getter for the topic. there is no setter, as a topic should never be edited.
+        SensorValueEntry.prototype.getTopic = function () {
+            return this.topic;
+        };
         //getter for the value. there is no setter, as values should never be edited
         SensorValueEntry.prototype.getValue = function () {
             return this.value;
         };
         return SensorValueEntry;
     })(DBEntry);
-    // temporary key class for putting sensor values to the database
-    //TODO: find better way for the keys (Date only? Strings? Numbers?
-    var DBValueKey = (function () {
-        //initialises the DBValueKey with a given topic and the current date
-        function DBValueKey(topic) {
-            this.topic = topic;
-            this.date = new Date;
-        }
-        //getter for the topic
-        DBValueKey.prototype.getTopic = function () {
-            return this.topic;
-        };
-        //getter for the date
-        DBValueKey.prototype.getDate = function () {
-            return this.date;
-        };
-        return DBValueKey;
-    })();
     //enum for the fuel types
     var fuel;
     (function (fuel) {
@@ -56,6 +43,7 @@ var DBAccess;
         fuel[fuel["Super_Plus_Unleaded"] = 3] = "Super_Plus_Unleaded";
     })(fuel || (fuel = {}));
     // Entry class for driver-specific info (dashboard-config, preferred fuel, whatever else we want to know)
+    //TODO: find better representation for a DriverInfo's key than a string
     var DriverInfoEntry = (function (_super) {
         __extends(DriverInfoEntry, _super);
         //initialises a new DriverInfoEntry with a standard dashboardconfig and no preferred fuel
@@ -93,7 +81,7 @@ var DBAccess;
         //constructor, initialises the LevelDBAccess with a given busdevice;
         function LevelDBAccess(busDevice) {
             this.currentDriver = null;
-            this.db = levelup('./vinjabdb');
+            this.db = levelup('./vinjabDB');
             this.busDevice = busDevice;
             var infoEntry = this.db.get("INFO", function (err, value) {
                 if (err) {
@@ -105,13 +93,17 @@ var DBAccess;
                 }
                 return value;
             });
-            this.maxCapacity = infoEntry.maxcapacity;
+            this.maxCapacity = infoEntry.maxCapacity;
             this.currentSize = infoEntry.size;
         }
         //puts a new sensor value to the database
         LevelDBAccess.prototype.putSensorValue = function (topic, value) {
-            this.db.put(new SensorValueEntry(value), new DBValueKey(topic));
+            this.db.put(new SensorValueEntry(value), this.dateToKey());
             this.incrementSize();
+        };
+        //helping method converting the current date to a number, to serve as a key for the database
+        LevelDBAccess.prototype.dateToKey = function () {
+            return Date.now();
         };
         //puts a new driver's information to the database
         LevelDBAccess.prototype.putDriverInfo = function (driver) {
@@ -151,20 +143,132 @@ var DBAccess;
             this.db.del("INFO");
             this.db.put(newEntry, "INFO");
         };
+        //returns all entries of a specific topic, optionally sorted by a specific timeframe
+        LevelDBAccess.prototype.getEntries = function (topic, beginDate, endDate) {
+            // if there is no begin date or end date, the values are set to 0 and accordingly "now".
+            if (beginDate === undefined) {
+                beginDate = 0;
+            }
+            if (endDate === undefined) {
+                endDate = Date.now();
+            }
+            var listOfKeys;
+            var listOfEntries;
+            //all keys are extracted from the database
+            this.db.createKeyStream().on('data', function (err, data) {
+                if (data instanceof Number) {
+                    listOfKeys.push(data);
+                }
+            });
+            //and for each key, the entry is checked for requested data. fitting entries are pushed to the returned list
+            for (var _i = 0; _i < listOfKeys.length; _i++) {
+                var entry = listOfKeys[_i];
+                this.db.get("dbentry", function (err, dbentry) {
+                    if (dbentry.getTopic() == topic && entry > beginDate && entry < endDate) {
+                        listOfEntries.push(dbentry);
+                    }
+                });
+            }
+            return listOfEntries;
+        };
+        LevelDBAccess.prototype.getDriverEntry = function (driver) {
+            return this.db.get(driver, function (err, value) {
+                if (err.notFound) {
+                    err.log("DBError: no such driver has been put to the database yet");
+                }
+                else if (err) {
+                    err.log("DBError: something went wrong:");
+                }
+                return value;
+            });
+        };
         return LevelDBAccess;
     })();
-    //TODO: extends BusDevice
+    DBAccess.LevelDBAccess = LevelDBAccess;
     var DBBusDevice = (function (_super) {
         __extends(DBBusDevice, _super);
         function DBBusDevice() {
             _super.call(this);
             this.dbAccess = new LevelDBAccess(this);
+            this.subscribe(Bus.SettingsMessage.TOPIC);
+            this.subscribe(Bus.DBRequestMessage.TOPIC);
+            //TODO: subscribe to all relevant Topics available
         }
         DBBusDevice.prototype.handleMessage = function (m) {
-            if (m.getTopic() !== Bus_1.DBRequestMessage.TOPIC) {
-                throw new Error('No correct Message');
+            if (m instanceof Bus_ts_1.DBRequestMessage) {
+                if (m.getRequest() instanceof DBValueRequest) {
+                    DemoMessage.demooutput(//demo; delete the "demooutput"-part later
+                    this.dbAccess.getEntries(m.getRequest().getTopic(), m.getRequest().getBeginDate(), m.getRequest().getEndDate()));
+                }
+                else if (m.getRequest() instanceof DBDriverInfoRequest) {
+                    this.dbAccess.getDriverEntry(m.getRequest().getDriver());
+                }
+            } //TODO: ELSE get sensor value from message and write to db / get config from message, ...
+            else if (m instanceof DemoMessage) {
+                this.dbAccess.putSensorValue(9377, m.value);
             }
+            //end: demo stuff
         };
         return DBBusDevice;
-    })(Bus_1.BusDevice);
+    })(Bus.BusDevice);
+    var DemoMessage = (function (_super) {
+        __extends(DemoMessage, _super);
+        function DemoMessage() {
+            _super.apply(this, arguments);
+        }
+        DemoMessage.demooutput = function (out) {
+            return out;
+        };
+        return DemoMessage;
+    })(Bus.Message);
+    var DBRequest = (function () {
+        function DBRequest() {
+        }
+        return DBRequest;
+    })();
+    var DBValueRequest = (function (_super) {
+        __extends(DBValueRequest, _super);
+        function DBValueRequest(topic, beginDate, endDate) {
+            _super.call(this);
+            this.topic = topic;
+            this.beginDate = beginDate;
+            this.endDate = endDate;
+        }
+        DBValueRequest.prototype.getTopic = function () {
+            return this.topic;
+        };
+        DBValueRequest.prototype.getBeginDate = function () {
+            return this.beginDate;
+        };
+        DBValueRequest.prototype.getEndDate = function () {
+            return this.endDate;
+        };
+        return DBValueRequest;
+    })(DBRequest);
+    var DBDriverInfoRequest = (function (_super) {
+        __extends(DBDriverInfoRequest, _super);
+        function DBDriverInfoRequest(driver, dashboardConfig, preferredFuel) {
+            _super.call(this);
+            this.driver = driver;
+            this.dashboardConfig = dashboardConfig;
+            this.preferredfFuel = preferredFuel;
+        }
+        DBDriverInfoRequest.prototype.getDriver = function () {
+            return this.driver;
+        };
+        DBDriverInfoRequest.prototype.getDashboardConfig = function () {
+            return this.dashboardConfig;
+        };
+        DBDriverInfoRequest.prototype.getPreferredFuel = function () {
+            return this.preferredfFuel;
+        };
+        return DBDriverInfoRequest;
+    })(DBRequest);
+    var DBSettingsRequest = (function (_super) {
+        __extends(DBSettingsRequest, _super);
+        function DBSettingsRequest() {
+            _super.apply(this, arguments);
+        }
+        return DBSettingsRequest;
+    })(DBRequest);
 })(DBAccess = exports.DBAccess || (exports.DBAccess = {}));
