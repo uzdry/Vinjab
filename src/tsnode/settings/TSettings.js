@@ -1,12 +1,27 @@
+/**
+ * Creates the main HTML table for the settings GUI.
+ */
 var TableFactory = (function () {
+    /**
+     * Creates a new TableFactory.
+     * @param container The HTML DOM object that should contain the table (not yet implemented).
+     * @param valueChangeListener The object that logs the changes to be written back to the database (to be removed soon...).
+     */
     function TableFactory(container, valueChangeListener) {
         this.container = container;
         this.valueChangeListener = valueChangeListener;
     }
-    TableFactory.prototype.addRow = function (name, description) {
+    /**
+     * Adds a new row to the table that contains a folder or a parameter.
+     * The information source is the actualSettingsNode and the amount of the rows already present.
+     * Therefore there are no parameters needed.
+     */
+    TableFactory.prototype.appendRow = function () {
         var changeListener = this.valueChangeListener;
         var rowId = this.tableBody.children.length;
         var actualRowNode = this.actualSettingsNode.getElements()[rowId];
+        var name = actualRowNode.getName();
+        var description = actualRowNode.getDescription();
         var actualDir = this.actualSettingsNode;
         var tr = document.createElement('tr');
         tr.style.height = "100px";
@@ -113,6 +128,10 @@ var TableFactory = (function () {
         tr.appendChild(td);
         this.tableBody.appendChild(tr);
     };
+    /**
+     * Creates a whole HTML table with the specified node as the parent (all the children will be displayed).
+     * @param actualSettingsNode The parent node, all of its children should be displayed in the table.
+     */
     TableFactory.prototype.createTable = function (actualSettingsNode) {
         this.table = document.createElement('table');
         this.table.id = 'settings_table';
@@ -124,18 +143,32 @@ var TableFactory = (function () {
         var elementList = this.actualSettingsNode.getElements();
         var listLength = elementList.length;
         for (var i = 0; i < listLength; i++) {
-            var actualElement = this.actualSettingsNode.getElements()[i];
-            this.addRow(actualElement.getName(), actualElement.getDescription());
+            this.appendRow();
         }
         this.table.appendChild(this.tableBody);
         this.container.appendChild(this.table);
     };
+    /**
+     * Deletes the whole table from the GUI.
+     */
     TableFactory.prototype.removeTable = function () {
         this.container.removeChild(this.table);
     };
     return TableFactory;
 })();
+/**
+ * A settings directory that can contain parameters or other directories.
+ */
 var SettingsDirectory = (function () {
+    /**
+     * Creates a settings directory.
+     * @param ruid The relatively unique ID of this directory. It must be unique among all the children of a parent.
+     *  Grandchildren may have the same ruid.
+     * @param name The name of the directory to be displayed in the GUI. Must not be unique.
+     * @param description The description of the directory to be displayed in the GUI.
+     * @param elements The children of this directory.
+     * @param imageURL The URL of the image to be displayed in the GUI as this folder.
+     */
     function SettingsDirectory(ruid, name, description, elements, imageURL) {
         this.ruid = ruid;
         this.name = name;
@@ -147,17 +180,34 @@ var SettingsDirectory = (function () {
         }
         this.imageURL = imageURL;
     }
+    /**
+     * Sets the value of the directory. To be ignored.
+     * @param value The new value of the directory.
+     */
     SettingsDirectory.prototype.setActualValue = function (value) {
     };
+    /**
+     * Gets the actual value of the directory. To be ignored.
+     * @returns {number} The actual value of the directory.
+     */
     SettingsDirectory.prototype.getActualValue = function () {
         return 0;
     };
+    /**
+     * Appends a new child element to this directory.
+     * @param element The child node to be appended to this directory.
+     */
     SettingsDirectory.prototype.appendChild = function (element) {
         if (this.getElementByRuid(element.getRuid()) == null) {
             this.elements.push(element);
             element.setParent(this);
         }
     };
+    /**
+     * Gets a child of this directory based on its ruid. No grandchildren will be checked.
+     * @param ruid The ruid of the child of this directory you are looking for.
+     * @returns {any} The child of this directory with the specified ruid, null if not found.
+     */
     SettingsDirectory.prototype.getElementByRuid = function (ruid) {
         for (var i = 0; i < this.elements.length; i++) {
             if (this.elements[i].getRuid() == ruid) {
@@ -166,42 +216,95 @@ var SettingsDirectory = (function () {
         }
         return null;
     };
+    /**
+     * Gets the original value of this directory. To be ignored.
+     * @returns {number} The original value of this directory.
+     */
     SettingsDirectory.prototype.getValue = function () {
         return 0;
     };
+    /**
+     * Gets the URL of the image that is to be displayed as this directory in the GUI.
+     * @returns {string} The URL of the image of this directory.
+     */
     SettingsDirectory.prototype.getImageURL = function () {
         return this.imageURL;
     };
+    /**
+     * Gets the full unique ID of this directory.
+     * All the nodes (directories/parameters...) have a unique Uid.
+     * @returns {string} The unique ID of this directory.
+     */
     SettingsDirectory.prototype.getFullUid = function () {
         if (this.parent == this) {
             return this.ruid;
         }
         return this.parent.getFullUid() + '/' + this.ruid;
     };
+    /**
+     * Gets the relatively unique ID of this directory.
+     * @returns {string} The ruid of this directory.
+     */
     SettingsDirectory.prototype.getRuid = function () {
         return this.ruid;
     };
+    /**
+     * Gets all the children of this directory.
+     * @returns {SettingsNode[]} The children of this directory.
+     */
     SettingsDirectory.prototype.getElements = function () {
         return this.elements;
     };
+    /**
+     * Gets the name of this directory that is to be displayed in the GUI.
+     * @returns {string} The name of this directory.
+     */
     SettingsDirectory.prototype.getName = function () {
         return this.name;
     };
+    /**
+     * Gets the description of this directory that is to be displayed in the GUI.
+     * @returns {string} The description of this directory.
+     */
     SettingsDirectory.prototype.getDescription = function () {
         return this.description;
     };
+    /**
+     * Checks whether this node is a directory.
+     * @returns {boolean} True.
+     */
     SettingsDirectory.prototype.isDirectory = function () {
         return true;
     };
+    /**
+     * Sets the parent directory of this directory.
+     * @param parent The new parent directory of this.
+     */
     SettingsDirectory.prototype.setParent = function (parent) {
         this.parent = parent;
     };
+    /**
+     * Gets the parent directory of this.
+     * @returns {SettingsNode} The parent directory of this.
+     */
     SettingsDirectory.prototype.getParent = function () {
         return this.parent;
     };
     return SettingsDirectory;
 })();
+/**
+ * A settings parameter that can have multiple numeric values.
+ */
 var SettingsParameter = (function () {
+    /**
+     * Creates a settings parameter.
+     * @param ruid The relatively unique ID of this directory. It must be unique among all the children of a parent.
+     *  Grandchildren may have the same ruid.
+     * @param name The name of the directory to be displayed in the GUI. Must not be unique.
+     * @param description The description of the directory to be displayed in the GUI.
+     * @param imageURL The URL of the image to be displayed in the GUI as this folder.
+     * @param value The original value of this settings parameter.
+     */
     function SettingsParameter(ruid, name, description, imageURL, value) {
         this.name = name;
         this.description = description;
@@ -210,50 +313,114 @@ var SettingsParameter = (function () {
         this.value = value;
         this.actualValue = value;
     }
+    /**
+     * Settings the actual value of this parameter (that is set in the GUI).
+     * Does not change the original value of this parameter that is in the DB.
+     * @param value The new actual value of this parameter.
+     */
     SettingsParameter.prototype.setActualValue = function (value) {
         this.actualValue = value;
     };
+    /**
+     * Gets the actual value of this parameter.
+     * @returns {number} The actual value of this parameter.
+     */
     SettingsParameter.prototype.getActualValue = function () {
         return this.actualValue;
     };
+    /**
+     * Gets the value of this parameter that is currently stored in the DB.
+     * @returns {number} The value of this parameter that is currently stored in the DB.
+     */
     SettingsParameter.prototype.getValue = function () {
         return this.value;
     };
+    /**
+     * Gets the URL of the image of this parameter that is to be displayed in the GUI.
+     * @returns {string} The URL of the image of this parameter.
+     */
     SettingsParameter.prototype.getImageURL = function () {
         return this.imageURL;
     };
+    /**
+     * Gets the full unique ID of this parameter.
+     * All the nodes (directories/parameters...) have a unique Uid.
+     * @returns {string} The unique ID of this parameter.
+     */
     SettingsParameter.prototype.getFullUid = function () {
         return this.parent.getFullUid() + '/' + this.ruid;
     };
+    /**
+     * Gets the relatively unique ID of this parameter.
+     * @returns {string} The ruid of this parameter.
+     */
     SettingsParameter.prototype.getRuid = function () {
         return this.ruid;
     };
+    /**
+     * Gets the elements of this node. Paramaters do not contain elements, so it returns null.
+     * @returns {null} Null.
+     */
     SettingsParameter.prototype.getElements = function () {
         return null;
     };
+    /**
+     * Gets the name of this parameter that is to be displayed in the GUI.
+     * @returns {string} The name of this parameter.
+     */
     SettingsParameter.prototype.getName = function () {
         return this.name;
     };
+    /**
+     * Gets the description of this parameter that is to be displayed in the GUI.
+     * @returns {string} The description of this parameter.
+     */
     SettingsParameter.prototype.getDescription = function () {
         return this.description;
     };
+    /**
+     * Checks whether this node is a directory.
+     * @returns {boolean} False.
+     */
     SettingsParameter.prototype.isDirectory = function () {
         return false;
     };
+    /**
+     * Sets the parent directory of this parameter.
+     * @param parent The new parent directory of this.
+     */
     SettingsParameter.prototype.setParent = function (parent) {
         this.parent = parent;
     };
+    /**
+     * Gets the parent directory of this.
+     * @returns {SettingsNode} The parent directory of this.
+     */
     SettingsParameter.prototype.getParent = function () {
         return this.parent;
     };
     return SettingsParameter;
 })();
+/**
+ * The class that logs all the changes to all the values that can be written back to the database.
+ * Deprecated, will be removed soon.
+ */
 var ValueChangeListener = (function () {
+    /**
+     * Creates the listener.
+     * @param textDebugger The debugger of the GUI that provides display function for this class.
+     */
     function ValueChangeListener(textDebugger) {
         this.textDebugger = textDebugger;
         this.list_uid = [];
         this.list_value = [];
     }
+    /**
+     * The method to be called when a value of a parameter changes.
+     * @param fullUid The full Uid of the parameter.
+     * @param value The new value of the parameter.
+     * @param originalValue The value of the parameter that is stored in the database.
+     */
     ValueChangeListener.prototype.valueChanged = function (fullUid, value, originalValue) {
         var index = this.getIndexOf(fullUid);
         if (index == -1) {
@@ -271,7 +438,7 @@ var ValueChangeListener = (function () {
                 this.list_value.splice(index, 1);
             }
         }
-        this.textDebugger.refreshData(this.list_uid, this.list_value);
+        TextDebugger.refreshData(this.list_uid, this.list_value);
     };
     ValueChangeListener.prototype.getIndexOf = function (fullUid) {
         for (var i = 0; i < this.list_uid.length; i++) {
@@ -283,6 +450,10 @@ var ValueChangeListener = (function () {
     };
     return ValueChangeListener;
 })();
+/**
+ * A class that was designed to support serialisation of the directory structure.
+ * Deprecated, to be removed soon.
+ */
 var SCommunicator = (function () {
     function SCommunicator() {
     }
@@ -290,6 +461,12 @@ var SCommunicator = (function () {
         // Some code ...
         // Sends data to the server ...
     }*/
+    /**
+     * Searches for an element in the buffer with a specified ruid.
+     * @param directoryBuffer The buffer that contains all the elements in which you are looking for a specified one.
+     * @param ruid The ruid of the specific element you are looking for.
+     * @returns {number} The index of the element in the array. -1 if not found.
+     */
     SCommunicator.getElementIndexByRuid = function (directoryBuffer, ruid) {
         for (var i = 0; i < directoryBuffer.length; i++) {
             if (directoryBuffer[i].getRuid() == ruid) {
@@ -298,6 +475,11 @@ var SCommunicator = (function () {
         }
         return -1;
     };
+    /**
+     * Emulates a situation where the whole directory structure is to be reconstructed based on a text file.
+     * @param directories The list of the directories.
+     * @returns {SettingsDirectory} The root directory.
+     */
     SCommunicator.receiveData = function (directories) {
         // Some code ...
         var directoryImgBaseDir = '../../img/settings';
@@ -340,6 +522,10 @@ var SCommunicator = (function () {
         }
         return directoryBuffer[index];
     };
+    /**
+     * The test method to be used to visualize the function of this whole class.
+     * @param directories The directories described as a string array.
+     */
     SCommunicator.testDataReceiver = function (directories) {
         var root = SCommunicator.receiveData(directories); //, parameters, parameterValues);
         var textDebugger = new TextDebugger();
@@ -349,9 +535,17 @@ var SCommunicator = (function () {
     };
     return SCommunicator;
 })();
+/**
+ * The class that provides a debugging console output in the browser.
+ */
 var TextDebugger = (function () {
     function TextDebugger() {
     }
+    /**
+     * Refreshes the whole output array consisting of two columns.
+     * @param fullUids The list of the Uids of the parameters.
+     * @param values The actual values of the parameters.
+     */
     TextDebugger.refreshData = function (fullUids, values) {
         var tableDebug = document.getElementById("table_debug");
         var tdBody = document.createElement("tbody");
@@ -402,7 +596,7 @@ buttonnode.onclick = function () {
     }
     var communicator = new SCommunicator();
     var rawString = "root|Name:Root|DescRoot|directory.png\\root/dir1|Directory1|Desc1|directory.png\\root/dir2|Directory2|Desc2|directory.png\\root/dir1/dir3|Directory3|Desc3|directory.png";
-    communicator.testDataReceiver(rawString.split('\\'), [], []);
+    SCommunicator.testDataReceiver(rawString.split('\\')); //, [], []);
 };
 buttonnode = document.createElement('input');
 buttonnode.setAttribute('type', 'button');
@@ -417,11 +611,11 @@ buttonnode.onclick = function () {
     var textDebugger = new TextDebugger();
     var valueChangeListener = new ValueChangeListener(textDebugger);
     var table = new TableFactory(document.body, valueChangeListener);
-    var par1 = new SettingsParameter('p1', 'My name is Parameter1', 'I am the description of Parameter1', 'res/img/p1.png', 15);
-    var par2 = new SettingsParameter('p2', 'My name is Parameter2', 'I am the description of Parameter2', 'res/img/p2.png', 12);
+    var par1 = new SettingsParameter('p1', 'My name is Parameter1', 'I am the description of Parameter1', '../../img/settings/p1.png', 15);
+    var par2 = new SettingsParameter('p2', 'My name is Parameter2', 'I am the description of Parameter2', '../../img/settings/p2.png', 12);
     var parList = [par1, par2];
-    var dir1 = new SettingsDirectory('d1', 'My name is Directory1', 'I am the description of Directory1', parList, 'res/img/directory.png');
-    var par3 = new SettingsParameter('p3', 'My name is Parameter3', 'I am the description of Parameter3', 'res/img/p3.png', 7);
-    var dir2 = new SettingsDirectory('root', 'MyNameIsROOT (I am the ROOT Directory :))', 'IAmTheDescriptionOfROOT', [dir1, par3], 'res/img/directory.png');
+    var dir1 = new SettingsDirectory('d1', 'My name is Directory1', 'I am the description of Directory1', parList, '../../img/settings/directory.png');
+    var par3 = new SettingsParameter('p3', 'My name is Parameter3', 'I am the description of Parameter3', '../../img/settings/p3.png', 7);
+    var dir2 = new SettingsDirectory('root', 'My name is ROOT', 'I am the description of ROOT', [dir1, par3], '../../img/settings/directory.png');
     table.createTable(dir2);
 };
