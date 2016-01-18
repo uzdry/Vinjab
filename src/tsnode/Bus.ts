@@ -1,12 +1,14 @@
-///<reference path="C:\Program Files (x86)\JetBrains\WebStorm 11.0.3\plugins\JavaScriptLanguage\typescriptCompiler\external\lib.es6.d.ts"/>
+///<reference path="/Applications/WebStorm.app/Contents/plugins/JavaScriptLanguage/typescriptCompiler/external/lib.es6.d.ts"/>
 
-import Value from "./Utils";
-import * as DBAccess from "./DBAccess";
+import {Value} from "./Utils";
+import {DBRequest} from "./DBAccess";
 
+//Topic defines the Topic of a message. BusDevices subscribe to Topics
 class Topic {
     private id:number;
     private name:string;
 
+    //instantiates a new Topic with ID and name
     constructor(pID:number, pName:string) {
         if (pID < 0) {
             return null;
@@ -25,6 +27,7 @@ class Topic {
 
 }
 
+//super class for all Message Types
 class Message {
     private topic:Topic;
 
@@ -37,6 +40,7 @@ class Message {
     }
 }
 
+//A BusDevice has acces to the Bus
 class BusDevice {
     protected broker:Broker;
     private id:number;
@@ -143,15 +147,15 @@ class ValueMessage extends Message {
 }
 
 class DBRequestMessage extends Message {
-    private req: DBAccess.DBRequest;
+    private req: DBRequest;
     static TOPIC = new Topic(10, "Database request message");
 
-    constructor(pReq: DBAccess.DBRequest) {
+    constructor(pReq: DBRequest) {
         super(DBRequestMessage.TOPIC);
         this.req = pReq;
     }
 
-    public getRequest(): DBAccess.DBRequest {
+    public getRequest():DBRequest {
         return this.req
     }
 
