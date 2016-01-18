@@ -1,12 +1,14 @@
+///<reference path="/Applications/WebStorm.app/Contents/plugins/JavaScriptLanguage/typescriptCompiler/external/lib.es6.d.ts"/>
 
-import Value from "./Utils";
-import DBRequest from "./DBAccess"
-import DBAccess = require("./DBAccess");
+import {Value} from "./Utils";
+import {DBRequest} from "./DBAccess";
 
+//Topic defines the Topic of a message. BusDevices subscribe to Topics
 class Topic {
     private id:number;
     private name:string;
 
+    //instantiates a new Topic with ID and name
     constructor(pID:number, pName:string) {
         if (pID < 0) {
             return null;
@@ -25,6 +27,7 @@ class Topic {
 
 }
 
+//super class for all Message Types
 class Message {
     private topic:Topic;
 
@@ -37,8 +40,9 @@ class Message {
     }
 }
 
+//A BusDevice has acces to the Bus
 class BusDevice {
-    private broker:Broker;
+    protected broker:Broker;
     private id:number;
     static cnt:number = 0;
 
@@ -99,11 +103,9 @@ class Broker {
             console.log('Set created');
         }
 
-        console.log(this.subscribers.get(topic));
 
         this.subscribers.get(topic).add(sub);
 
-        console.log(this.subscribers.get(topic).values());
 
     }
 
@@ -111,16 +113,36 @@ class Broker {
 
         this.subscribers.get(topic).delete(sub);
 
-        console.log(this.subscribers.get(topic).values());
-
     }
 
     private distribute(m:Message) {
 
-        for (var i in this.subscribers.get(m.getTopic()).values()) {
-            i.handleMessage();
+        if (this.subscribers.get(m.getTopic()) == null) {
+            return;
         }
 
+        var iter = this.subscribers.get(m.getTopic()).entries();
+
+        var x;
+        while((x = iter.next().value) != null) {
+            x[0].handleMessage(m);
+        }
+
+
+    }
+}
+
+class ValueMessage extends Message {
+    static TOPIC = new Topic(30, "Value message")
+    private value: Value;
+    constructor(pTopic: Topic, pValue: Value) {
+        super(pTopic);
+        this.value = pValue;
+
+    }
+
+    public getValue(): Value {
+        return this.value;
     }
 }
 
@@ -133,9 +155,10 @@ class DBRequestMessage extends Message {
         this.req = pReq;
     }
 
-    public getRequest(): DBRequest {
-        return this.req;
+    public getRequest():DBRequest {
+        return this.req
     }
+
 }
 
 class SettingsMessage extends Message {
@@ -153,4 +176,4 @@ class SettingsMessage extends Message {
 
 }
 
-export {BusDevice, Topic, Message, DBRequestMessage, SettingsMessage};
+export {BusDevice, Topic, Message, ValueMessage, DBRequestMessage, SettingsMessage};

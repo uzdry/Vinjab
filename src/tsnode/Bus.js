@@ -74,13 +74,15 @@ var Broker = (function () {
             this.subscribers.set(topic, new Set());
             console.log('Set created');
         }
-        console.log(this.subscribers.get(topic));
         this.subscribers.get(topic).add(sub);
-        console.log(this.subscribers.get(topic).values());
+        var iter = this.subscribers.get(topic).entries();
+        var x;
+        while ((x = iter.next().value) != null) {
+            console.log(x[0]);
+        }
     };
     Broker.prototype.unsubscribe = function (topic, sub) {
         this.subscribers.get(topic).delete(sub);
-        console.log(this.subscribers.get(topic).values());
     };
     Broker.prototype.distribute = function (m) {
         for (var i in this.subscribers.get(m.getTopic()).values()) {
@@ -95,9 +97,6 @@ var DBRequestMessage = (function (_super) {
         _super.call(this, DBRequestMessage.TOPIC);
         this.req = pReq;
     }
-    DBRequestMessage.prototype.getRequest = function () {
-        return this.req;
-    };
     DBRequestMessage.TOPIC = new Topic(10, "Database request message");
     return DBRequestMessage;
 })(Message);
@@ -114,4 +113,3 @@ var SettingsMessage = (function (_super) {
     SettingsMessage.TOPIC = new Topic(20, "Settings message");
     return SettingsMessage;
 })(Message);
-exports.SettingsMessage = SettingsMessage;
