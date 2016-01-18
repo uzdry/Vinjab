@@ -458,9 +458,9 @@ var SCommunicator = (function () {
     function SCommunicator() {
     }
     /*public sendData(fullUids : string[], values : number[]) {
-        // Some code ...
-        // Sends data to the server ...
-    }*/
+     // Some code ...
+     // Sends data to the server ...
+     }*/
     /**
      * Searches for an element in the buffer with a specified ruid.
      * @param directoryBuffer The buffer that contains all the elements in which you are looking for a specified one.
@@ -474,6 +474,58 @@ var SCommunicator = (function () {
             }
         }
         return -1;
+    };
+    SCommunicator.startXML = function (xmlURL) {
+        var xhttp = new XMLHttpRequest();
+        xhttp.onreadystatechange = function () {
+            if (xhttp.readyState == 4 && xhttp.status == 200) {
+                myFunction(xhttp);
+            }
+        };
+        xhttp.open("GET", xmlURL, true);
+        xhttp.send();
+        function myFunction(xml) {
+            var xmlDoc = xml.responseXML;
+            var root = SCommunicator.receiveXML(xmlDoc);
+            SCommunicator.testXMLReceiver2(root);
+        }
+    };
+    SCommunicator.receiveXML = function (xml) {
+        var root2 = xml.children;
+        if (root2.length != 1) {
+            // Error
+            return;
+        }
+        return SCommunicator.createRecursively(root2[0]);
+    };
+    SCommunicator.createRecursively = function (directory) {
+        var childNodes = directory.childNodes;
+        var settingsDir;
+        settingsDir = new SettingsDirectory(SCommunicator.getValue("ruid", directory), SCommunicator.getValue("name", directory), SCommunicator.getValue("description", directory), [], SCommunicator.getValue("imageURL", directory));
+        for (var i = 0; i < childNodes.length; i++) {
+            var child;
+            if (childNodes[i].tagName == "dir") {
+                child = SCommunicator.createRecursively(childNodes[i]);
+                settingsDir.appendChild(child);
+            }
+            else if (childNodes[i].tagName == "npar") {
+                child = SCommunicator.parseNumericParameter(childNodes[i]);
+                settingsDir.appendChild(child);
+            }
+        }
+        return settingsDir;
+    };
+    SCommunicator.parseNumericParameter = function (parameter) {
+        var childPar = new SettingsParameter(SCommunicator.getValue("ruid", parameter), SCommunicator.getValue("name", parameter), SCommunicator.getValue("description", parameter), SCommunicator.getValue("imageURL", parameter), 0);
+        return childPar;
+    };
+    SCommunicator.getValue = function (tag, directory) {
+        for (var i = 0; i < directory.childNodes.length; i++) {
+            if (directory.childNodes[i].tagName == tag) {
+                return directory.childNodes[i].innerHTML;
+            }
+        }
+        return "XML error. Tag \"" + tag + "\" is missing.";
     };
     /**
      * Emulates a situation where the whole directory structure is to be reconstructed based on a text file.
@@ -533,6 +585,15 @@ var SCommunicator = (function () {
         var table = new TableFactory(document.body, valueChangeListener);
         table.createTable(root);
     };
+    SCommunicator.testXMLReceiver = function (xmlURL) {
+        SCommunicator.startXML(xmlURL);
+    };
+    SCommunicator.testXMLReceiver2 = function (root) {
+        var textDebugger = new TextDebugger();
+        var valueChangeListener = new ValueChangeListener(textDebugger);
+        var table = new TableFactory(document.body, valueChangeListener);
+        table.createTable(root);
+    };
     return SCommunicator;
 })();
 /**
@@ -584,38 +645,42 @@ var TextDebugger = (function () {
     };
     return TextDebugger;
 })();
-var buttonnode = document.createElement('input');
-buttonnode.setAttribute('type', 'button');
-buttonnode.setAttribute('name', 'bt_communicator_test');
-buttonnode.setAttribute('value', 'Communicator Test');
-document.body.appendChild(buttonnode);
-buttonnode.onclick = function () {
-    var oldtable = document.getElementById('settings_table');
-    if (oldtable != null) {
-        document.body.removeChild(oldtable);
-    }
-    var communicator = new SCommunicator();
-    var rawString = "root|Name:Root|DescRoot|directory.png\\root/dir1|Directory1|Desc1|directory.png\\root/dir2|Directory2|Desc2|directory.png\\root/dir1/dir3|Directory3|Desc3|directory.png";
-    SCommunicator.testDataReceiver(rawString.split('\\')); //, [], []);
-};
-buttonnode = document.createElement('input');
-buttonnode.setAttribute('type', 'button');
-buttonnode.setAttribute('name', 'bt_parameter_editor_test');
-buttonnode.setAttribute('value', 'Parameter Editor Test');
-document.body.appendChild(buttonnode);
-buttonnode.onclick = function () {
-    var oldtable = document.getElementById('settings_table');
-    if (oldtable != null) {
-        document.body.removeChild(oldtable);
-    }
-    var textDebugger = new TextDebugger();
-    var valueChangeListener = new ValueChangeListener(textDebugger);
-    var table = new TableFactory(document.body, valueChangeListener);
-    var par1 = new SettingsParameter('p1', 'My name is Parameter1', 'I am the description of Parameter1', '../../img/settings/p1.png', 15);
-    var par2 = new SettingsParameter('p2', 'My name is Parameter2', 'I am the description of Parameter2', '../../img/settings/p2.png', 12);
-    var parList = [par1, par2];
-    var dir1 = new SettingsDirectory('d1', 'My name is Directory1', 'I am the description of Directory1', parList, '../../img/settings/directory.png');
-    var par3 = new SettingsParameter('p3', 'My name is Parameter3', 'I am the description of Parameter3', '../../img/settings/p3.png', 7);
-    var dir2 = new SettingsDirectory('root', 'My name is ROOT', 'I am the description of ROOT', [dir1, par3], '../../img/settings/directory.png');
-    table.createTable(dir2);
-};
+/*
+ var buttonnode= document.createElement('input');
+ buttonnode.setAttribute('type','button');
+ buttonnode.setAttribute('name','bt_communicator_test');
+ buttonnode.setAttribute('value','Communicator Test');
+ document.body.appendChild(buttonnode);
+ buttonnode.onclick = function () {
+ var oldtable = document.getElementById('settings_table');
+ if (oldtable != null) {
+ document.body.removeChild(oldtable);
+ }
+ var communicator = new SCommunicator();
+ var rawString = "root|Name:Root|DescRoot|directory.png\\root/dir1|Directory1|Desc1|directory.png\\root/dir2|Directory2|Desc2|directory.png\\root/dir1/dir3|Directory3|Desc3|directory.png";
+ SCommunicator.testDataReceiver(rawString.split('\\')); //, [], []);
+ };
+
+ buttonnode = document.createElement('input');
+ buttonnode.setAttribute('type','button');
+ buttonnode.setAttribute('name','bt_parameter_editor_test');
+ buttonnode.setAttribute('value','Parameter Editor Test');
+ document.body.appendChild(buttonnode);
+ buttonnode.onclick = function () {
+ var oldtable = document.getElementById('settings_table');
+ if (oldtable != null) {
+ document.body.removeChild(oldtable);
+ }
+ var textDebugger = new TextDebugger();
+ var valueChangeListener = new ValueChangeListener(textDebugger);
+ var table = new TableFactory(document.body, valueChangeListener);
+ var par1 = new SettingsParameter('p1', 'My name is Parameter1', 'I am the description of Parameter1', '../../img/settings/p1.png', 15);
+ var par2 = new SettingsParameter('p2', 'My name is Parameter2', 'I am the description of Parameter2', '../../img/settings/p2.png', 12);
+ var parList = [par1, par2];
+ var dir1 = new SettingsDirectory('d1', 'My name is Directory1', 'I am the description of Directory1', parList, '../../img/settings/directory.png');
+ var par3 = new SettingsParameter('p3', 'My name is Parameter3', 'I am the description of Parameter3', '../../img/settings/p3.png', 7);
+ var dir2 = new SettingsDirectory('root', 'My name is ROOT', 'I am the description of ROOT', [dir1, par3], '../../img/settings/directory.png');
+ table.createTable(dir2);
+ };
+ */
+SCommunicator.testXMLReceiver("settingsDS.xml");
