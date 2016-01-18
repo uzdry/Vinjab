@@ -91,15 +91,16 @@ class LevelDBAccess {
         this.currentDriver = null;
         this.db = levelup('./vinjabDB');
         this.busDevice = busDevice;
-        var infoEntry = this.db.get("INFO", function (err, value) { //If there is no DBInfoEntry, it will be created.
+        var infoEntry: DBInfoEntry = this.db.get("INFO", function (err, value) { //If there is no DBInfoEntry, it will be created.
             if(err) {
                 if(err.notFound) {
                     infoEntry = new DBInfoEntry(2000);
-                    this.db.put(infoEntry, "INFO");
+                    this.db.put(infoEntry, "INFO", function(err) {});
                 } else {
                 }
-            } return value;
+            } infoEntry = value;
         });
+        infoEntry = new DBInfoEntry(2000); //TODO: make it work, don't rely on this bad implementation
         this.maxCapacity = infoEntry.maxCapacity;
         this.currentSize = infoEntry.size;
     }
@@ -309,7 +310,7 @@ class DBSettingsRequest extends DBRequest {
 export {DBRequest, DBValueRequest, DBDriverInfoRequest, DBSettingsRequest, DemoMessage, DBBusDevice};
 
 
-function test() {
+export function test() {
     var x: number = 0;
     var dbbd: DBBusDevice = new DBBusDevice();
     while (x < 500) {
