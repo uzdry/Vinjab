@@ -1,4 +1,3 @@
-///<reference path="/Applications/WebStorm.app/Contents/plugins/JavaScriptLanguage/typescriptCompiler/external/lib.es6.d.ts"/>
 
 import {Value} from "./Utils";
 import {DBRequest} from "./DBAccess";
