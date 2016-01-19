@@ -1,6 +1,7 @@
 ///<reference path="../../../typings/backbone/backbone.d.ts" />
 
-abstract class Widget extends Backbone.View {
+import Model = Backbone.Model;
+abstract class Widget extends Backbone.View<Model> {
 
 
 }
