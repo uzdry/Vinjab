@@ -1,8 +1,7 @@
 /// <reference path="../../levelup.d.ts" />
 
 import levelup = require("levelup");
-import * as Bus from "./Bus"
-import {DBRequestMessage, Message, SettingsMessage} from "./Bus";
+import {DBRequestMessage, Message, SettingsMessage, ValueMessage, Topic, BusDevice} from "./Bus";
 
 // The entry types that are to be written to the database:
 
@@ -70,6 +69,7 @@ class DBInfoEntry {
     }
 }
 
+//The access class for the levelup instance
 class LevelDBAccess {
     private DBInfo: DBInfoEntry;
     private currentDriver: String;
@@ -181,7 +181,7 @@ class LevelDBAccess {
 }
 
 //the BusDevice for the Database. makes the db accessible and decodes messages to db requests
-class DBBusDevice extends Bus.BusDevice {
+class DBBusDevice extends BusDevice {
 
     private dbAccess: LevelDBAccess;
 
@@ -189,70 +189,55 @@ class DBBusDevice extends Bus.BusDevice {
     constructor() {
         super();
         this.dbAccess = new LevelDBAccess(this);
-        this.subscribe(Bus.SettingsMessage.TOPIC);
-        this.subscribe(Bus.DBRequestMessage.TOPIC);
+        this.subscribe(SettingsMessage.TOPIC);
+        this.subscribe(DBRequestMessage.TOPIC);
+        this.subscribe(ValueMessage.TOPIC);
         //TODO: subscribe to all relevant Topics available
     }
 
-    public static sendValueMessage(content: SensorValueEntry[]) {
-        DemoMessage.demooutput(content); //TODO: delete this line
-        //TODO: Send Message with topic to Bus
+    public sendValueMessage(content: SensorValueEntry[]) {
+        this.broker.handleMessage(new ValueMessage(new Topic(31, "Values from DB"), content));
+        //TODO: Send Message with appropriate topic to Bus
 }
 
     //the overriden handleMessage-function. depending on the type of the message, a different action is performed.
-    public handleMessage(m: Bus.Message): void {
+    public handleMessage(m: Message): void {
         //If the given message
         if(m instanceof DBRequestMessage) {
             if(m.getRequest() instanceof  DBValueRequest) {
                 var dbValueReq = <DBValueRequest> m.getRequest();
-                    this.dbAccess.getEntries(dbValueReq.getTopic().getID(), 0, LevelDBAccess.dateToKey(dbValueReq.getEndDate()), function(res){
-                        DBBusDevice.sendValueMessage(res);
-                    }); //TODO: parse date to correct begin date
+                    this.dbAccess.getEntries(dbValueReq.getTopic().getID(), LevelDBAccess.dateToKey(dbValueReq.getBeginDate()), LevelDBAccess.dateToKey(dbValueReq.getEndDate()), function(res){
+                        this.sendValueMessage(res);
+                    });
             } else if (m.getRequest() instanceof DBDriverInfoRequest) {
                 var n = <DBDriverInfoRequest>m.getRequest();
                 this.dbAccess.getDriverEntry(n.getDriver());
             }
-            //TODO: Send Message containing the information required
-        } //TODO: ELSE get sensor value from message and write to db / get config from message, ...
-        //begin: demo stuff
-        else if(m instanceof DemoMessage) {
-            this.dbAccess.putSensorValue(9377, m.value);
+        } else if (m instanceof ValueMessage) {
+            this.dbAccess.putSensorValue(m.getTopic().getID(), m.getValue);
+        } else if (m instanceof SettingsMessage) {
+            //TODO: understand the organisation of settingsMessages and put them to the db accordingly
         }
-        //end: demo stuff
+        //TODO: ELSE get sensor value from message and write to db / get config from message, ...
     }
 }
-
-class DemoMessage extends Bus.Message {
-    public value: any;
-    constructor(value: any) {
-        super(new Bus.Topic(9377, "9377"));
-        this.value = value;
-    }
-    public static demooutput(out: SensorValueEntry[]) {
-        console.log("The values put to the Database in this demonstration were: ");
-        for(var entry of out) {
-            console.log(""+ entry.value);
-        }
-    }
-}
-
 
 class DBRequest {
 }
 
 class DBValueRequest extends DBRequest {
-    private topic: Bus.Topic;
+    private topic: Topic;
     private beginDate: Date;
     private endDate: Date;
 
-    constructor (topic: Bus.Topic, beginDate: Date, endDate: Date) {
+    constructor (topic: Topic, beginDate: Date, endDate: Date) {
         super();
         this.topic = topic;
         this.beginDate = beginDate;
         this.endDate = endDate;
     }
 
-    public getTopic(): Bus.Topic {
+    public getTopic(): Topic {
         return this.topic;
     }
 
@@ -294,4 +279,4 @@ class DBSettingsRequest extends DBRequest {
 
 }
 
-export {DBRequest, DBValueRequest, DBDriverInfoRequest, DBSettingsRequest, DemoMessage, DBBusDevice};
+export {DBRequest, DBValueRequest, DBDriverInfoRequest, DBSettingsRequest, DBBusDevice};
