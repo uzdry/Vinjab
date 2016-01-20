@@ -5,8 +5,8 @@ var __extends = (this && this.__extends) || function (d, b) {
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
 var levelup = require("levelup");
-var Bus = require("./Bus.ts");
-var Bus_ts_1 = require("./Bus.ts");
+var Bus = require("./Bus");
+var Bus_1 = require("./Bus");
 // The entry types that are to be written to the database:
 // Abstract class for all Entry types
 var DBEntry = (function () {
@@ -84,24 +84,27 @@ var LevelDBAccess = (function () {
         var infoEntry = this.db.get("INFO", function (err, value) {
             if (err) {
                 if (err.notFound) {
-                    this.db.put(new DBInfoEntry(2000), "INFO");
+                    infoEntry = new DBInfoEntry(2000);
+                    this.db.put(infoEntry, "INFO", function (err) { });
                 }
                 else {
                 }
             }
-            return value;
+            infoEntry = value;
         });
+        infoEntry = new DBInfoEntry(2000); //TODO: make it work, don't rely on this bad implementation
         this.maxCapacity = infoEntry.maxCapacity;
         this.currentSize = infoEntry.size;
     }
     //puts a new sensor value to the database
-    LevelDBAccess.prototype.putSensorValue = function (topic, value) {
-        this.db.put(new SensorValueEntry(value), this.dateToKey());
+    LevelDBAccess.prototype.putSensorValue = function (topicID, value) {
+        this.db.put(LevelDBAccess.dateToKey(new Date()), new SensorValueEntry(value));
         this.incrementSize();
+        this.deleteOnMaxCapacity();
     };
     //helping method converting the current date to a number, to serve as a key for the database
-    LevelDBAccess.prototype.dateToKey = function () {
-        return Date.now();
+    LevelDBAccess.dateToKey = function (date) {
+        return date.getTime();
     };
     //puts a new driver's information to the database
     LevelDBAccess.prototype.putDriverInfo = function (driver) {
@@ -144,12 +147,6 @@ var LevelDBAccess = (function () {
     //returns all entries of a specific topic, optionally sorted by a specific timeframe
     LevelDBAccess.prototype.getEntries = function (topic, beginDate, endDate) {
         // if there is no begin date or end date, the values are set to 0 and accordingly "now".
-        if (beginDate === undefined) {
-            beginDate = 0;
-        }
-        if (endDate === undefined) {
-            endDate = Date.now();
-        }
         var listOfKeys;
         var listOfEntries;
         //all keys are extracted from the database
@@ -169,6 +166,7 @@ var LevelDBAccess = (function () {
         }
         return listOfEntries;
     };
+    //calls levelup to find the config entry for a certain driver
     LevelDBAccess.prototype.getDriverEntry = function (driver) {
         return this.db.get(driver, function (err, value) {
             if (err.notFound) {
@@ -182,8 +180,10 @@ var LevelDBAccess = (function () {
     };
     return LevelDBAccess;
 })();
+//the BusDevice for the Database. makes the db accessible and decodes messages to db requests
 var DBBusDevice = (function (_super) {
     __extends(DBBusDevice, _super);
+    //initialises the BusDevice with a new instance of the LevelDBAccess and subscribes to all relevant topics.
     function DBBusDevice() {
         _super.call(this);
         this.dbAccess = new LevelDBAccess(this);
@@ -191,14 +191,18 @@ var DBBusDevice = (function (_super) {
         this.subscribe(Bus.DBRequestMessage.TOPIC);
         //TODO: subscribe to all relevant Topics available
     }
+    //the overriden handleMessage-function. depending on the type of the message, a different action is performed.
     DBBusDevice.prototype.handleMessage = function (m) {
-        if (m instanceof Bus_ts_1.DBRequestMessage) {
+        //If the given message
+        if (m instanceof Bus_1.DBRequestMessage) {
             if (m.getRequest() instanceof DBValueRequest) {
+                var dbValueReq = m.getRequest();
                 DemoMessage.demooutput(//demo; delete the "demooutput"-part later
-                this.dbAccess.getEntries(m.getRequest().getTopic(), m.getRequest().getBeginDate(), m.getRequest().getEndDate()));
+                this.dbAccess.getEntries(dbValueReq.getTopic().getID(), LevelDBAccess.dateToKey(dbValueReq.getBeginDate()), LevelDBAccess.dateToKey(dbValueReq.getEndDate())));
             }
             else if (m.getRequest() instanceof DBDriverInfoRequest) {
-                this.dbAccess.getDriverEntry(m.getRequest().getDriver());
+                var n = m.getRequest();
+                this.dbAccess.getDriverEntry(n.getDriver());
             }
         } //TODO: ELSE get sensor value from message and write to db / get config from message, ...
         else if (m instanceof DemoMessage) {
@@ -211,11 +215,18 @@ var DBBusDevice = (function (_super) {
 exports.DBBusDevice = DBBusDevice;
 var DemoMessage = (function (_super) {
     __extends(DemoMessage, _super);
-    function DemoMessage() {
-        _super.apply(this, arguments);
+    function DemoMessage(value) {
+        _super.call(this, new Bus.Topic(5037, "5037"));
+        this.value = value;
     }
     DemoMessage.demooutput = function (out) {
-        return out;
+        var output = "The values put to the Database in this demonstration were: ";
+        for (var _i = 0; _i < out.length; _i++) {
+            var entry = out[_i];
+            if (entry instanceof SensorValueEntry) {
+                output = output + "" + entry.getValue();
+            }
+        }
     };
     return DemoMessage;
 })(Bus.Message);
@@ -274,3 +285,12 @@ var DBSettingsRequest = (function (_super) {
     return DBSettingsRequest;
 })(DBRequest);
 exports.DBSettingsRequest = DBSettingsRequest;
+function test() {
+    var x = 0;
+    var dbbd = new DBBusDevice();
+    while (x < 500) {
+        dbbd.handleMessage(new DemoMessage(x));
+    }
+    dbbd.handleMessage(new Bus_1.DBRequestMessage(new DBValueRequest(new Bus.Topic(5037, "5037"), new Date(2013, 12, 1), new Date())));
+}
+exports.test = test;

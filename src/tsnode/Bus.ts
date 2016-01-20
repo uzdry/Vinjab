@@ -1,4 +1,3 @@
-///<reference path="C:\Program Files (x86)\JetBrains\WebStorm 11.0.3\plugins\JavaScriptLanguage\typescriptCompiler\external\lib.es6.d.ts"/>
 
 import {Value} from "./Utils";
 import {DBRequest} from "./DBAccess";

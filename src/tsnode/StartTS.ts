@@ -2,7 +2,6 @@ import {Source} from "./Source";
 import {Topic, BusDevice, DBRequestMessage} from "./Bus";
 import {TerminalProxy} from "./Receivers";
 import {DBBusDevice} from "./DBAccess";
-//import {Iterator} from "../../../../../../../Applications/WebStorm.app/Contents/plugins/JavaScriptLanguage/typescriptCompiler/external/lib.es6";
 
 var speed: Topic = new Topic(99, "Speed");
 

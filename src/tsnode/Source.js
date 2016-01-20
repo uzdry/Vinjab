@@ -4,6 +4,7 @@ var __extends = (this && this.__extends) || function (d, b) {
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 };
 var Bus_1 = require("./Bus");
+var Utils_1 = require("./Utils");
 /**
  * Created by valentin on 12/01/16.
  */
@@ -13,6 +14,11 @@ var Source = (function (_super) {
         _super.call(this);
     }
     Source.prototype.handleMessage = function (m) {
+    };
+    Source.prototype.publish = function (t) {
+        var m;
+        m = new Bus_1.ValueMessage(t, new Utils_1["default"](1, "a"));
+        this.broker.handleMessage(m);
     };
     return Source;
 })(Bus_1.BusDevice);
