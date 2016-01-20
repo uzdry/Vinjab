@@ -1,11 +1,15 @@
+///<reference path="/Applications/WebStorm.app/Contents/plugins/JavaScriptLanguage/typescriptCompiler/external/lib.es6.d.ts"/>
+///<reference path="../../typings/node/node.d.ts"/>
 
 import {Value} from "./Utils";
 import {DBRequest} from "./DBAccess";
+import * as Event from 'events'
 
 //Topic defines the Topic of a message. BusDevices subscribe to Topics
 class Topic {
     private id:number;
     private name:string;
+    static SPEED: Topic = new Topic(99, "Speed");
 
     //instantiates a new Topic with ID and name
     constructor(pID:number, pName:string) {
@@ -17,10 +21,10 @@ class Topic {
     }
 
     public getID():number {
-        return this.id;
+        return this.id
     }
 
-    public equals(topic: Topic) {
+    public equals(topic: Topic): boolean {
         return this.getID() === topic.getID();
     }
 
@@ -34,14 +38,14 @@ class Message {
         this.topic = pTopic;
     }
 
-    getTopic():Topic {
+    public getTopic():Topic {
         return this.topic;
     }
 }
 
 //A BusDevice has acces to the Bus
 class BusDevice {
-    protected broker:Broker;
+    public broker:Broker;
     private id:number;
     static cnt:number = 0;
 
@@ -63,7 +67,7 @@ class BusDevice {
     }
 
     public unsubscribe(t:Topic) {
-        this.broker.unsubscribe(t, this);
+        Broker.get().unsubscribe(t, this);
     }
 
     public getID():number {
@@ -75,7 +79,6 @@ class BusDevice {
 
 class Broker {
 
-    private subs:{[tid: number]:Array<BusDevice>} = <any>[];
     private static instance:Broker;
 
     bds: Set<BusDevice>;
@@ -86,24 +89,24 @@ class Broker {
     }
 
     public static get():Broker {
-        if (this.instance == null) {
-            this.instance = new Broker();
+        if (Broker.instance == null || typeof Broker.instance == undefined) {
+            Broker.instance = new Broker();
         }
         return Broker.instance;
     }
 
-    public handleMessage(m:Message):void {
-        this.distribute(m);
-    }
 
     public subscribe(topic:Topic, sub:BusDevice):void {
         if (this.subscribers.get(topic) == null) {
             this.subscribers.set(topic, new Set<BusDevice>());
             console.log('Set created');
         }
-
-
+        console.log(sub);
         this.subscribers.get(topic).add(sub);
+
+
+        console.log(this.subscribers.get(topic));
+
 
 
     }
@@ -114,12 +117,13 @@ class Broker {
 
     }
 
-    private distribute(m:Message) {
-
+    public distribute(m:Message) {
         if (this.subscribers.get(m.getTopic()) == null) {
+            console.log("serious");
             return;
         }
 
+        console.log("handeling");
         var iter = this.subscribers.get(m.getTopic()).entries();
 
         var x;
@@ -127,17 +131,33 @@ class Broker {
             x[0].handleMessage(m);
         }
 
+    }
+}
 
+class ValueAnswerMessage extends Message {
+    static TOPIC = new Topic(31, "Value answer message");
+    private times: number[];
+    private values: any[];
+    constructor(pTopic: Topic, times: number[], values: any[]) {
+        super(pTopic);
+        this.times = times;
+        this.values = values;
+    }
+
+    public getTimes(): number[] {
+        return this.times;
+    }
+    public getValues(): any[] {
+        return this.values;
     }
 }
 
 class ValueMessage extends Message {
-    static TOPIC = new Topic(30, "Value message")
+    static TOPIC = new Topic(30, "Value message");
     private value: Value;
     constructor(pTopic: Topic, pValue: Value) {
         super(pTopic);
         this.value = pValue;
-
     }
 
     public getValue(): Value {
@@ -157,7 +177,6 @@ class DBRequestMessage extends Message {
     public getRequest():DBRequest {
         return this.req
     }
-
 }
 
 class SettingsMessage extends Message {
@@ -175,4 +194,4 @@ class SettingsMessage extends Message {
 
 }
 
-export {BusDevice, Topic, Message, ValueMessage, DBRequestMessage, SettingsMessage};
+export {BusDevice, Broker, Topic, Message, ValueMessage, DBRequestMessage, SettingsMessage};
