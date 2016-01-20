@@ -14,22 +14,13 @@ abstract class DBEntry {
 
 // Entry class for Sensor values
 class SensorValueEntry extends DBEntry {
-    private topic: number;
-    private value: any;
+    topic: number;
+    value: any;
 
     //initialises the SensorValueEntry with its value
     constructor(value:any) {
         super();
         this.value = value;
-    }
-
-    //getter for the topic. there is no setter, as a topic should never be edited.
-    getTopic(): number {
-        return this.topic;
-    }
-    //getter for the value. there is no setter, as values should never be edited
-    getValue():any {
-        return this.value;
     }
 }
 
@@ -74,66 +65,74 @@ class DriverInfoEntry extends DBEntry {
 class DBInfoEntry {
     size: number;
     maxCapacity: number;
-    constructor(size: number) {
-        this.size = size;
+    constructor(maxCapacity: number) {
+        this.maxCapacity = maxCapacity;
+        this.size = 0;
     }
 }
 
 class LevelDBAccess {
+    private DBInfo: DBInfoEntry;
     private currentDriver: String;
-    private maxCapacity: number;
     private db;
     private busDevice: DBBusDevice;
-    private currentSize: number;
 
     //constructor, initialises the LevelDBAccess with a given busdevice;
     constructor(busDevice : DBBusDevice) {
         this.currentDriver = null;
-        this.db = levelup('./vinjabDB');
+        this.db = levelup('./vinjabDB', function(err, db){
+        if(err) console.log("Error in opening the Database:" + err);
+        this.db = db;
+    });
         this.busDevice = busDevice;
-        var infoEntry: DBInfoEntry = this.db.get("INFO", function (err, value) { //If there is no DBInfoEntry, it will be created.
+        this.DBInfo = new DBInfoEntry(2000);
+        this.db.get("INFO", function (err, value) { //If there is no DBInfoEntry, it will be created.
             if(err) {
                 if(err.notFound) {
-                    infoEntry = new DBInfoEntry(2000);
-                    this.db.put(infoEntry, "INFO", function(err) {});
+                    this.db.put("INFO", JSON.stringify(new DBInfoEntry(2000)), function(err) {
+                        if(err) console.log("Error in putting Entry:" + err);
+                    });
                 } else {
+                    console.log("Error: Something went wrong fetching an Entry: " + err);
                 }
-            } infoEntry = value;
+            } else {
+                this.DBInfo = JSON.parse(value);
+            }
         });
-        infoEntry = new DBInfoEntry(2000); //TODO: make it work, don't rely on this bad implementation
-        this.maxCapacity = infoEntry.maxCapacity;
-        this.currentSize = infoEntry.size;
     }
 
     //puts a new sensor value to the database
     putSensorValue(topicID: number, value: any) {
-        this.db.put(LevelDBAccess.dateToKey(new Date()), new SensorValueEntry(value));
+        this.db.put(LevelDBAccess.dateToKey(new Date()), JSON.stringify (new SensorValueEntry(value)), function(err) {
+            if (err) console.log("Error in putting Entry:" + err);
+        });
         this.incrementSize();
         this.deleteOnMaxCapacity();
     }
 
-    //helping method converting the current date to a number, to serve as a key for the database
+    //assisting method converting the current date to a number, to serve as a key for the database
     public static dateToKey(date: Date): number {
         return date.getTime();
     }
 
     //puts a new driver's information to the database
     putDriverInfo(driver: String) {
-        this.db.put(new DriverInfoEntry(), driver);
+        this.db.put(driver, JSON.stringify(new DriverInfoEntry()));
     }
 
     //deletes the oldest data entries until the current size is 10% smaller than the maximum size
     private deleteOnMaxCapacity() {
-        if(this.currentSize > this.maxCapacity) {
-            var listOfEntries: number[];
-            this.db.createKeyStream().on('data', function(data) {
+        if(this.DBInfo.size > this.DBInfo.maxCapacity) {
+            var listOfEntries: number[] = [];
+            this.db.createKeyStream().on('data', function(data){
                 listOfEntries.push(data);
             });
             listOfEntries.sort();
-            var newSize: number = this.maxCapacity * 0.9;
+            var newSize: number = this.DBInfo.maxCapacity * 0.9;
             var i: number = 0;
-            while(this.currentSize > newSize){
-                this.db.del(listOfEntries[i], function(err) { //TODO: write errors to log file
+            while(this.DBInfo.size > newSize){
+                this.db.del(listOfEntries[i], function(err) {
+                    if(err) console.log("Error while deleting entries: " + err);
                 });
                 this.decrementSize();
                 i++;
@@ -143,55 +142,41 @@ class LevelDBAccess {
 
     //increments the variables for the size of the database both locally and in the db entry
     private incrementSize() {
-        this.currentSize++;
-        var newEntry = this.db.get("INFO");
-        newEntry.size++;
-        this.db.del("INFO");
-        this.db.put(newEntry, "INFO");
+        this.DBInfo.size++;
+        this.db.put("INFO", JSON.stringify(this.DBInfo), function(err){if(err){ console.log("Error in putting updated size to the Database:" + err)}});
     }
 
     //decrements the variables for the size of the database both locally and in the db entry
     private decrementSize() {
-        this.currentSize--;
-        var newEntry = this.db.get("INFO");
-        newEntry.size--;
-        this.db.del("INFO");
-        this.db.put(newEntry, "INFO");
+        this.DBInfo.size--;
+        this.db.put("INFO", JSON.stringify(this.DBInfo), function(err){if(err){console.log("Error in putting updated size to the Database:" + err)}});
     }
 
     //returns all entries of a specific topic, optionally sorted by a specific timeframe
-    public getEntries(topic: number, beginDate: number, endDate: number): SensorValueEntry[] {
-        // if there is no begin date or end date, the values are set to 0 and accordingly "now".
-        var listOfKeys: number[];
-        var listOfEntries: SensorValueEntry[];
-
-        //all keys are extracted from the database
-        this.db.createKeyStream().on('data', function(err, data) {
-            if (data instanceof Number) {
-                listOfKeys.push(data);
+    public getEntries(topic: number, beginDate: number, endDate: number, callback) {
+        var listOfKeys: number[] = [];
+        var listOfEntries: SensorValueEntry[] = [];
+        this.db.createReadStream().on('data', function(data){
+            if(!isNaN(data.key - 0)) {
+                    if(data.key > beginDate && data.key < endDate) {
+                        listOfKeys[listOfKeys.length] = data.key;
+                        listOfEntries[listOfEntries.length] = new SensorValueEntry(JSON.parse(data.value).value);
+                    }
             }
+        }).on('end', function(end) {
+            callback(listOfEntries);
         });
-
-        //and for each key, the entry is checked for requested data. fitting entries are pushed to the returned list
-        for(var entry of listOfKeys){
-            this.db.get("dbentry", function(err, dbentry) {
-                if(dbentry.getTopic() == topic && entry > beginDate && entry < endDate) {
-                    listOfEntries.push(dbentry);
-                }
-            });
-        }
-        return listOfEntries;
     }
 
     //calls levelup to find the config entry for a certain driver
     public getDriverEntry(driver: String) {
         return this.db.get(driver, function(err, value) {
             if(err.notFound) {
-                err.log("DBError: no such driver has been put to the database yet")
+                console.log(err + "The Driver was not yet put into the Database");
             } else if(err) {
-                err.log("DBError: something went wrong:");
+                console.log("Error:" + err);
             }
-            return value;
+            return JSON.parse(value);
         })
     }
 }
@@ -210,15 +195,20 @@ class DBBusDevice extends Bus.BusDevice {
         //TODO: subscribe to all relevant Topics available
     }
 
+    public static sendValueMessage(content: SensorValueEntry[]) {
+        DemoMessage.demooutput(content); //TODO: delete this line
+        //TODO: Send Message with topic to Bus
+}
+
     //the overriden handleMessage-function. depending on the type of the message, a different action is performed.
     public handleMessage(m: Bus.Message): void {
         //If the given message
         if(m instanceof DBRequestMessage) {
             if(m.getRequest() instanceof  DBValueRequest) {
                 var dbValueReq = <DBValueRequest> m.getRequest();
-                DemoMessage.demooutput( //demo; delete the "demooutput"-part later
-                    this.dbAccess.getEntries(dbValueReq.getTopic().getID(), LevelDBAccess.dateToKey(dbValueReq.getBeginDate()), LevelDBAccess.dateToKey(dbValueReq.getEndDate()))
-                )
+                    this.dbAccess.getEntries(dbValueReq.getTopic().getID(), 0, LevelDBAccess.dateToKey(dbValueReq.getEndDate()), function(res){
+                        DBBusDevice.sendValueMessage(res);
+                    }); //TODO: parse date to correct begin date
             } else if (m.getRequest() instanceof DBDriverInfoRequest) {
                 var n = <DBDriverInfoRequest>m.getRequest();
                 this.dbAccess.getDriverEntry(n.getDriver());
@@ -236,15 +226,13 @@ class DBBusDevice extends Bus.BusDevice {
 class DemoMessage extends Bus.Message {
     public value: any;
     constructor(value: any) {
-        super(new Bus.Topic(5037, "5037"));
+        super(new Bus.Topic(9377, "9377"));
         this.value = value;
     }
     public static demooutput(out: SensorValueEntry[]) {
-        var output: String = "The values put to the Database in this demonstration were: ";
+        console.log("The values put to the Database in this demonstration were: ");
         for(var entry of out) {
-            if (entry instanceof SensorValueEntry) {
-                output = output + "" + entry.getValue();
-            }
+            console.log(""+ entry.value);
         }
     }
 }
@@ -308,13 +296,3 @@ class DBSettingsRequest extends DBRequest {
 }
 
 export {DBRequest, DBValueRequest, DBDriverInfoRequest, DBSettingsRequest, DemoMessage, DBBusDevice};
-
-
-export function test() {
-    var x: number = 0;
-    var dbbd: DBBusDevice = new DBBusDevice();
-    while (x < 500) {
-        dbbd.handleMessage(new DemoMessage(x));
-    }
-    dbbd.handleMessage(new DBRequestMessage(new DBValueRequest(new Bus.Topic(5037, "5037"), new Date(2013,12,1), new Date())));
-}
