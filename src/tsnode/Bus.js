@@ -1,3 +1,5 @@
+///<reference path="/Applications/WebStorm.app/Contents/plugins/JavaScriptLanguage/typescriptCompiler/external/lib.es6.d.ts"/>
+///<reference path="../../typings/node/node.d.ts"/>
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
@@ -19,6 +21,7 @@ var Topic = (function () {
     Topic.prototype.equals = function (topic) {
         return this.getID() === topic.getID();
     };
+    Topic.SPEED = new Topic(99, "Speed");
     return Topic;
 })();
 exports.Topic = Topic;
@@ -49,7 +52,7 @@ var BusDevice = (function () {
         this.broker.subscribe(t, this);
     };
     BusDevice.prototype.unsubscribe = function (t) {
-        this.broker.unsubscribe(t, this);
+        Broker.get().unsubscribe(t, this);
     };
     BusDevice.prototype.getID = function () {
         return this.id;
@@ -60,32 +63,32 @@ var BusDevice = (function () {
 exports.BusDevice = BusDevice;
 var Broker = (function () {
     function Broker() {
-        this.subs = [];
         this.subscribers = new Map();
     }
     Broker.get = function () {
-        if (this.instance == null) {
-            this.instance = new Broker();
+        if (Broker.instance == null || typeof Broker.instance == undefined) {
+            Broker.instance = new Broker();
         }
         return Broker.instance;
-    };
-    Broker.prototype.handleMessage = function (m) {
-        this.distribute(m);
     };
     Broker.prototype.subscribe = function (topic, sub) {
         if (this.subscribers.get(topic) == null) {
             this.subscribers.set(topic, new Set());
             console.log('Set created');
         }
+        console.log(sub);
         this.subscribers.get(topic).add(sub);
+        console.log(this.subscribers.get(topic));
     };
     Broker.prototype.unsubscribe = function (topic, sub) {
         this.subscribers.get(topic).delete(sub);
     };
     Broker.prototype.distribute = function (m) {
         if (this.subscribers.get(m.getTopic()) == null) {
+            console.log("serious");
             return;
         }
+        console.log("handeling");
         var iter = this.subscribers.get(m.getTopic()).entries();
         var x;
         while ((x = iter.next().value) != null) {
@@ -94,6 +97,23 @@ var Broker = (function () {
     };
     return Broker;
 })();
+exports.Broker = Broker;
+var ValueAnswerMessage = (function (_super) {
+    __extends(ValueAnswerMessage, _super);
+    function ValueAnswerMessage(pTopic, times, values) {
+        _super.call(this, pTopic);
+        this.times = times;
+        this.values = values;
+    }
+    ValueAnswerMessage.prototype.getTimes = function () {
+        return this.times;
+    };
+    ValueAnswerMessage.prototype.getValues = function () {
+        return this.values;
+    };
+    ValueAnswerMessage.TOPIC = new Topic(31, "Value answer message");
+    return ValueAnswerMessage;
+})(Message);
 var ValueMessage = (function (_super) {
     __extends(ValueMessage, _super);
     function ValueMessage(pTopic, pValue) {
