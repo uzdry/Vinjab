@@ -1,25 +1,28 @@
-///<reference path="/typings/backbone/backbone.d.ts" />
-///<reference path="Widget.ts" />
-///<reference path="Dashboard.ts" />
-///<reference path="DataModel.ts" />
+///<reference path="../../../typings/backbone/backbone.d.ts" />
+///<reference path="widget.ts" />
+///<reference path="dashboard.ts" />
+///<reference path="dataModel.ts" />
 
-var widgetPrototypes: { [id: string] : Widget; } = {};
 
 
 class WidgetFactory{
 
-    createWidget(WidgetID: string, SignalID: string){
-        var prototype: Widget = widgetPrototypes[WidgetID];
-        var model: DataModel = dataCollection.get(SignalID);
+    private widgetConfigurations: { [id: string] : WidgetConfig; } = {};
 
-        if(model != null && prototype != null){
-            var widget: Widget = new prototype(SignalID);
+    createWidget(widgetTagName: string, model :DataModel, options?):Widget{
+        var widgetConfig = this.widgetConfigurations[widgetTagName];
+
+        if( widgetConfig != null){
+            var widget: Widget = widgetConfig.newInstance({model: model});
+            return widget;
         }
     }
 
-    addWidget(widget: Widget){
-        widgetPrototypes[widget.tagName] = widget;
+    addWidget(widgetConfig: WidgetConfig){
+        this.widgetConfigurations[widgetConfig.type_name] = widgetConfig;
     }
+
+
 
 }
 
