@@ -134,6 +134,24 @@ class Broker {
     }
 }
 
+class ValueAnswerMessage extends Message {
+    static TOPIC = new Topic(31, "Value answer message");
+    private times: number[];
+    private values: any[];
+    constructor(pTopic: Topic, times: number[], values: any[]) {
+        super(pTopic);
+        this.times = times;
+        this.values = values;
+    }
+
+    public getTimes(): number[] {
+        return this.times;
+    }
+    public getValues(): any[] {
+        return this.values;
+    }
+}
+
 class ValueMessage extends Message {
     static TOPIC = new Topic(30, "Value message");
     private value: Value;
@@ -159,7 +177,6 @@ class DBRequestMessage extends Message {
     public getRequest():DBRequest {
         return this.req
     }
-
 }
 
 class SettingsMessage extends Message {
