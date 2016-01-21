@@ -4,6 +4,7 @@
 import {Value} from "./Utils";
 import {DBRequest} from "./DBAccess";
 import * as Event from 'events'
+import {EventEmitter} from "events";
 
 //Topic defines the Topic of a message. BusDevices subscribe to Topics
 class Topic {
@@ -67,7 +68,7 @@ class BusDevice {
     }
 
     public unsubscribe(t:Topic) {
-        Broker.get().unsubscribe(t, this);
+        this.broker.unsubscribe(t, this);
     }
 
     public getID():number {
@@ -79,7 +80,10 @@ class BusDevice {
 
 class Broker {
 
+
     private static instance:Broker;
+
+    private emit = new EventEmitter();
 
     bds: Set<BusDevice>;
     private subscribers: Map<Topic, Set<BusDevice>>;
@@ -95,6 +99,10 @@ class Broker {
         return Broker.instance;
     }
 
+    public handleMessage(m: Message) {
+        this.distribute(m);
+    }
+
 
     public subscribe(topic:Topic, sub:BusDevice):void {
         if (this.subscribers.get(topic) == null) {
@@ -107,6 +115,10 @@ class Broker {
 
         console.log(this.subscribers.get(topic));
 
+        this.emit.on('event', function() {
+            console.log('ja');
+        });
+
 
 
     }
@@ -117,13 +129,12 @@ class Broker {
 
     }
 
-    public distribute(m:Message) {
+    private distribute(m:Message) {
         if (this.subscribers.get(m.getTopic()) == null) {
             console.log("serious");
             return;
         }
 
-        console.log("handeling");
         var iter = this.subscribers.get(m.getTopic()).entries();
 
         var x;
