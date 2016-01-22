@@ -1,5 +1,5 @@
 
-export default class Value {
+class Value {
     private value: number;
     private identifier: string;
 
@@ -10,6 +10,4 @@ export default class Value {
 
 }
 
-class DBReqest {
-
-}
+export {Value}
