@@ -1,11 +1,8 @@
 ///<reference path="/Applications/WebStorm.app/Contents/plugins/JavaScriptLanguage/typescriptCompiler/external/lib.es6.d.ts"/>
 ///<reference path="../../typings/node/node.d.ts"/>
-///<reference path="../../typings/node/node.d.ts"/>
 
 import {Value} from "./Utils";
 import {DBRequest} from "./DBAccess";
-import * as Event from 'events'
-import {EventEmitter} from "events";
 
 //Topic defines the Topic of a message. BusDevices subscribe to Topics
 class Topic {
