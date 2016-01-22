@@ -1,5 +1,6 @@
 ///<reference path="/Applications/WebStorm.app/Contents/plugins/JavaScriptLanguage/typescriptCompiler/external/lib.es6.d.ts"/>
 ///<reference path="../../typings/node/node.d.ts"/>
+///<reference path="../../typings/node/node.d.ts"/>
 
 import {Value} from "./Utils";
 import {DBRequest} from "./DBAccess";
@@ -46,7 +47,7 @@ class Message {
 
 //A BusDevice has acces to the Bus
 class BusDevice {
-    public broker:Broker;
+    broker:Broker;
     private id:number;
     static cnt:number = 0;
 
