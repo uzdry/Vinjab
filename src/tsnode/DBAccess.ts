@@ -1,7 +1,7 @@
 /// <reference path="../../levelup.d.ts" />
 
 import levelup = require("levelup");
-import {DBRequestMessage, Message, SettingsMessage, ValueMessage, Topic, BusDevice} from "./Bus";
+import {ValueAnswerMessage, DBRequestMessage, Message, SettingsMessage, ValueMessage, Topic, BusDevice} from "./Bus";
 
 // The entry types that are to be written to the database:
 
@@ -12,13 +12,15 @@ abstract class DBEntry {
 
 // Entry class for Sensor values
 class SensorValueEntry extends DBEntry {
+    driveNumber: number;
     topic: number;
     value: any;
 
     //initialises the SensorValueEntry with its value
-    constructor(value:any) {
+    constructor(value:any, drivenr: number) {
         super();
         this.value = value;
+        this.driveNumber = drivenr;
     }
 }
 
@@ -62,10 +64,12 @@ class DriverInfoEntry extends DBEntry {
 // class for a database entry containing necessary information for the boot of the database module
 class DBInfoEntry {
     size: number;
+    currentDrive: number;
     maxCapacity: number;
-    constructor(maxCapacity: number) {
+    constructor(maxCapacity: number, currentDrive: number) {
         this.maxCapacity = maxCapacity;
         this.size = 0;
+        this.currentDrive = currentDrive;
     }
 }
 
@@ -84,25 +88,25 @@ class LevelDBAccess {
         this.db = db;
     });
         this.busDevice = busDevice;
-        this.DBInfo = new DBInfoEntry(2000);
+        this.DBInfo = new DBInfoEntry(2000, 0);
         this.db.get("INFO", function (err, value) { //If there is no DBInfoEntry, it will be created.
             if(err) {
                 if(err.notFound) {
-                    this.db.put("INFO", JSON.stringify(new DBInfoEntry(2000)), function(err) {
+                    this.db.put("INFO", JSON.stringify(new DBInfoEntry(2000, 0)), function(err) {
                         if(err) console.log("Error in putting Entry:" + err);
                     });
                 } else {
                     console.log("Error: Something went wrong fetching an Entry: " + err);
                 }
             } else {
-                this.DBInfo = JSON.parse(value);
+                this.DBInfo = new DBInfoEntry(JSON.parse(value).maxCapacity, JSON.parse(value).currentDrive + 1);
             }
         });
     }
 
     //puts a new sensor value to the database
     putSensorValue(topicID: number, value: any) {
-        this.db.put(LevelDBAccess.dateToKey(new Date()), JSON.stringify (new SensorValueEntry(value)), function(err) {
+        this.db.put(LevelDBAccess.dateToKey(new Date()), JSON.stringify(new SensorValueEntry(value, this.DBInfo.currentDrive)), function(err) {
             if (err) console.log("Error in putting Entry:" + err);
         });
         this.incrementSize();
@@ -154,16 +158,16 @@ class LevelDBAccess {
     //returns all entries of a specific topic, optionally sorted by a specific timeframe
     public getEntries(topic: number, beginDate: number, endDate: number, callback) {
         var listOfKeys: number[] = [];
-        var listOfEntries: SensorValueEntry[] = [];
+        var listOfEntries: any[] = [];
         this.db.createReadStream().on('data', function(data){
             if(!isNaN(data.key - 0)) {
                     if(data.key > beginDate && data.key < endDate) {
                         listOfKeys[listOfKeys.length] = data.key;
-                        listOfEntries[listOfEntries.length] = new SensorValueEntry(JSON.parse(data.value).value);
+                        listOfEntries[listOfEntries.length] = JSON.parse(data.value);
                     }
             }
         }).on('end', function(end) {
-            callback(listOfEntries);
+            callback(listOfEntries, listOfKeys);
         });
     }
 
@@ -195,8 +199,8 @@ class DBBusDevice extends BusDevice {
         //TODO: subscribe to all relevant Topics available
     }
 
-    public sendValueMessage(content: SensorValueEntry[]) {
-        this.broker.handleMessage(new ValueMessage(new Topic(31, "Values from DB"), content));
+    public sendValueMessage(content: SensorValueEntry[], times: number[]) {
+        this.broker.handleMessage(new ValueAnswerMessage(new Topic(31, "Values from DB"), times, content));
         //TODO: Send Message with appropriate topic to Bus
 }
 
@@ -206,8 +210,8 @@ class DBBusDevice extends BusDevice {
         if(m instanceof DBRequestMessage) {
             if(m.getRequest() instanceof  DBValueRequest) {
                 var dbValueReq = <DBValueRequest> m.getRequest();
-                    this.dbAccess.getEntries(dbValueReq.getTopic().getID(), LevelDBAccess.dateToKey(dbValueReq.getBeginDate()), LevelDBAccess.dateToKey(dbValueReq.getEndDate()), function(res){
-                        this.sendValueMessage(res);
+                    this.dbAccess.getEntries(dbValueReq.getTopic().getID(), LevelDBAccess.dateToKey(dbValueReq.getBeginDate()), LevelDBAccess.dateToKey(dbValueReq.getEndDate()), function(res, tim){
+                        this.sendValueMessage(res, tim);
                     });
             } else if (m.getRequest() instanceof DBDriverInfoRequest) {
                 var n = <DBDriverInfoRequest>m.getRequest();
