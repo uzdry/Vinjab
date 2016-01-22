@@ -203,4 +203,4 @@ class SettingsMessage extends Message {
 
 }
 
-export {BusDevice, Broker, Topic, Message, ValueMessage, DBRequestMessage, SettingsMessage};
+export {BusDevice, Broker, Topic, Message, ValueMessage, DBRequestMessage, SettingsMessage, ValueAnswerMessage};
