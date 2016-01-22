@@ -1,0 +1,39 @@
+Konventionen für Bus und Messages:
+
+Topic: String für Name des Topics (bsp. "Speed", "Engine Speed", "Mileage")
+
+
+
+Topics:
+
+Message-Types:	"ValueMessage" 10
+				"DBRequestMessage", 20
+				"ValueAnswerMessage", 30
+				"SettingsMessage", 40
+
+
+
+Sensorwert-Typen:	"coolant temperature", 110
+					"fuel pressure", 120
+					"RPM", 130
+					"speed", 140
+					"steering", 150
+					"intake air temperature", 160
+					"engine runtime", 170
+					"fuel", 180
+					"exhaust gas recirculation state", 190
+					"injection pressure State", 200
+					"fuel pressure control state", 210
+					"gas pressure vaporizer", 220
+					"catalyst temperature", 230
+					"throttle", 240
+					"accelerator pedal position", 250
+					"temperature outside", 260
+					"engine torque", 270
+					"exhaust gas temperature", 280
+					"exhaust gas pressure", 290
+					"ultrasonic sensor distance", 300
+					"average fuel consumption", 310
+					"fuel consumption", 320
+					"mileage", 330
+					"average speed", 340
