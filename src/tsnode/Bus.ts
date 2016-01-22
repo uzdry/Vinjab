@@ -197,7 +197,7 @@ class SettingsMessage extends Message {
         this.configs = new Map<Topic, Value>();
     }
 
-    getConfigs(): Map<Topic,Value> {
+    public getConfigs(): Map<Topic,Value> {
         return this.configs;
     }
 
