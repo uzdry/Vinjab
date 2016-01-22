@@ -1,29 +1,32 @@
 ///<reference path="../../typings/node/node.d.ts"/>
+
+
 import {BusDevice, Message, ValueMessage, Topic, Broker}  from "./Bus";
 import {Value} from "./Utils";
-import * as Event from 'events'
-
-/**
- * Created by valentin on 12/01/16.
- */
 
 
 class Source extends BusDevice {
 
-    private cnt: number = 0;
     value: Value;
-    private topic: Topic;
+    topic: Topic;
+    cnt: number = 0;
+
 
     constructor() {
         super();
-        this.value = new Value(this.cnt++, 'km/h');
-        setInterval(this.update, 500);
+        this.value = new Value(0, 'km/h');
+        this.cnt = 0;
     }
 
-    public update(): void {
+    public fire() {
+        setInterval(this.update.bind(this),500);
+    }
+
+    private update(): void {
+        console.log('went in');
         this.value = new Value(this.cnt++, 'km/h');
         var m: Message = new ValueMessage(Topic.SPEED, this.value);
-        Broker.get().distribute(m);
+        this.broker.handleMessage(m);
     }
 
 
@@ -33,7 +36,7 @@ class Source extends BusDevice {
 
     public publish(t: Topic): void {
         var m: Message = new ValueMessage(t, this.value);
-        Broker.get().distribute(m);
+        Broker.get().handleMessage(m);
     }
 
 }
@@ -41,7 +44,9 @@ class Source extends BusDevice {
 class TerminalProxy extends BusDevice {
 
     public handleMessage(m: Message) {
-        console.log(m.getTopic());
+        if (m instanceof ValueMessage) {
+            console.log(m.getValue().getValue());
+        }
     }
 
 }
