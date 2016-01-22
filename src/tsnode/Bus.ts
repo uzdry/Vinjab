@@ -6,9 +6,11 @@ import {DBRequest} from "./DBAccess";
 
 //Topic defines the Topic of a message. BusDevices subscribe to Topics
 class Topic {
+
+    static SPEED = new Topic(140, "speed");
+
     private id:number;
     private name:string;
-    static SPEED: Topic = new Topic(99, "Speed");
 
     //instantiates a new Topic with ID and name
     constructor(pID:number, pName:string) {
@@ -80,10 +82,6 @@ class Broker {
 
 
     private static instance:Broker;
-
-    private emit = new EventEmitter();
-
-    bds: Set<BusDevice>;
     private subscribers: Map<Topic, Set<BusDevice>>;
 
     constructor() {
@@ -109,15 +107,6 @@ class Broker {
         }
         console.log(sub);
         this.subscribers.get(topic).add(sub);
-
-
-        console.log(this.subscribers.get(topic));
-
-        this.emit.on('event', function() {
-            console.log('ja');
-        });
-
-
 
     }
 
