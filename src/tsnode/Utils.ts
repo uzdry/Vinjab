@@ -8,6 +8,10 @@ class Value {
         this.identifier = pID;
     }
 
+    public numericalValue(): number {
+        return this.value;
+    }
+
 }
 
 export {Value}
