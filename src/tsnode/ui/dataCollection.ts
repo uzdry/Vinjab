@@ -10,7 +10,6 @@ class DataCollection extends Backbone.Collection<DataModel> {
     constructor(options?){
         super(options);
 
-        this.set({value: 0});
     }
 
 }

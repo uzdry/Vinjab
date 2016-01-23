@@ -22,6 +22,15 @@ class WidgetFactory{
         this.widgetConfigurations[widgetConfig.type_name] = widgetConfig;
     }
 
+    getOptions():string[]{
+        var array: string[] = [];
+        for(var key in this.widgetConfigurations){
+            if(!this.widgetConfigurations.hasOwnProperty(key)) continue;
+            array.push(key);
+        }
+        return array;
+    }
+
 
 
 }

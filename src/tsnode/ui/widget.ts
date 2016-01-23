@@ -9,6 +9,9 @@ abstract class Widget extends Backbone.View<DataModel> {
     /** String that is beeing introduced to the grid */
     htmlElement: string;
 
+    /** HTML Grid wrapper */
+    htmlWrapper: JQuery;
+
     /** update the shown value */
     abstract updateValue(value: number|boolean);
 

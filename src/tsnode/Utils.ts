@@ -12,6 +12,10 @@ class Value {
         return this.value;
     }
 
+    public getIdentifier(): string{
+        return this.identifier;
+    }
+
 }
 
 export {Value}

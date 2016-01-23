@@ -1,25 +1,23 @@
 /// <reference path="../../../../typings/canv-gauge/gauge.d.ts" />
 /// <reference path="../widget.ts" />
 
+class PercentGaugeWidgetConfig implements WidgetConfig{
 
+    "type_name" = "PercentGauge";
 
-//widgetFactory.addWidget(new GaugeWidgetConfig());
+    "display_name" = "Percentage Gauge";
 
-import EventsHash = Backbone.EventsHash;
-class GaugeWidgetConfig implements WidgetConfig{
-
-    "type_name" = "GaugeWidget";
 
     newInstance(options):Widget {
-        return new GaugeWidget(options);
+        return new PercentGaugeWidget(options);
     }
 
 }
 
-class GaugeWidget extends Widget{
+class PercentGaugeWidget extends Widget{
 
     /** Tag name */
-    typeID: string = "gauge";
+    typeID: string = "percent_gauge";
 
     /** Main Element of the Gauge */
     gauge: Gauge;
@@ -31,32 +29,13 @@ class GaugeWidget extends Widget{
     /** configuration */
     config:GaugeConfig = {
         renderTo: 'gauge',
-        width: 400,
-        height: 400,
+        width: 200,
+        height: 200,
         glow: true,
-        units: 'Km/h',
+        units: '%',
         title: false,
         minValue: 0,
         maxValue: 220,
-        majorTicks: ['0', '20', '40', '60', '80', '100', '120', '140', '160', '180', '200', '220'],
-        minorTicks: 2,
-        strokeTicks: false,
-        highlights: [
-            {from: 0, to: 50, color: 'rgba(0,   255, 0, .15)'},
-            {from: 50, to: 100, color: 'rgba(255, 255, 0, .15)'},
-            {from: 100, to: 150, color: 'rgba(255, 30,  0, .25)'},
-            {from: 150, to: 200, color: 'rgba(255, 0,  225, .25)'},
-            {from: 200, to: 220, color: 'rgba(0, 0,  255, .25)'}
-        ],
-        colors: {
-            plate: '#222',
-            majorTicks: '#f5f5f5',
-            minorTicks: '#ddd',
-            title: '#fff',
-            units: '#ccc',
-            numbers: '#eee',
-            needle: {start: 'rgba(240, 128, 128, 1)', end: 'rgba(255, 160, 122, .9)'}
-        }
     };
 
 
@@ -70,6 +49,7 @@ class GaugeWidget extends Widget{
 
         this.config.renderTo = "" + this.typeID + "-" + this.model.id;
 
+        this.config.title = this.model.get("name");
 
     }
 
@@ -79,9 +59,10 @@ class GaugeWidget extends Widget{
     }
 
     /** Gets called after a update of the value */
-    render(){
+    render(): PercentGaugeWidget{
         var value:number = this.model.get("value");
         this.gauge.setValue(value);
+        return this;
     }
 
     /** Function to update the Widget */
@@ -93,6 +74,8 @@ class GaugeWidget extends Widget{
     init(){
         this.gauge = new Gauge(this.config);
         this.gauge.draw();
+
+        this.htmlElement.on
     }
 
 }

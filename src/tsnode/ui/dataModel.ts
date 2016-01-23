@@ -5,6 +5,7 @@ class DataModel extends Backbone.Model{
 
     constructor(options?){
         super(options);
+
     }
 
 }

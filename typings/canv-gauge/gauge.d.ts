@@ -36,7 +36,7 @@ interface GaugeConfig{
     height?: number;
 
     /** the title which should be drawn on a gauge. By default is false (no title to display) */
-    title?: string;
+    title?: string|boolean;
 
     /** the minimal value which is used on a gauge bar. Default is 0 */
     minValue?: number;
@@ -48,7 +48,7 @@ interface GaugeConfig{
     minorTicks?: number;
 
     /** array of a major tick marks. By default is ['0', '20', '60', '80', '100'] */
-    majorTicks?: number[];
+    majorTicks?: number[]|string[];
 
     /** the flag which identifies if the ticks bar should be stroked or not. By default is true. */
     strokeTicks?: boolean;

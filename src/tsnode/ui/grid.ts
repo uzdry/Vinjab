@@ -9,7 +9,7 @@ class Grid {
 
     constructor(){
 
-        this.gridster = $(".gridster ul").gridster({widget_base_dimensions: [200, 200],
+        this.gridster = $(".gridster ul").gridster({widget_base_dimensions: [100, 100],
             widget_margins: [5, 5]}).data('gridster');
 
 
@@ -17,9 +17,10 @@ class Grid {
 
     addWidget(widget: Widget){
 
-        var jqueryElement: JQuery = this.gridster.add_widget(widget.htmlElement, 2, 2);
+        widget.htmlWrapper = this.gridster.add_widget(widget.htmlElement, 2, 2);
 
         widget.init();
+
 
     }
 
