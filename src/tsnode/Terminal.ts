@@ -6,6 +6,7 @@
 /**
  * This class is the connection in the client side.
  */
+import * as Bus from "./Bus";
 class Terminal {
 
     /**
@@ -25,8 +26,8 @@ class Terminal {
      * send a message to the server.
      * @param message the message, which will be sent.
      */
-    public sendMessage(message : string) {
-        this.connection.emit('message', message);
+    public sendMessage(message : Bus.Message) {
+        this.connection.emit('message', JSON.stringify(message));
     }
 
 }
