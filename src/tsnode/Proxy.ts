@@ -9,31 +9,33 @@ class Proxy extends Bus.BusDevice{
     /**
      * public constructor, set a server connection to the client
      */
+    private app;
+    private io;
     constructor() {
         super();
 
         var express = require('express');
-        var app = express();
-        var http = require('http').Server(app);
-        var io = require('socket.io')(http);
+        this.app = express();
+        var http = require('http').Server(this.app);
+        this.io = require('socket.io')(http);
 
 
-        app.use(express.static(__dirname ));
-        app.use(express.static(__dirname + '/src'));
-        app.use(express.static(__dirname + '/src/tsnode/ui' ));
-        app.use(express.static(__dirname + '/src/tsnode/ui/widgets' ));
-        app.use(express.static(__dirname + '/src/tsnode/settings'))
+        this.app.use(express.static(__dirname ));
+        this.app.use(express.static(__dirname + '/src'));
+        this.app.use(express.static(__dirname + '/src/tsnode/ui' ));
+        this.app.use(express.static(__dirname + '/src/tsnode/ui/widgets' ));
+        this.app.use(express.static(__dirname + '/src/tsnode/settings'))
 
-        app.get('/ui', function(req, res){
+        this.app.get('/ui', function(req, res){
             res.sendFile(__dirname + '/src/tsnode/ui/index.html');
         });
 
-        app.get('/setting', function(req, res){
+        this.app.get('/setting', function(req, res){
             res.sendFile(__dirname + '/src/tsnode/settings/test.html');
         });
 
 
-        io.on('connection', function(socket){
+        this.io.on('connection', function(socket){
             console.log('a user connected');
 
             socket.on('disconnect', function(){
@@ -61,8 +63,10 @@ class Proxy extends Bus.BusDevice{
      * @param message the message should be delivered
      * @param socket the connection
      */
-    public handelMessage(message: string, socket): void {
-        socket.to(socket.id.toString()).emit('message', message);
+    public handelMessage(message: Bus.Message): void {
+        this.io.on('connection', function (socket) {
+            socket.to(socket.id.toString()).emit('message', JSON.stringify(message));
+        })
     }
 
 }
