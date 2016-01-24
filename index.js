@@ -6,13 +6,19 @@ var app = express();
 var http = require('http').Server(app);
 var io = require('socket.io')(http);
 
+
 app.use(express.static(__dirname ));
 app.use(express.static(__dirname + '/src'));
 app.use(express.static(__dirname + '/src/tsnode/ui' ));
 app.use(express.static(__dirname + '/src/tsnode/ui/widgets' ));
+app.use(express.static(__dirname + '/src/tsnode/settings'))
 
-app.get('/', function(req, res){
+app.get('/ui', function(req, res){
     res.sendFile(__dirname + '/src/tsnode/ui/index.html');
+});
+
+app.get('/setting', function(req, res){
+    res.sendFile(__dirname + '/src/tsnode/settings/test.html');
 });
 
 
@@ -21,12 +27,12 @@ io.on('connection', function(socket){
     socket.on('disconnect', function(){
         console.log('user disconnected');
     });
-    socket.on('message', function(msg){
-        console.log("Required message : " + msg );
-
+    socket.on('message', function(msg, id){
+        console.log("Required message : " + msg + ', from: ' + id);
+        io.to(id).emit(msg);
         //processing the message
+        //io.emit('message', "the asked message (" + msg  + ") is blablabla.");
 
-        io.emit('message', "the asked message (" + msg  + ") is blablabla.");
     });
 });
 
