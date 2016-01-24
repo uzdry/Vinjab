@@ -1,7 +1,8 @@
-///<reference path="C:\Program Files (x86)\JetBrains\WebStorm 11.0.3\plugins\JavaScriptLanguage\typescriptCompiler\external\lib.es6.d.ts" />
+///<reference path="/Applications/WebStorm.app/Contents/plugins/JavaScriptLanguage/typescriptCompiler/external/lib.es6.d.ts"/>
 
 import {DBRequestMessage, ValueAnswerMessage, BusDevice, ValueMessage, Topic, Message} from "./Bus";
-import Value from "./Utils";
+import {Value} from "./Utils";
+import {TlsOptions} from "tls";
 
 class Distance extends BusDevice {
     private currentDistanceInMeters: number;
@@ -18,18 +19,18 @@ class Distance extends BusDevice {
         this.currentDistanceInMeters = oldDistance;
         this.lastTimeInMS = 0;
         this.lastSpeedInMpS = 0;
-        this.subscribe(new Topic(42, "SPEED")); //TODO: SPEED.TOPIC
+        this.subscribe(new Topic(140, "SPEED")); //TODO: SPEED.TOPIC
     }
 
     public handleMessage(m: Message) {
-        if ((m instanceof ValueMessage) && m.getTopic().getID() == 0) { //TODO: SPEED.TOPIC
+        if ((m instanceof ValueMessage) && m.getTopic().getID() == 140) { //TODO: SPEED.TOPIC
             var currentTime = Date.now();
-            var currentSpeed = m.getValue() * 0.2777777778;
+            var currentSpeed = m.getValue().numericalValue() * 0.2777777778;
             var avgSpeed = 0.5 * this.lastSpeedInMpS + currentSpeed;
             this.currentDistanceInMeters += (currentTime - this.lastTimeInMS) * 0.001 * avgSpeed;
             this.lastTimeInMS = currentTime;
-            this.lastSpeedInMpS = m.getValue();
-            this.broker.handleMessage(new ValueMessage(new Topic(42, "Distance"), new Value(this.currentDistanceInMeters, "meters"))); //TODO: Distance.Tpoic
+            this.lastSpeedInMpS = m.getValue().numericalValue();
+            this.broker.handleMessage(new ValueMessage(new Topic(330, "mileage"), new Value(this.currentDistanceInMeters, "meters"))); //TODO: Distance.Tpoic
         }
     }
 }
@@ -66,11 +67,46 @@ class AvgFuelConsumption extends BusDevice {
 
     public handleMessage(m: Message) {
         if(m instanceof ValueMessage) {
-            if(m.getTopic().getID() == 0 ) { //TODO: DISTANCE.TOPIC
-                this.currentDistanceInMeters = m.getValue().value;
-            } else if(m.getTopic().getID() == 0) { //TODO: TANKCONTENTS.TOPIC
-                this.currentTankContentsInPercent = m.getValue().value;
+            if(m.getTopic().getID() == 330 ) { //TODO: DISTANCE.TOPIC
+                this.currentDistanceInMeters = m.getValue().numericalValue();
+            } else if(m.getTopic().getID() == 180) { //TODO: TANKCONTENTS.TOPIC
+                this.currentTankContentsInPercent = m.getValue().numericalValue();
             }
         }
     }
+}
+
+class FuelConsumption extends BusDevice {
+
+    maf: number;
+    lph: number;
+    speed: number;
+
+
+    constructor() {
+        super();
+        this.maf = 0;
+        this.lph = 0;
+        this.speed = 0;
+    }
+
+    public init() {
+        this.subscribe(new Topic(350, "mass air flow"));
+        this.subscribe(new Topic(140, "speed"));
+    }
+
+    public handleMessage(m: Message) {
+        if (m instanceof ValueMessage) {
+            // Mass Air Flow in gramms per second
+            if (m.getTopic().getID() == 350) {
+                this.maf = m.getValue().numericalValue();
+                this.lph = this.maf / 14.7 / 750 * 3600; //liter
+            }
+            // vehicle speed
+            else if (m.getTopic().getID() == 140) {
+                var lphkm = this.lph / this.speed * 100;
+            }
+        }
+    }
+
 }
