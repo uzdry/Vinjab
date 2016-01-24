@@ -193,9 +193,9 @@ class DBBusDevice extends BusDevice {
     constructor() {
         super();
         this.dbAccess = new LevelDBAccess(this);
-        this.subscribe(SettingsMessage.TOPIC);
-        this.subscribe(DBRequestMessage.TOPIC);
-        this.subscribe(ValueMessage.TOPIC);
+        this.subscribe(Topic.SETTINGS_MSG);
+        this.subscribe(Topic.DBREQ_MSG);
+        this.subscribeAll(Topic.VALUES);
         //TODO: subscribe to all relevant Topics available
     }
 

@@ -12,10 +12,11 @@ class Source extends BusDevice {
     cnt: number = 0;
 
 
-    constructor() {
+    constructor(pTopic: Topic) {
         super();
         this.value = new Value(0, 'km/h');
         this.cnt = 0;
+        this.topic = pTopic;
     }
 
     public fire() {
@@ -24,8 +25,8 @@ class Source extends BusDevice {
 
     private update(): void {
         console.log('went in');
-        this.value = new Value(this.cnt++, 'km/h');
-        var m: Message = new ValueMessage(Topic.SPEED, this.value);
+        this.value = new Value(60, 'km/h');
+        var m: Message = new ValueMessage(this.topic, this.value);
         this.broker.handleMessage(m);
     }
 
@@ -45,7 +46,7 @@ class TerminalProxy extends BusDevice {
 
     public handleMessage(m: Message) {
         if (m instanceof ValueMessage) {
-            console.log(m.getValue().getValue());
+            console.log(m.getValue().numericalValue());
         }
     }
 
