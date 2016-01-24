@@ -22,7 +22,7 @@ io.on('connection', function(socket){
         console.log('user disconnected');
     });
     socket.on('message', function(msg){
-        console.log("Required " + 'message' + ": " + msg );
+        console.log("Required message : " + msg );
 
         //processing the message
 
