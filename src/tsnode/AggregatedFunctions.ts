@@ -78,35 +78,39 @@ class AvgFuelConsumption extends BusDevice {
 
 class FuelConsumption extends BusDevice {
 
-    maf: number;
     lph: number;
     speed: number;
+    lphkm: number;
 
 
     constructor() {
         super();
-        this.maf = 0;
-        this.lph = 0;
-        this.speed = 0;
+        this.lph = 10;
+        this.speed = 10;
+        this.lphkm = 10;
     }
 
     public init() {
-        this.subscribe(new Topic(350, "mass air flow"));
-        this.subscribe(new Topic(140, "speed"));
+        this.subscribe(Topic.SPEED);
+        this.subscribe(Topic.MAF);
     }
 
     public handleMessage(m: Message) {
         if (m instanceof ValueMessage) {
             // Mass Air Flow in gramms per second
             if (m.getTopic().getID() == 350) {
-                this.maf = m.getValue().numericalValue();
-                this.lph = this.maf / 14.7 / 750 * 3600; //liter
+                var maf = m.getValue().numericalValue();
+                this.lph = (maf / 14.7 / 750) * 3600; //liter
             }
             // vehicle speed
-            else if (m.getTopic().getID() == 140) {
-                var lphkm = this.lph / this.speed * 100;
+            else {
+                if (m.getTopic().getID() == 140) {
+                    this.lphkm = this.lph / this.speed;
+                }
             }
         }
+        this.broker.handleMessage(new ValueMessage(Topic.FUEL_CONSUMPTION_H, new Value(this.lph, 'lph')));
     }
-
 }
+
+export {FuelConsumption};
