@@ -20,6 +20,7 @@ class Terminal {
     constructor() {
         this.connection = io();
         this.connection.emit('createChannel');
+
     }
 
     /**
@@ -31,6 +32,9 @@ class Terminal {
     }
 
 }
+
+export {Terminal}
+
 
 
 
