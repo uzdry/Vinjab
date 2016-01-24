@@ -1,6 +1,8 @@
 /**
  * Created by yimeng on 17/01/16.
  */
+/// <reference path="../../typings/socket.io/socket.io.d.ts"/>
+
 var express = require('express');
 var app = express();
 var http = require('http').Server(app);
@@ -24,18 +26,25 @@ app.get('/setting', function(req, res){
 
 io.on('connection', function(socket){
     console.log('a user connected');
+
     socket.on('disconnect', function(){
         console.log('user disconnected');
     });
-    socket.on('message', function(msg, id){
-        console.log("Required message : " + msg + ', from: ' + id);
-        io.to(id).emit(msg);
-        //processing the message
-        //io.emit('message', "the asked message (" + msg  + ") is blablabla.");
 
+    socket.on('message', function(msg):any{
+        return msg;
     });
+
+    socket.on('createChannel', function (){
+        socket.join(socket.id.toString());
+    })
+
 });
 
 http.listen(3000, function(){
     console.log('listening on *:3000');
 });
+
+
+
+
