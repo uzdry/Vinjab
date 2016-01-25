@@ -47,8 +47,8 @@ class AverageSpeed extends BusDevice {
     public handleMessage(m: Message) {
         if(m instanceof ValueMessage && m.getTopic().getID() == 0) { //TODO: SPEED.TOPIC
             this.numberOfValues++;
-            this.avgSpeed = this.avgSpeed * 1-(1/this.numberOfValues) + m.getValue().value / this.numberOfValues;
-            this.broker.handleMessage(new ValueMessage(new Topic(42, "Average Speed"), new Value(this.avgSpeed, "Km/h")));
+            this.avgSpeed = this.avgSpeed * 1-(1/this.numberOfValues) + m.getValue().numericalValue() / this.numberOfValues;
+            this.broker.handleMessage(new ValueMessage(Topic.AVG_SPEED, new Value(this.avgSpeed, "Km/h")));
         }
     }
 }
@@ -72,6 +72,22 @@ class AvgFuelConsumption extends BusDevice {
             } else if(m.getTopic().getID() == 180) { //TODO: TANKCONTENTS.TOPIC
                 this.currentTankContentsInPercent = m.getValue().numericalValue();
             }
+        }
+    }
+}
+
+class AverageComputation extends BusDevice {
+    avgOf: Topic;
+
+    constructor(t: Topic) {
+        super();
+        this.avgOf = t;
+        this.subscribe(t);
+    }
+
+    public handleMesage(m: Message) {
+        if (m instanceof ValueMessage) {
+
         }
     }
 }
@@ -110,6 +126,7 @@ class FuelConsumption extends BusDevice {
             }
         }
         this.broker.handleMessage(new ValueMessage(Topic.FUEL_CONSUMPTION_H, new Value(this.lph, 'lph')));
+        this.broker.handleMessage(new ValueMessage(Topic.FUEL_CONSUMPTION, new Value(this.lphkm, 'l/100km')));
     }
 }
 
