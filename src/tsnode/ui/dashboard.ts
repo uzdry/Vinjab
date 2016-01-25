@@ -6,10 +6,19 @@
 ///<reference path="../Bus.ts" />
 ///<reference path="../../../typings/socket.io/socket.io.d.ts" />
 ///<reference path="widgets/textWidget.ts"/>
+///<reference path="/Applications/WebStorm.app/Contents/plugins/JavaScriptLanguage/typescriptCompiler/external/lib.es6.d.ts"/>
+///<reference path="../Terminal.ts"/>
+
+//import {Message} from "../Bus";
+//import {ValueMessage} from "../Bus";
+//import Topic from "../Bus";
+//import Terminal from "../Terminal";
+import * as Term from "../Terminal";
+var terminal = new Term.Terminal();
 
 
-import {Message} from "../Bus";
-import {ValueMessage} from "../Bus";
+
+
 class Dashboard{
     /** MVC Stuff */
     dataCollection: DataCollection = new DataCollection();
@@ -35,6 +44,8 @@ class Dashboard{
         this.widgetFactory.addWidget(new SpeedGaugeWidgetConfig());
         this.widgetFactory.addWidget(new TextWidgetConfig());
         this.widgetFactory.addWidget(new PercentGaugeWidgetConfig());
+
+        terminal.sendMessage(new ValueMessage(Topic.SPEED), new Value(144,"v"));
 
     }
 

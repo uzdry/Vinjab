@@ -1,16 +1,21 @@
 import * as Bus from "./Bus";
+//import SettingsMessage from "./Bus";
+//import ValueMessage from "./Bus";
+import {ValueAnswerMessage, DBRequestMessage, Message, SettingsMessage, ValueMessage, Topic, BusDevice} from "./Bus";
+
 /**
  * Created by yimeng on 17/01/16.
  */
 /// <reference path="../../typings/socket.io/socket.io.d.ts"/>
 
-class Proxy extends Bus.BusDevice{
+class Proxy extends BusDevice{
 
     /**
      * public constructor, set a server connection to the client
      */
     private app;
     private io;
+
     constructor() {
         super();
 
@@ -20,18 +25,18 @@ class Proxy extends Bus.BusDevice{
         this.io = require('socket.io')(http);
 
 
-        this.app.use(express.static(__dirname ));
-        this.app.use(express.static(__dirname + '/src'));
-        this.app.use(express.static(__dirname + '/src/tsnode/ui' ));
-        this.app.use(express.static(__dirname + '/src/tsnode/ui/widgets' ));
-        this.app.use(express.static(__dirname + '/src/tsnode/settings'))
+        this.app.use(express.static(__dirname + '/../..'));
+        this.app.use(express.static(__dirname + '/../'));
+        this.app.use(express.static(__dirname + '/ui' ));
+        this.app.use(express.static(__dirname + '/widgets' ));
+        this.app.use(express.static(__dirname + '/settings'))
 
         this.app.get('/ui', function(req, res){
-            res.sendFile(__dirname + '/src/tsnode/ui/index.html');
+            res.sendFile(__dirname + '/ui/index.html');
         });
 
         this.app.get('/setting', function(req, res){
-            res.sendFile(__dirname + '/src/tsnode/settings/test.html');
+            res.sendFile(__dirname + '/settings/test.html');
         });
 
 
@@ -43,6 +48,7 @@ class Proxy extends Bus.BusDevice{
             });
 
             socket.on('message', function(msg):string{
+                console.log(msg);
                 return msg;
             });
 
@@ -55,6 +61,9 @@ class Proxy extends Bus.BusDevice{
         http.listen(3000, function(){
             console.log('listening on *:3000');
         });
+
+        this.subscribe(SettingsMessage.TOPIC);
+        this.subscribe(ValueMessage.TOPIC);
     }
 
 
@@ -64,13 +73,13 @@ class Proxy extends Bus.BusDevice{
      * @param socket the connection
      */
     public handelMessage(message: Bus.Message): void {
-        this.io.on('connection', function (socket) {
+        this.io.on('', function (socket) {
             socket.to(socket.id.toString()).emit('message', JSON.stringify(message));
         })
     }
 
 }
 
-
+var proxy = new Proxy();
 
 
