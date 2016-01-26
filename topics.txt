@@ -37,3 +37,4 @@ Sensorwert-Typen:	"coolant temperature", 110
 					"fuel consumption", 320
 					"mileage", 330
 					"average speed", 340
+					"mass air flow", 350

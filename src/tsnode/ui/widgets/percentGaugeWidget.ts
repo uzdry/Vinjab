@@ -75,7 +75,7 @@ class PercentGaugeWidget extends Widget{
         this.gauge = new Gauge(this.config);
         this.gauge.draw();
 
-        this.htmlElement.on
+        this.htmlElement.on;
     }
 
 }

@@ -7,7 +7,7 @@ import * as Msg from "./messages"
 
 
 //A BusDevice has acces to the Bus
-class BusDevice {
+abstract class BusDevice {
     broker:Broker;
     private id:number;
     static cnt:number = 0;
@@ -17,9 +17,7 @@ class BusDevice {
         this.broker = Broker.get();
     }
 
-    public handleMessage(m:Msg.Message):void {
-        this.abstractHandle();
-    }
+    public abstract handleMessage(m:Msg.Message):void;
 
     private abstractHandle():void {
         throw new Error('This method is abstract and must be overridden');

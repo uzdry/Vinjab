@@ -1,6 +1,7 @@
 ///<reference path="/Applications/WebStorm.app/Contents/plugins/JavaScriptLanguage/typescriptCompiler/external/lib.es6.d.ts"/>
 
-import {DBRequestMessage, ValueAnswerMessage, BusDevice, ValueMessage, Topic, Message} from "./Bus";
+import {DBRequestMessage, ValueAnswerMessage, ValueMessage, Topic, Message} from "./messages";
+import {BusDevice} from "./Bus";
 import {Value} from "./Utils";
 import {TlsOptions} from "tls";
 
@@ -25,11 +26,11 @@ class Distance extends BusDevice {
     public handleMessage(m: Message) {
         if ((m instanceof ValueMessage) && m.getTopic().getID() == 140) { //TODO: SPEED.TOPIC
             var currentTime = Date.now();
-            var currentSpeed = m.getValue().numericalValue() * 0.2777777778;
+            var currentSpeed = m.value.numericalValue() * 0.2777777778;
             var avgSpeed = 0.5 * this.lastSpeedInMpS + currentSpeed;
             this.currentDistanceInMeters += (currentTime - this.lastTimeInMS) * 0.001 * avgSpeed;
             this.lastTimeInMS = currentTime;
-            this.lastSpeedInMpS = m.getValue().numericalValue();
+            this.lastSpeedInMpS = m.value.numericalValue();
             this.broker.handleMessage(new ValueMessage(new Topic(330, "mileage"), new Value(this.currentDistanceInMeters, "meters"))); //TODO: Distance.Tpoic
         }
     }
@@ -47,7 +48,7 @@ class AverageSpeed extends BusDevice {
     public handleMessage(m: Message) {
         if(m instanceof ValueMessage && m.getTopic().getID() == 0) { //TODO: SPEED.TOPIC
             this.numberOfValues++;
-            this.avgSpeed = this.avgSpeed * 1-(1/this.numberOfValues) + m.getValue().numericalValue() / this.numberOfValues;
+            this.avgSpeed = this.avgSpeed * 1-(1/this.numberOfValues) + m.value.numericalValue() / this.numberOfValues;
             this.broker.handleMessage(new ValueMessage(Topic.AVG_SPEED, new Value(this.avgSpeed, "Km/h")));
         }
     }
@@ -68,9 +69,9 @@ class AvgFuelConsumption extends BusDevice {
     public handleMessage(m: Message) {
         if(m instanceof ValueMessage) {
             if(m.getTopic().getID() == 330 ) { //TODO: DISTANCE.TOPIC
-                this.currentDistanceInMeters = m.getValue().numericalValue();
+                this.currentDistanceInMeters = m.value.numericalValue();
             } else if(m.getTopic().getID() == 180) { //TODO: TANKCONTENTS.TOPIC
-                this.currentTankContentsInPercent = m.getValue().numericalValue();
+                this.currentTankContentsInPercent = m.value.numericalValue();
             }
         }
     }
@@ -87,7 +88,9 @@ class AverageComputation extends BusDevice {
 
     public handleMesage(m: Message) {
         if (m instanceof ValueMessage) {
+            if (m.getTopic().getID() == this.avgOf.getID()) {
 
+            }
         }
     }
 }
@@ -115,7 +118,7 @@ class FuelConsumption extends BusDevice {
         if (m instanceof ValueMessage) {
             // Mass Air Flow in gramms per second
             if (m.getTopic().getID() == 350) {
-                var maf = m.getValue().numericalValue();
+                var maf = m.value.numericalValue();
                 this.lph = (maf / 14.7 / 750) * 3600; //liter
             }
             // vehicle speed
