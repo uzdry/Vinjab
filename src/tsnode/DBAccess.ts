@@ -1,7 +1,8 @@
 /// <reference path="../../levelup.d.ts" />
 
 import levelup = require("levelup");
-import {ValueAnswerMessage, DBRequestMessage, Message, SettingsMessage, ValueMessage, Topic, BusDevice} from "./Bus";
+import {BusDevice} from "./Bus";
+import {ValueAnswerMessage, DBRequestMessage, Message, ValueMessage, Topic} from "./messages";
 
 // The entry types that are to be written to the database:
 
@@ -219,7 +220,7 @@ class DBBusDevice extends BusDevice {
             }
         } else if (m instanceof ValueMessage) {
             this.dbAccess.putSensorValue(m.getTopic().getID(), m.getValue);
-        } else if (m instanceof SettingsMessage) {
+      //  } else if (m instanceof SettingsMessage) {
             //TODO: understand the organisation of settingsMessages and put them to the db accordingly
         }
         //TODO: ELSE get sensor value from message and write to db / get config from message, ...
