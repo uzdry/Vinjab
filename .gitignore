@@ -1,2 +1,5 @@
 archive
 node_modules
+/tsnode/Bus.js
+/tsnode/Bus.ts.map
+
