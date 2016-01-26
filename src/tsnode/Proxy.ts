@@ -1,7 +1,8 @@
 import * as Bus from "./Bus";
 //import SettingsMessage from "./Bus";
 //import ValueMessage from "./Bus";
-import {ValueAnswerMessage, DBRequestMessage, Message, SettingsMessage, ValueMessage, Topic, BusDevice} from "./Bus";
+import {BusDevice} from "./Bus";
+import {ValueAnswerMessage, DBRequestMessage, Message, ValueMessage, Topic} from "./messages";
 
 /**
  * Created by yimeng on 17/01/16.
@@ -62,8 +63,8 @@ class Proxy extends BusDevice{
             console.log('listening on *:3000');
         });
 
-        this.subscribe(SettingsMessage.TOPIC);
-        this.subscribe(ValueMessage.TOPIC);
+        this.subscribe(Topic.SETTINGS_MSG);
+        this.subscribe(Topic.SPEED);
     }
 
 
@@ -72,7 +73,7 @@ class Proxy extends BusDevice{
      * @param message the message should be delivered
      * @param socket the connection
      */
-    public handelMessage(message: Bus.Message): void {
+    public handelMessage(message: Message): void {
         this.io.on('', function (socket) {
             socket.to(socket.id.toString()).emit('message', JSON.stringify(message));
         })

@@ -1,8 +1,9 @@
 ///<reference path="../../typings/node/node.d.ts"/>
 
 
-import {BusDevice, Message, ValueMessage, Topic, Broker}  from "./Bus";
+import {BusDevice, Broker}  from "./Bus";
 import {Value} from "./Utils";
+import {Topic, Message, ValueMessage} from "./messages";
 
 
 class Source extends BusDevice {
@@ -46,7 +47,7 @@ class TerminalProxy extends BusDevice {
 
     public handleMessage(m: Message) {
         if (m instanceof ValueMessage) {
-            console.log(m.getValue().numericalValue());
+            console.log(m.value.numericalValue());
         }
     }
 

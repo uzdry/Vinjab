@@ -1,37 +1,31 @@
-import {Source} from "./Source";
-import {Topic, BusDevice, DBRequestMessage} from "./Bus";
-import {TerminalProxy} from "./Receivers";
-import {DBBusDevice} from "./DBAccess";
+import {Source, TerminalProxy} from "./Source";
+import {BusDevice} from "./Bus";
+import {Topic, Message} from "./messages";
+import * as DBAccess from "./DBAccess";
+import {FuelConsumption} from "./AggregatedFunctions";
 
-var speed: Topic = new Topic(99, "Speed");
+var terProx: TerminalProxy = new TerminalProxy();
+terProx.subscribe(Topic.FUEL_CONSUMPTION);
 
 var sources: Set<BusDevice> = new Set<BusDevice>();
-sources.add(new Source(speed));
 
-var ter: Set<BusDevice> = new Set<BusDevice>();
+sources.add(new Source(Topic.SPEED));
+sources.add(new Source(Topic.MAF));
 
-ter.add(new TerminalProxy());
-
-for (var i = 0; i < 4; i++) {
-    ter.add(new TerminalProxy())
-}
-
-var db: BusDevice = new DBBusDevice();
-
-db.subscribe(DBRequestMessage.TOPIC);
-db.subscribe(speed);
+var af = new FuelConsumption();
+af.init();
 
 
-var iter = ter.entries();
+var iter = sources.values();
+
 var x;
-while ((x = iter.next().value) != null) {
-    x[0].subscribe(speed);
+while((x = iter.next().value) != null) {
+    x.fire();
 }
-iter = sources.entries();
 
-while ((x = iter.next().value) != null) {
-    x[0].publish();
-}
+
+//console.log("Gokkk");
+
 
 
 

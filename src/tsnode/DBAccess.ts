@@ -2,7 +2,7 @@
 
 import levelup = require("levelup");
 import {BusDevice} from "./Bus";
-import {ValueAnswerMessage, DBRequestMessage, Message, ValueMessage, Topic} from "./messages";
+import {ValueAnswerMessage, DBRequest, DBRequestMessage, Message, ValueMessage, Topic} from "./messages";
 
 // The entry types that are to be written to the database:
 
@@ -219,15 +219,12 @@ class DBBusDevice extends BusDevice {
                 this.dbAccess.getDriverEntry(n.getDriver());
             }
         } else if (m instanceof ValueMessage) {
-            this.dbAccess.putSensorValue(m.getTopic().getID(), m.getValue);
+            this.dbAccess.putSensorValue(m.getTopic().getID(), m.value);
       //  } else if (m instanceof SettingsMessage) {
             //TODO: understand the organisation of settingsMessages and put them to the db accordingly
         }
         //TODO: ELSE get sensor value from message and write to db / get config from message, ...
     }
-}
-
-class DBRequest {
 }
 
 class DBValueRequest extends DBRequest {

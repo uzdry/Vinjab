@@ -122,6 +122,9 @@ class ValueMessage extends Message {
     }
 }
 
+class DBRequest {
+}
+
 class DBRequestMessage extends Message {
     private req: DBRequest;
 
@@ -135,4 +138,4 @@ class DBRequestMessage extends Message {
     }
 }
 
-export {Topic, Message, ValueMessage, ValueAnswerMessage, DBRequestMessage};
+export {Topic, Message, ValueMessage, ValueAnswerMessage, DBRequest, DBRequestMessage};
