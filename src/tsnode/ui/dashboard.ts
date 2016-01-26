@@ -14,6 +14,8 @@
 //import Topic from "../Bus";
 //import Terminal from "../Terminal";
 import * as Term from "../Terminal";
+import * as Msg from "../messages";
+import * as Utils from "../Utils";
 var terminal = new Term.Terminal();
 
 
@@ -45,7 +47,7 @@ class Dashboard{
         this.widgetFactory.addWidget(new TextWidgetConfig());
         this.widgetFactory.addWidget(new PercentGaugeWidgetConfig());
 
-        terminal.sendMessage(new ValueMessage(Topic.SPEED), new Value(144,"v"));
+        terminal.sendMessage(new Msg.ValueMessage(Msg.Topic.SPEED, new Utils.Value(144,"v")));
 
     }
 
@@ -80,7 +82,7 @@ class Dashboard{
     }
 
     decodeMessage(s:string){
-        var message:ValueMessage = <ValueMessage>JSON.parse(s);
+        var message: Msg.ValueMessage = <Msg.ValueMessage>JSON.parse(s);
 
         var model: DataModel = this.dataCollection.get(message.getTopic().getID());
 
@@ -89,7 +91,7 @@ class Dashboard{
             this.dataCollection.add(model);
         }
 
-        model.set({value: message.getValue().numericalValue(), name: message.getValue().getIdentifier()});
+        model.set({value: message.value.numericalValue(), name: message.value.getIdentifier()});
 
     }
 
