@@ -3,20 +3,13 @@
 ///<reference path="grid.ts" />
 ///<reference path="widgets/speedGaugeWidget.ts" />
 ///<reference path="widgets/percentGaugeWidget.ts" />
-///<reference path="../Bus.ts" />
 ///<reference path="../../../typings/socket.io/socket.io.d.ts" />
 ///<reference path="widgets/textWidget.ts"/>
-///<reference path="/Applications/WebStorm.app/Contents/plugins/JavaScriptLanguage/typescriptCompiler/external/lib.es6.d.ts"/>
 ///<reference path="../Terminal.ts"/>
 
-//import {Message} from "../Bus";
-//import {ValueMessage} from "../Bus";
-//import Topic from "../Bus";
+
 //import Terminal from "../Terminal";
-import * as Term from "../Terminal";
-import * as Msg from "../messages";
-import * as Utils from "../Utils";
-var terminal = new Term.Terminal();
+
 
 
 
@@ -31,8 +24,8 @@ class Dashboard{
 
 
     selector:HTMLSelectElement = <HTMLSelectElement>document.getElementById("WidgetSelect");
+    idSelector:HTMLSelectElement = <HTMLSelectElement>document.getElementById("valueSelect");
     button:HTMLButtonElement = <HTMLButtonElement>document.getElementById("addButton");
-    textField:HTMLInputElement = <HTMLInputElement>document.getElementById("ValueID");
 
     options:string[];
 
@@ -47,7 +40,6 @@ class Dashboard{
         this.widgetFactory.addWidget(new TextWidgetConfig());
         this.widgetFactory.addWidget(new PercentGaugeWidgetConfig());
 
-        terminal.sendMessage(new Msg.ValueMessage(Msg.Topic.SPEED, new Utils.Value(144,"v")));
 
     }
 
@@ -64,39 +56,31 @@ class Dashboard{
 
     }
 
-    decodeValue(s: string){
-        var obj:Value = <Value>JSON.parse(s);
-        //console.log("" + obj.id + "|" + obj.name + "|" + obj.value );
-
-        var model: DataModel = this.dataCollection.get(obj.id);
-
-        if(!model){
-            model = new DataModel({id: obj.id});
-            this.dataCollection.add(model);
-            //var widget: Widget = this.widgetFactory.createWidget("SpeedGauge", model);
-            //this.grid.addWidget(widget);
-        }
-
-        model.set({value: obj.value});
-
-    }
-
     decodeMessage(s:string){
-        var message: Msg.ValueMessage = <Msg.ValueMessage>JSON.parse(s);
 
-        var model: DataModel = this.dataCollection.get(message.getTopic().getID());
+
+        var message = JSON.parse(s);
+
+        var model: DataModel = this.dataCollection.get(message.topic.id);
 
         if(!model){
-            model = new DataModel({id: message.getTopic().getID()});
+            model = new DataModel({id: message.topic.id});
             this.dataCollection.add(model);
+
+            var c = document.createElement("option");
+            c.text = message.topic.name;
+            this.idSelector.options.add(c);
         }
 
-        model.set({value: message.value.numericalValue(), name: message.value.getIdentifier()});
+        model.set({value: message.value.value, name: message.topic.name, unit: message.value.identifier});
 
     }
+
+
 
     startSelector() {
 
+        //========= Widgets
 
         var options:string[] = this.widgetFactory.getOptions();
         for (var i in options) {
@@ -105,30 +89,36 @@ class Dashboard{
             this.selector.options.add(c);
         }
 
+        //========= Values
+
+        var names:string[] = this.dataCollection.getAllNames();
+
+        if(!names){
+            for (var i in names){
+                var c = document.createElement("option");
+                c.text = names[i];
+                this.idSelector.options.add(c);
+            }
+        }
+
+
         this.button.onclick = this.click.bind(this);
 
     }
 
     click(){
+        var valueName = this.idSelector[this.idSelector.selectedIndex].text;
+
         var widget = this.widgetFactory.createWidget(this.selector[this.selector.selectedIndex].text,
-            this.dataCollection.get(this.textField.value));
+            this.dataCollection.where({name: valueName})[0]);
         this.grid.addWidget(widget);
     }
 
 }
 
-class Value{
-    name:string;
-    value:number;
-    id: number;
-    type:string|boolean;
-    maxValue: number;
-    minValue: number;
-}
 
 
 var dashboard: Dashboard = new Dashboard();
-dashboard.test();
 dashboard.startSelector();
 
 //==========================
@@ -139,12 +129,12 @@ dashboard.startSelector();
 
 /** Test Code */
 /*
-/var widget = widgetFactory.createWidget("GaugeWidget", "123");
-grid.addWidget(widget);
+ /var widget = widgetFactory.createWidget("GaugeWidget", "123");
+ grid.addWidget(widget);
 
-var secondWidget = widgetFactory.createWidget("GaugeWidget", "456");
-grid.addWidget(secondWidget);
+ var secondWidget = widgetFactory.createWidget("GaugeWidget", "456");
+ grid.addWidget(secondWidget);
 
-var cnt: number = 0;
-setInterval(function(){widget.updateValue(cnt++)}, 500);
-*/
+ var cnt: number = 0;
+ setInterval(function(){widget.updateValue(cnt++)}, 500);
+ */
