@@ -1,25 +1,17 @@
 var Source_1 = require("./Source");
-var Bus_1 = require("./Bus");
-var Receivers_1 = require("./Receivers");
-var DBAccess_1 = require("./DBAccess");
-var speed = new Bus_1.Topic(99, "Speed");
+var messages_1 = require("./messages");
+var AggregatedFunctions_1 = require("./AggregatedFunctions");
+var terProx = new Source_1.TerminalProxy();
+terProx.subscribe(messages_1.Topic.FUEL_CONSUMPTION);
 var sources = new Set();
-sources.add(new Source_1.Source(speed));
-var ter = new Set();
-ter.add(new Receivers_1.TerminalProxy());
-for (var i = 0; i < 4; i++) {
-    ter.add(new Receivers_1.TerminalProxy());
-}
-var db = new DBAccess_1.DBBusDevice();
-db.subscribe(Bus_1.DBRequestMessage.TOPIC);
-db.subscribe(speed);
-var iter = ter.entries();
+sources.add(new Source_1.Source(messages_1.Topic.SPEED));
+sources.add(new Source_1.Source(messages_1.Topic.MAF));
+var af = new AggregatedFunctions_1.FuelConsumption();
+af.init();
+var iter = sources.values();
 var x;
 while ((x = iter.next().value) != null) {
-    x[0].subscribe(speed);
+    x.fire();
 }
-iter = sources.entries();
-while ((x = iter.next().value) != null) {
-    x[0].publish();
-}
+//console.log("Gokkk");
 //process.exit(1);

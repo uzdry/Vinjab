@@ -3,12 +3,12 @@ var Value = (function () {
         this.value = pValue;
         this.identifier = pID;
     }
+    Value.prototype.numericalValue = function () {
+        return this.value;
+    };
+    Value.prototype.getIdentifier = function () {
+        return this.identifier;
+    };
     return Value;
 })();
-exports.__esModule = true;
-exports["default"] = Value;
-var DBReqest = (function () {
-    function DBReqest() {
-    }
-    return DBReqest;
-})();
+exports.Value = Value;

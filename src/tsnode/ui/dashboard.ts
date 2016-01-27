@@ -29,6 +29,9 @@ class Dashboard{
 
     options:string[];
 
+    /** Cookie Stuff */
+    cookie: string;
+
 
     constructor(){
         this.dataCollection = new DataCollection();
@@ -40,7 +43,11 @@ class Dashboard{
         this.widgetFactory.addWidget(new TextWidgetConfig());
         this.widgetFactory.addWidget(new PercentGaugeWidgetConfig());
 
+        this.cookie = Dashboard.getCookie("user");
 
+        if(this.cookie === ""){
+            document.cookie = "user=idiot";
+        }
     }
 
     test(){
@@ -76,7 +83,27 @@ class Dashboard{
 
     }
 
+    static getCookie(cname: string): string {
+        var name = cname + "=";
+        var ca = document.cookie.split(';');
+        for(var i=0; i<ca.length; i++) {
+            var c = ca[i];
+            while (c.charAt(0)==' ') c = c.substring(1);
+            if (c.indexOf(name) == 0) return c.substring(name.length, c.length);
+        }
+        return "";
+    }
 
+    static makeid()
+    {
+        var text = "";
+        var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+
+        for( var i=0; i < 5; i++ )
+            text += possible.charAt(Math.floor(Math.random() * possible.length));
+
+        return text;
+    }
 
     startSelector() {
 
