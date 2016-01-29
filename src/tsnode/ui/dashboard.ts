@@ -9,6 +9,8 @@
 ///<reference path="/Applications/WebStorm.app/Contents/plugins/JavaScriptLanguage/typescriptCompiler/external/lib.es6.d.ts"/>
 ///<reference path="../Terminal.ts"/>
 
+/// <reference path="../../../typings/postal/postal.d.ts"/>
+
 //import {Message} from "../Bus";
 //import {ValueMessage} from "../Bus";
 //import Topic from "../Bus";
@@ -82,16 +84,16 @@ class Dashboard{
     }
 
     decodeMessage(s:string){
-        var message: Msg.ValueMessage = <Msg.ValueMessage>JSON.parse(s);
+        var message = JSON.parse(s);
 
         var model: DataModel = this.dataCollection.get(message.getTopic().getID());
 
         if(!model){
-            model = new DataModel({id: message.getTopic().getID()});
+            model = new DataModel({id: message.topic.id});
             this.dataCollection.add(model);
         }
 
-        model.set({value: message.value.numericalValue(), name: message.value.getIdentifier()});
+        model.set({value: message.value.value, name: message.value.identifier});
 
     }
 
