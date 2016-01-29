@@ -6,14 +6,6 @@
     <link rel="stylesheet" type="text/css" href="../../../node_modules/gridster/dist/jquery.gridster.css">
     <link rel="stylesheet" type="text/css" href="test.css">
 
-    <style>
-        body { font: 13px Helvetica, Arial; }
-        form {padding: 3px; position: fixed;bottom: 0; width: 100%; }
-        form select
-        form input { border: 0; padding: 10px; width: 90%; margin-right: .5%; }
-        form button { width: 9%; background: rgb(130, 224, 255); border: none; padding: 10px; }
-    </style>
-
     <script src="http://underscorejs.org/underscore.js"></script>
     <script type="text/javascript" src="../../../node_modules/jquery/dist/jquery.js"></script>
     <script src="http://backbonejs.org/backbone.js"></script>
@@ -33,33 +25,27 @@
 </head>
 
 <body>
-<form action = "">
-<select id="WidgetSelect"></select> <input type="number", id="ValueID"> <button>Add</button>
-</form>
+<select id="WidgetSelect"></select> <select id="valueSelect"></select> <button id="addButton">Add</button>
+
 
 <div class="gridster">
     <ul></ul>
 </div>
+</div>
 
 
-<!-- <script type="text/javascript" src="/src/tsnode/UI/grid.js"></script> -->
+
 <script type="text/javascript" src="../../tsnode/ui/dashboard.js"></script>
 
-<!-- <script>
+<script>
     var socket = io();
-    $('form').submit(function(){
-        socket.emit('message', $('#ValueID').val());
-        $('#ValueID').val('');
-        return false;
-    });
+
     socket.on('message', function(msg){
-        //dashboard.decodeValue(msg);
         dashboard.decodeMessage(msg);
     });
 
-//    setInterval(function(){
-//        socket.emit('message', "NACHRICHT");
-//    }, 500);
-</script> -->
+
+</script>
+
 </body>
 </html>
