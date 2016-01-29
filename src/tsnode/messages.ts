@@ -11,7 +11,7 @@ class Topic {
 
     static SPEED =              new Topic(140, "value.speed");
     static MAF =                new Topic(350, "value.mass air flow");
-    static CO0LANT_PRESSURE =   new Topic(110, "value.coolant temperature");
+    static COOLANT_PRESSURE =   new Topic(110, "value.coolant temperature");
     static FUEL_PRESSURE =      new Topic(120, "value.fuel pressure");
     static RPM =                new Topic(130, "value.RPM");
     static STEERING =           new Topic(150, "value.steering");
@@ -40,7 +40,7 @@ class Topic {
 
     static VALUES: Topic[] = [     Topic.SPEED,
         Topic.MAF,
-        Topic.CO0LANT_PRESSURE,
+        Topic.COOLANT_PRESSURE,
         Topic.FUEL_PRESSURE,
         Topic.RPM,
         Topic.STEERING,
@@ -88,7 +88,7 @@ class Topic {
 
 //super class for all Message Types
 class Message {
-    private topic:Topic;
+    topic:Topic;
 
     constructor(pTopic:Topic) {
         this.topic = pTopic;
@@ -100,8 +100,8 @@ class Message {
 }
 
 class ValueAnswerMessage extends Message {
-    private times: number[];
-    private values: any[];
+    times: number[];
+    values: any[];
     constructor(pTopic: Topic, times: number[], values: any[]) {
         super(pTopic);
         this.times = times;
@@ -128,7 +128,7 @@ class DBRequest {
 }
 
 class DBRequestMessage extends Message {
-    private req: DBRequest;
+    req: DBRequest;
 
     constructor(pReq: DBRequest) {
         super(Topic.DBREQ_MSG);
