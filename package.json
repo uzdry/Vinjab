@@ -21,7 +21,8 @@
     "eslint": "~1.10.3",
     "backbone": "~1.2.3",
     "underscore": "~1.8.3",
-    "tsd": "~0.6.5"
+    "tsd": "~0.6.5",
+    "browserify": "~13.0.0"
   },
   "dependencies": {
     "leveldown": "1.4.3",
@@ -29,7 +30,8 @@
     "jquery": "~2.2.0",
     "socket.io": "~1.4.4",
     "gridster": "~0.5.6",
-    "express": "~4.13.4"
+    "express": "~4.13.4",
+    "socket.io-client": "~1.4.5"
   },
   "engines": {
     "node": ">=0.10.0"

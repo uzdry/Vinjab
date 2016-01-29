@@ -1,4 +1,4 @@
-///<reference path="/Applications/WebStorm.app/Contents/plugins/JavaScriptLanguage/typescriptCompiler/external/lib.es6.d.ts"/>
+///<reference path="C:\Program Files (x86)\JetBrains\WebStorm 11.0.3\plugins\JavaScriptLanguage\typescriptCompiler\external\lib.es6.d.ts"/>
 
 import {DBRequestMessage, ValueAnswerMessage, ValueMessage, Topic, Message} from "./messages";
 import {BusDevice} from "./Bus";
@@ -10,28 +10,23 @@ class Distance extends BusDevice {
     private lastTimeInMS: number;
     private lastSpeedInMpS: number;
 
-    /**
-     Constructor;
-     On init, the old value of distanceinmeters must be fetched from the database and given to the constructor!
-     @param oldDistance: number: the distance the vehicle has moved overall since the first system start
-     */
-    constructor(oldDistance: number) {
+    constructor() {
         super();
-        this.currentDistanceInMeters = oldDistance;
+        this.currentDistanceInMeters = 0;
         this.lastTimeInMS = 0;
         this.lastSpeedInMpS = 0;
-        this.subscribe(new Topic(140, "SPEED")); //TODO: SPEED.TOPIC
+        this.subscribe(Topic.SPEED);
     }
 
     public handleMessage(m: Message) {
-        if ((m instanceof ValueMessage) && m.getTopic().getID() == 140) { //TODO: SPEED.TOPIC
+        if ((m instanceof ValueMessage) && m.getTopic() == Topic.SPEED) {
             var currentTime = Date.now();
             var currentSpeed = m.value.numericalValue() * 0.2777777778;
             var avgSpeed = 0.5 * this.lastSpeedInMpS + currentSpeed;
             this.currentDistanceInMeters += (currentTime - this.lastTimeInMS) * 0.001 * avgSpeed;
             this.lastTimeInMS = currentTime;
             this.lastSpeedInMpS = m.value.numericalValue();
-            this.broker.handleMessage(new ValueMessage(new Topic(330, "mileage"), new Value(this.currentDistanceInMeters, "meters"))); //TODO: Distance.Tpoic
+            this.broker.handleMessage(new ValueMessage(Topic.MILEAGE, new Value(this.currentDistanceInMeters, "meters")));
         }
     }
 }
@@ -43,10 +38,11 @@ class AverageSpeed extends BusDevice {
     constructor () {
         super();
         this.avgSpeed = 0;
+        this.subscribe(Topic.SPEED)
     }
 
     public handleMessage(m: Message) {
-        if(m instanceof ValueMessage && m.getTopic().getID() == 0) { //TODO: SPEED.TOPIC
+        if(m instanceof ValueMessage && m.getTopic() == Topic.SPEED) {
             this.numberOfValues++;
             this.avgSpeed = this.avgSpeed * 1-(1/this.numberOfValues) + m.value.numericalValue() / this.numberOfValues;
             this.broker.handleMessage(new ValueMessage(Topic.AVG_SPEED, new Value(this.avgSpeed, "Km/h")));

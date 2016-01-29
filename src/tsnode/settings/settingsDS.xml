@@ -1,3 +1,4 @@
+<!-- @Author: David G. -->
 <root>
     <ruid>root</ruid>
     <name>ROOT</name>
@@ -24,7 +25,18 @@
                 <name>Parameter 1</name>
                 <description>Description of Parameter 1</description>
                 <imageURL>../../img/settings/p1.png</imageURL>
+                <topicID>101</topicID>
+                <topicName>topicName_par1</topicName>
             </npar>
+            <npar>
+                <ruid>par2</ruid>
+                <name>Parameter 2</name>
+                <description>Description of Parameter 2</description>
+                <imageURL>../../img/settings/p2.png</imageURL>
+                <topicID>201</topicID>
+                <topicName>topicName_par2</topicName>
+            </npar>
+
         </dir>
     </dir>
 </root>
