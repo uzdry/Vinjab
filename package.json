@@ -25,6 +25,7 @@
     "browserify": "~13.0.0"
   },
   "dependencies": {
+    "bower": "^1.7.7",
     "express": "~4.13.4",
     "gridster": "^0.5.6",
     "jquery": "~2.2.0",
