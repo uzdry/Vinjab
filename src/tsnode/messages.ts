@@ -117,8 +117,8 @@ class ValueAnswerMessage extends Message {
 }
 
 class ValueMessage extends Message {
-    public value: Utils.Value;
-    constructor(pTopic: Topic, pValue: Utils.Value ) {
+    public value: Value;
+    constructor(pTopic: Topic, pValue: Value ) {
         super(pTopic);
         this.value= pValue;
     }
@@ -140,4 +140,24 @@ class DBRequestMessage extends Message {
     }
 }
 
-export {Topic, Message, ValueMessage, ValueAnswerMessage, DBRequest, DBRequestMessage};
+class Value {
+    private value: number;
+    private identifier: string;
+
+    constructor(pValue:number, pID: string) {
+        this.value = pValue;
+        this.identifier = pID;
+    }
+
+    public numericalValue(): number {
+        return this.value;
+    }
+
+    public getIdentifier(): string{
+        return this.identifier;
+    }
+
+}
+
+
+export {Topic, Message, ValueMessage, ValueAnswerMessage, DBRequest, DBRequestMessage, Value};

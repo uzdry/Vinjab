@@ -6,13 +6,11 @@
 ///<reference path="../../../typings/socket.io/socket.io.d.ts" />
 ///<reference path="widgets/textWidget.ts"/>
 ///<reference path="../Terminal.ts"/>
+///<reference path="../../../typings/postal/postal.d.ts"/>
+/* global postal, $ */
 
-
-//import Terminal from "../Terminal";
-
-
-
-
+import {Terminal} from "../Terminal"
+//import {Postal} from "postal";
 
 class Dashboard{
     /** MVC Stuff */
@@ -147,6 +145,15 @@ class Dashboard{
 
 var dashboard: Dashboard = new Dashboard();
 dashboard.startSelector();
+
+var ch = postal.channel("forward");
+
+var sub = ch.subscribe("value.*", function(data, envelope) {
+    console.log(data);
+});
+
+
+var terminal = new Terminal();
 
 //==========================
 

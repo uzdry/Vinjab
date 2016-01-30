@@ -1,51 +1,30 @@
+<!doctype html>
+<html class="no-js" lang="">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="x-ua-compatible" content="ie=edge">
+        <title>testio</title>
 
-<html>
-<head>
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-    <title>Demo &raquo; Add widgets dynamically &raquo; gridster.js</title>
-    <link rel="stylesheet" type="text/css" href="../../../node_modules/gridster/dist/jquery.gridster.css">
-    <link rel="stylesheet" type="text/css" href="test.css">
+        <script type="text/javascript" src="../bower/jquery/jquery.min.js"></script>
+        <script type="text/javascript" src="../bower/lodash/dist/lodash.js"></script>
+        <script type="text/javascript" src="../bower/conduitjs/lib/conduit.min.js"></script>
+        <script type="text/javascript" src="./lib/postal.js"></script>
+        <script type="text/javascript" src="../bower/postal.diagnostics/lib/postal.diagnostics.js"></script>
 
-    <script src="http://underscorejs.org/underscore.js"></script>
-    <script type="text/javascript" src="../../../node_modules/jquery/dist/jquery.js"></script>
-    <script src="http://backbonejs.org/backbone.js"></script>
-    <script src="../../../node_modules/gridster/dist/jquery.gridster.js" type="text/javascript" charset="utf-8"></script>
-    <script src="../../../node_modules/socket.io-client/socket.io.js"></script>
-    <script src="../../js/canv-gauge/gauge.js"></script>
-    <script src="widgetFactory.js"></script>
-    <script src="grid.js"></script>
-    <script src="widget.js"></script>
-    <script src="widgets/speedGaugeWidget.js"></script>
-    <script src="widgets/percentGaugeWidget.js"></script>
-    <script src="widgets/textWidget.js"></script>
-    <script src="dataCollection.js"></script>
-    <script src="dataModel.js"></script>
+        <script src="js/plugins.js"></script>
 
 
-</head>
+        <script src="js/main.js"></script>
 
-<body>
-<select id="WidgetSelect"></select> <select id="valueSelect"></select> <button id="addButton">Add</button>
-
-
-<div class="gridster">
-    <ul></ul>
-</div>
-</div>
-
-
-
-<script type="text/javascript" src="../../tsnode/ui/dashboard.js"></script>
-
-<script>
-    var socket = io();
-
-    socket.on('message', function(msg){
-        dashboard.decodeMessage(msg);
-    });
-
-
-</script>
-
-</body>
+    </head>
+        <!-- Google Analytics: change UA-XXXXX-X to be your site's ID. -->
+        <script>
+            (function(b,o,i,l,e,r){b.GoogleAnalyticsObject=l;b[l]||(b[l]=
+            function(){(b[l].q=b[l].q||[]).push(arguments)});b[l].l=+new Date;
+            e=o.createElement(i);r=o.getElementsByTagName(i)[0];
+            e.src='https://www.google-analytics.com/analytics.js';
+            r.parentNode.insertBefore(e,r)}(window,document,'script','ga'));
+            ga('create','UA-XXXXX-X','auto');ga('send','pageview');
+        </script>
+    </body>
 </html>
