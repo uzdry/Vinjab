@@ -2,8 +2,7 @@
 
 
 import {BusDevice, Broker}  from "./Bus";
-import {Value} from "./Utils";
-import {Topic, Message, ValueMessage} from "./messages";
+import {Topic, Message, ValueMessage, Value} from "./messages";
 
 
 class Source extends BusDevice {
@@ -36,6 +35,9 @@ class Source extends BusDevice {
 
     }
 
+    /*
+    te
+    */
     public publish(t: Topic): void {
         var m: Message = new ValueMessage(t, this.value);
         Broker.get().handleMessage(m);

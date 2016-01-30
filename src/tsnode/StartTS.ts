@@ -3,8 +3,9 @@ import {BusDevice} from "./Bus";
 import {Topic, Message} from "./messages";
 import * as DBAccess from "./DBAccess";
 import {FuelConsumption} from "./AggregatedFunctions";
+import {Proxy} from "./Proxy"
 
-var terProx: TerminalProxy = new TerminalProxy();
+var terProx: Proxy = new Proxy();
 terProx.subscribe(Topic.FUEL_CONSUMPTION);
 
 var sources: Set<BusDevice> = new Set<BusDevice>();

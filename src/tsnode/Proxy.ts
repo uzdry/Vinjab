@@ -1,6 +1,3 @@
-import * as Bus from "./Bus";
-//import SettingsMessage from "./Bus";
-//import ValueMessage from "./Bus";
 import {BusDevice} from "./Bus";
 import {ValueAnswerMessage, DBRequestMessage, Message, ValueMessage, Topic} from "./messages";
 
@@ -81,4 +78,4 @@ class Proxy extends BusDevice {
 
 }
 
-
+export {Proxy}

@@ -149,7 +149,7 @@ dashboard.startSelector();
 var ch = postal.channel("forward");
 
 var sub = ch.subscribe("value.*", function(data, envelope) {
-    console.log(data);
+    console.log("got something");
 });
 
 
