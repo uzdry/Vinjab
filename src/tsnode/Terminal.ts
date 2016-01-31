@@ -45,6 +45,15 @@ class Terminal {
         this.connection.emit('message', JSON.stringify(message));
     }
 
+
+    public giveMessage():Message {
+        var message = this.connection.on(message, function(msg) {
+            return msg;
+        })
+
+
+    }
+
 }
 
 export {Terminal}
