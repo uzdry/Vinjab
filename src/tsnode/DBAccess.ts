@@ -2,7 +2,7 @@
 
 import levelup = require("levelup");
 import {BusDevice} from "./Bus";
-import {ValueAnswerMessage, DBRequest, DBRequestMessage, Message, ValueMessage, Topic} from "./messages";
+import {ValueAnswerMessage, DBRequest, DBRequestMessage, Message, ValueMessage, Topic, DashboardMessage, DashboardRspMessage} from "./messages";
 
 // The entry types that are to be written to the database:
 
@@ -26,39 +26,14 @@ class SensorValueEntry extends DBEntry {
     }
 }
 
-//enum for the fuel types
-enum fuel {Diesel, Unleaded, Super_Unleaded, Super_Plus_Unleaded}
-
 // Entry class for driver-specific info (dashboard-config, preferred fuel, whatever else we want to know)
 class DriverInfoEntry extends DBEntry {
-    private dashboardConfig : number; // Must be adjusted to representation of dashboardconfig!
-    private preferredFuel: fuel;
+    public dashboardConfig : String;
 
     //initialises a new DriverInfoEntry with a standard dashboardconfig and no preferred fuel
-    constructor (dbc: number, pf: fuel) {
+    constructor (dbc: String) {
         super();
-        this.dashboardConfig = dbc; // TODO: must be adjusted to standard dashboardconfig
-        this.preferredFuel = pf;
-    }
-
-    //getter for the dashboardconfig
-    getDashboardConfig() : number {
-        return this.dashboardConfig;
-    }
-
-    //setter for the dashboardconfig
-    setDashboardConfig(newDashboardConfig: number) : void {
-        this.dashboardConfig = newDashboardConfig;
-    }
-
-    //getter for the preferred fuel
-    getPreferredFuel() : fuel {
-        return this.preferredFuel;
-    }
-
-    //setter for the preferred fuel
-    setPreferredFuel(newPreferedFuel : fuel) : void {
-        this.preferredFuel = newPreferedFuel;
+        this.dashboardConfig = dbc;
     }
 }
 
@@ -120,8 +95,8 @@ class LevelDBAccess {
     }
 
     //puts a new driver's information to the database
-    putDriverInfo(driver: String) {
-        this.db.put(driver, JSON.stringify(new DriverInfoEntry(0, fuel.Diesel))); //TODO: put standard values or values from msg
+    putDriverInfo(driver: String, config: String) {
+        this.db.put(driver, JSON.stringify(new DriverInfoEntry(config)));
     }
 
     /*
@@ -149,6 +124,17 @@ class LevelDBAccess {
                 }
             });
         }
+    }
+
+    //deletes an entry for a key from the db
+    protected deleteFromKey(k: any) {
+        this.db.get(k, function(value, err) {
+            if(err && !err.notFound) {
+                console.log(err);
+            } else {
+                this.db.delete(k);
+            }
+        })
     }
 
     //increments the variables for the size of the database both locally and in the db entry
@@ -192,13 +178,13 @@ class LevelDBAccess {
 
     //calls levelup to find the config entry for a certain driver and gives it to a callback function
     public getDriverEntry(driver: String, callback) {
-        this.db.get(driver, function(err, value) {
+        this.db.get(driver, function(value, err) {
             if(err.notFound) {
                 console.log(err + "The Driver was not yet put into the Database");
             } else if(err) {
                 console.log("Error:" + err);
             } else {
-                var dr = new DriverInfoEntry(JSON.parse(value).dashboardConfig, JSON.parse(value).preferredfFuel);
+                var dr = new DriverInfoEntry(JSON.parse(value).dashboardConfig);
                 callback(dr);
             }
         })
@@ -217,11 +203,16 @@ class DBBusDevice extends BusDevice {
         this.subscribe(Topic.SETTINGS_MSG);
         this.subscribe(Topic.DBREQ_MSG);
         this.subscribeAll(Topic.VALUES);
+        this.subscribe(Topic.DASHBOARD_MSG);
     }
 
     public sendValueMessage(content: SensorValueEntry[], times: number[]) {
         this.broker.handleMessage(new ValueAnswerMessage(Topic.VALUE_ANSWER_MSG, times, content));
 }
+
+    public sendDashboardRspMessage(user: String, content: String){
+        this.broker.handleMessage(new DashboardRspMessage(user, content));
+    }
 
     //the overriden handleMessage-function. depending on the type of the message, a different action is performed.
     public handleMessage(m: Message): void {
@@ -234,20 +225,36 @@ class DBBusDevice extends BusDevice {
                         this.sendValueMessage(res, tim);
                     });
             }
-            //handling of a Driver Info Request: the Info is fetched from the DB and a driver response is sent
-            else if (m.getRequest() instanceof DBDriverInfoRequest) {
-                var n = <DBDriverInfoRequest>m.getRequest();
-                this.dbAccess.getDriverEntry(n.getDriver(), function(dr: DriverInfoEntry){
-                    this.sendDriverMessage(dr); //TODO: actually implement driver message
-                });
-            }
         }
         //If the given message is a regular value message, it is written to the db
         else if (m instanceof ValueMessage) {
             this.dbAccess.putSensorValue(m.value.getIdentifier(), m.value.numericalValue);
+        }
+        //If the given message is a DashboardMessage, it is either written to the db or fetched from the db
+        else if(m instanceof DashboardMessage) {
+            var dbm = <DashboardMessage> m;
+            if(dbm.request) {
+                this.dbAccess.getDriverEntry(dbm.user, function(value, err) {
+                    if (err) console.log(err);
+                    else this.sendDashboardRspMessage(value.dashboardConfig);
+                })
+            } else {
+                this.dbAccess.getDriverEntry(dbm.user, function(value, err) {
+                    if(err.notFound) {
+                        this.dbAccess.putDriverInfo(dbm.user, dbm.config, function(err) {
+                            console.log(err);
+                        });
+                    } else if (err) {
+                        console.log(err);
+                    } else {
+                        this.dbAccess.deleteFromKey(dbm.user);
+                        this.dbAccess.putDriverInfo(dbm.user, dbm.config);
+                    }
+                })
+            }
+        }
       //  } else if (m instanceof SettingsMessage) {
             //TODO: understand the organisation of settingsMessages and put them to the db accordingly
-        }
     }
 }
 
@@ -276,33 +283,8 @@ class DBValueRequest extends DBRequest {
     }
 }
 
-class DBDriverInfoRequest extends DBRequest {
-    private driver:String;
-    private dashboardConfig:boolean;
-    private preferredfFuel:boolean;
-
-    constructor(driver:String, dashboardConfig:boolean, preferredFuel:boolean) {
-        super();
-        this.driver = driver;
-        this.dashboardConfig = dashboardConfig;
-        this.preferredfFuel = preferredFuel;
-    }
-
-    public getDriver():String {
-        return this.driver;
-    }
-
-    public getDashboardConfig():boolean {
-        return this.dashboardConfig;
-    }
-
-    public getPreferredFuel():boolean {
-        return this.preferredfFuel;
-    }
-}
-
 class DBSettingsRequest extends DBRequest {
 
 }
 
-export {DBRequest, DBValueRequest, DBDriverInfoRequest, DBSettingsRequest, DBBusDevice};
+export {DBRequest, DBValueRequest, DBSettingsRequest, DBBusDevice};
