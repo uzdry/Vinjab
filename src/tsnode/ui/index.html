@@ -6,11 +6,11 @@
     <link rel="stylesheet" type="text/css" href="../../../node_modules/gridster/dist/jquery.gridster.css">
     <link rel="stylesheet" type="text/css" href="test.css">
 
-    <script type="text/javascript" src="../../../bower/lodash/lodash.js"></script>
-    <script type="text/javascript" src="../../../bower/jquery/jquery.min.js"></script>
-    <script type="text/javascript" src="../../../bower/conduitjs/lib/conduit.min.js"></script>
+    <script type="text/javascript" src="../../../bower_components/lodash/lodash.js"></script>
+    <script type="text/javascript" src="../../../bower_components/jquery/jquery.min.js"></script>
+    <script type="text/javascript" src="../../../bower_components/conduitjs/lib/conduit.min.js"></script>
     <script type="text/javascript" src="../../lib/postal.js"></script>
-    <script type="text/javascript" src="../../../bower/postal.diagnostics/lib/postal.diagnostics.js"></script>
+    <script type="text/javascript" src="../../../bower_components/postal.diagnostics/lib/postal.diagnostics.js"></script>
 
     <script src="http://underscorejs.org/underscore.js"></script>
     <script type="text/javascript" src="../../../node_modules/jquery/dist/jquery.js"></script>
@@ -32,18 +32,44 @@
 </head>
 
 <body>
+<p><button id="bDashboard">Dashboard</button><button id="bEditMode">EditMode</button><button id="bSettings">Settings</button></p>
+<div id="dEditMode">
 <select id="WidgetSelect"></select> <select id="valueSelect"></select> <button id="addButton">Add</button>
+</div>
 
-
+<div id="dDashboard">
 <div class="gridster">
     <ul></ul>
 </div>
 </div>
 
+<div id="dSettings">
+<div id="div1" style="margin-left:40px; margin-right:40px"></div>
+</div>
 
 
-<script type="text/javascript" src="../../tsnode/ui/browdash.js"></script>
 
+<script type="text/javascript" src="../../tsnode/ui/dashboard.b.js"></script>
+<script src="../settings/TSettings.js"></script>
+
+
+<script>
+    $( "#bDashboard" ).click(function() {
+        $( "#dDashboard" ).show( "slow" );
+        $( "#dSettings").hide("slow");
+        $( "#dEditMode").hide("slow");
+    });
+    $( "#bSettings" ).click(function() {
+        $( "#dDashboard" ).hide( "slow" );
+        $( "#dSettings").show("slow");
+        $( "#dEditMode").hide("slow");
+    });
+    $( "#bEditMode" ).click(function() {
+        $( "#dDashboard" ).show( "slow" );
+        $( "#dSettings").hide("slow");
+        $( "#dEditMode").show("slow");
+    });
+</script>
 
 </body>
 </html>

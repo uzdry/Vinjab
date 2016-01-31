@@ -78,4 +78,6 @@ class Proxy extends BusDevice {
 
 }
 
+var proxy = new Proxy();
+
 export {Proxy}

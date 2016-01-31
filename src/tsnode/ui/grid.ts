@@ -2,7 +2,7 @@
 /// <reference path="../../../typings/socket.io/socket.io.d.ts" />
 /// <reference path="widget.ts" />
 /// <reference path="widgetFactory.ts" />
-
+/// <reference path="dashboard.ts" />
 
 class Grid {
 
@@ -20,8 +20,11 @@ class Grid {
     widgets: {[id: string]: Widget; } = {};
 
     widgetFactory: WidgetFactory;
+    dashboard: Dashboard;
 
-    constructor(factory: WidgetFactory){
+    constructor(factory: WidgetFactory, dashboard: Dashboard){
+
+        this.dashboard = dashboard;
 
         // Create the gridster instance
         this.gridster = $(".gridster ul").gridster({
@@ -38,7 +41,9 @@ class Grid {
                     var name:string = outerHTML.match("id=\"(.*?)\"")[1];
 
                     dashboard.grid.widgets[name].resize(size_x * dashboard.grid.cube_sizex, size_y * dashboard.grid.cube_sizey);
-                }
+
+                    this.sendDashboardConfig();
+                }.bind(this)
             }
         }).data('gridster');
             /*{widget_base_dimensions: [100, 100],
@@ -59,10 +64,6 @@ class Grid {
         this.widgetsJQuery[widget.widgetID]=widget.htmlWrapper;
 
         this.widgets[widget.widgetID]=widget;
-
-        //console.log(JSON.stringify(widget.htmlWrapper));
-        //console.log(widget.htmlWrapper);
-
 
         widget.init();
 
@@ -108,6 +109,10 @@ class Grid {
             widget.init();
 
         }
+    }
+
+    sendDashboardConfig(){
+
     }
 
 }

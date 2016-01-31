@@ -19,19 +19,18 @@ class Terminal {
      * public constructor
      */
     constructor() {
+
         this.connection = io();
         this.connection.emit('createChannel');
 
-        var channel = postal.channel("forward");
+        var channel = postal.channel("values");
 
         var msg = this.connection.on('message', function(msg) {
-            console.log("aha")
             var message = JSON.parse(msg);
-            channel.publish("value.yap", {message});
+            channel.publish(message.topic.name, message);
         });
 
         channel.publish("value.speed", new ValueMessage(Topic.SPEED, new Value(123,"dd")));
-
 
     }
 

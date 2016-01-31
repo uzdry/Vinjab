@@ -39,14 +39,15 @@ io.sockets.on('connection', function (socket) {
         console.log(msg);
     });
 
+
     setInterval(function () {
         socket.emit('message', JSON.stringify(new ValueMessage(Topic.SPEED, new Value(cnt++, "km/h"))));
         cnt %= 220;
-    }, 200);
+    }, 2000);
     setInterval(function(){
         socket.emit('message', JSON.stringify(new ValueMessage(Topic.FUEL, new Value(cnt2++, "%"))));
         cnt2 %= 100;
-    }, 100);
+    }, 1000);
     setInterval(function(){
         socket.emit('message', JSON.stringify(new ValueMessage(Topic.STEERING, new Value(cnt3++, "degree"))));
         cnt3 %= 100;
@@ -54,15 +55,15 @@ io.sockets.on('connection', function (socket) {
     setInterval(function(){
         socket.emit('message', JSON.stringify(new ValueMessage(Topic.TEMP_OUT, new Value(cnt4++, "celcius"))));
         cnt4 %= 100;
-    }, 500);
+    }, 5000);
     setInterval(function(){
         socket.emit('message', JSON.stringify(new ValueMessage(Topic.TORQUE, new Value(cnt5++, ""))));
         cnt5 %= 220;
-    }, 50);
+    }, 5000);
     setInterval(function(){
         socket.emit('message', JSON.stringify(new ValueMessage(Topic.ENGINE_RUNTIME, new Value(cnt6++, "s"))));
         cnt6 %= 220;
-    }, 10);
+    }, 1000);
 
 });
 

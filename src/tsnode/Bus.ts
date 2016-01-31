@@ -1,4 +1,4 @@
-///<reference path="/Applications/WebStorm.app/Contents/plugins/JavaScriptLanguage/typescriptCompiler/external/lib.es6.d.ts"/>
+///<reference path="/home/nutzio/PSE/WebStorm/plugins/JavaScriptLanguage/typescriptCompiler/external/lib.es6.d.ts" />
 ///<reference path="../../typings/node/node.d.ts"/>
 
 import {DBRequest} from "./DBAccess";

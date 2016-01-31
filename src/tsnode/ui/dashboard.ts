@@ -8,10 +8,7 @@
 ///<reference path="../Terminal.ts"/>
 
 
-//import Terminal from "../Terminal";
-
-
-
+import {Terminal} from "../Terminal"
 
 
 class Dashboard{
@@ -21,9 +18,6 @@ class Dashboard{
     /** Widget Stuff */
     widgetFactory: WidgetFactory;
     grid: Grid;
-
-    //gridHtml: HTMLElement = document.getElementsByClassName("gridster");
-
 
     selector:HTMLSelectElement = <HTMLSelectElement>document.getElementById("WidgetSelect");
     idSelector:HTMLSelectElement = <HTMLSelectElement>document.getElementById("valueSelect");
@@ -37,8 +31,8 @@ class Dashboard{
 
     constructor(){
         this.dataCollection = new DataCollection();
-        this.widgetFactory = new WidgetFactory(this.dataCollection);
-        this.grid = new Grid(this.widgetFactory);
+        this.widgetFactory = new WidgetFactory(this.dataCollection, this);
+        this.grid = new Grid(this.widgetFactory, this);
 
         //Add all default widgetsJQuery
         this.widgetFactory.addWidget(new SpeedGaugeWidgetConfig());
@@ -54,39 +48,8 @@ class Dashboard{
 
         console.log("user=" + this.cookie);
 
-    }
 
-    test(){
-        var dataModel: DataModel = new DataModel({id: 12});
-        this.dataCollection.add(dataModel);
-
-        var widget = this.widgetFactory.createWidget("SpeedGauge", this.dataCollection.get(12));
-        this.grid.addWidget(widget);
-
-        var cnt: number = 0;
-
-        setInterval(function(){dataModel.set("value", cnt++);}, 500);
-
-    }
-
-    decodeMessage(s:string){
-
-
-        var message = JSON.parse(s);
-
-        var model: DataModel = this.dataCollection.get(message.topic.id);
-
-        if(!model){
-            model = new DataModel({id: message.topic.id});
-            this.dataCollection.add(model);
-
-            var c = document.createElement("option");
-            c.text = message.topic.name;
-            this.idSelector.options.add(c);
-        }
-
-        model.set({value: message.value.value, name: message.topic.name, unit: message.value.identifier});
-
+        this.startSelector();
     }
 
     static getCookie(cname: string): string {
@@ -143,16 +106,27 @@ class Dashboard{
         var valueName = this.idSelector[this.idSelector.selectedIndex].text;
 
         var widget = this.widgetFactory.createWidget(this.selector[this.selector.selectedIndex].text,
-            this.dataCollection.where({name: valueName})[0]);
+            parseInt(valueName.split(":")[1]));
         this.grid.addWidget(widget);
+    }
+
+    setAvailableSignals(signals:{[id: number]: SignalDescription;}){
+
+        for(var i in signals){
+            var c = document.createElement("option");
+            c.text = signals[i].name + ":" + signals[i].id;
+            this.idSelector.options.add(c);
+        }
+
     }
 
 }
 
 
-
+var terminal = new Terminal();
 var dashboard: Dashboard = new Dashboard();
 dashboard.startSelector();
+dashboard.widgetFactory.getSignals();
 
 
 

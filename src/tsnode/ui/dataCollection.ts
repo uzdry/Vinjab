@@ -25,12 +25,14 @@ class DataCollection extends Backbone.Collection<DataModel> {
         names.push(m.get("name"));
     }
 
-    getOrCreate(id: number){
-        var model:DataModel =this.get(id);
+    getOrCreate(options){
+        var model:DataModel = this.get(options.id);
         if(model == undefined){
-            model = new DataModel({id: id, value: 0});
+            model = new DataModel(options);
             this.add(model);
         }
+
+        model.set(options);
         return model;
 
     }
