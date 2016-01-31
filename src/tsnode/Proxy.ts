@@ -29,7 +29,7 @@ class Proxy extends BusDevice{
         this.app.use(express.static(__dirname + '/../..'));
         this.app.use(express.static(__dirname + '/../'));
         this.app.use(express.static(__dirname + '/ui' ));
-        this.app.use(express.static(__dirname + '/widgets' ));
+        this.app.use(express.static(__dirname + '/widgetsJQuery' ));
         this.app.use(express.static(__dirname + '/settings'))
 
         this.app.get('/ui', function(req, res){

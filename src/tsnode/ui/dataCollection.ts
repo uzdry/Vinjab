@@ -2,6 +2,7 @@
 ///<reference path="widget.ts" />
 ///<reference path="dataModel.ts" />
 
+import Model = Backbone.Model;
 var names: string[] = [];
 
 class DataCollection extends Backbone.Collection<DataModel> {
@@ -22,6 +23,16 @@ class DataCollection extends Backbone.Collection<DataModel> {
 
     addName(m: DataModel){
         names.push(m.get("name"));
+    }
+
+    getOrCreate(id: number){
+        var model:DataModel =this.get(id);
+        if(model == undefined){
+            model = new DataModel({id: id, value: 0});
+            this.add(model);
+        }
+        return model;
+
     }
 
 }

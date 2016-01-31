@@ -19,8 +19,10 @@ class Dashboard{
     dataCollection: DataCollection = new DataCollection();
 
     /** Widget Stuff */
-    widgetFactory: WidgetFactory = new WidgetFactory();
-    grid: Grid = new Grid();
+    widgetFactory: WidgetFactory;
+    grid: Grid;
+
+    //gridHtml: HTMLElement = document.getElementsByClassName("gridster");
 
 
     selector:HTMLSelectElement = <HTMLSelectElement>document.getElementById("WidgetSelect");
@@ -35,10 +37,10 @@ class Dashboard{
 
     constructor(){
         this.dataCollection = new DataCollection();
-        this.widgetFactory = new WidgetFactory();
-        this.grid = new Grid();
+        this.widgetFactory = new WidgetFactory(this.dataCollection);
+        this.grid = new Grid(this.widgetFactory);
 
-        //Add all default widgets
+        //Add all default widgetsJQuery
         this.widgetFactory.addWidget(new SpeedGaugeWidgetConfig());
         this.widgetFactory.addWidget(new TextWidgetConfig());
         this.widgetFactory.addWidget(new PercentGaugeWidgetConfig());
@@ -46,8 +48,12 @@ class Dashboard{
         this.cookie = Dashboard.getCookie("user");
 
         if(this.cookie === ""){
-            document.cookie = "user=idiot";
+            this.cookie = Dashboard.makeid();
+            document.cookie = "user=" + this.cookie;
         }
+
+        console.log("user=" + this.cookie);
+
     }
 
     test(){
@@ -147,6 +153,8 @@ class Dashboard{
 
 var dashboard: Dashboard = new Dashboard();
 dashboard.startSelector();
+
+
 
 //==========================
 

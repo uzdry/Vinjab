@@ -8,6 +8,19 @@
 class WidgetFactory{
 
     private widgetConfigurations: { [id: string] : WidgetConfig; } = {};
+    private dataCollection: DataCollection;
+
+    constructor(dataCollection: DataCollection){
+        this.dataCollection = dataCollection;
+    }
+
+    createWidgetFromConfig(conf: WidgetSerConfig):Widget{
+
+        var model: DataModel = this.dataCollection.getOrCreate(conf.id);
+
+        return this.createWidget(conf.name, model);
+
+    }
 
     createWidget(widgetTagName: string, model :DataModel, options?):Widget{
         var widgetConfig = this.widgetConfigurations[widgetTagName];

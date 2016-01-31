@@ -3,6 +3,9 @@
 
 abstract class Widget extends Backbone.View<DataModel> {
 
+    /** Widget ID */
+    widgetID: string;
+
     /** Name of the Widget Type */
     typeID: string;
 
@@ -23,6 +26,10 @@ abstract class Widget extends Backbone.View<DataModel> {
         super(options);
     }
 
+    /** Resize the widgets
+     * attributes are the size in pixels*/
+    abstract resize(size_x: number, size_y: number);
+
 }
 
 interface WidgetConfig {
@@ -39,4 +46,15 @@ interface WidgetConfig {
 
     // Same as with datasource plugin, but there is no updateCallback parameter in this case.
     newInstance(config): Widget;
+}
+
+class WidgetSerConfig{
+
+    name: string;
+    id: number;
+    size_x: number;
+    size_y: number;
+    col: number;
+    row: number;
+
 }

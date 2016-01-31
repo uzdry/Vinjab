@@ -16,8 +16,10 @@ class TextWidgetConfig implements WidgetConfig{
 
 class TextWidget extends Widget{
 
+    static widgetCounter: number = 0;
+
     /** Name of the Widget Type */
-    typeID: string = "text";
+    typeID: string = "TextWidget";
 
     /** HTML-String that is pushed into the HTML-File */
     htmlElement: string;
@@ -38,13 +40,17 @@ class TextWidget extends Widget{
 
 
     init() {
-        this.htmlText = <HTMLParagraphElement>document.getElementById("" + this.typeID + "-" + this.model.id);
+        this.htmlText = <HTMLParagraphElement>document.getElementById(this.widgetID);
         this.htmlText.innerHTML = "<br ><br ><br ><br ><br >"+ this.model.get("name") + "<br >" + this.value;
     }
 
     constructor(options?){
         super(options);
-        this.htmlElement = "<li><p align=\"center\" id=\"" + this.typeID + "-" + this.model.id  + "\"> </p></li>";
+
+        this.widgetID = this.typeID + "-" + this.model.id + "-" + TextWidget.widgetCounter;
+        TextWidget.widgetCounter++;
+
+        this.htmlElement = "<li><p align=\"center\" id=\"" + this.widgetID  + "\"> </p></li>";
         this.value = options.value;
         this.id = options.id;
     }
@@ -61,6 +67,10 @@ class TextWidget extends Widget{
         this.htmlText.innerHTML = "<br ><br ><br ><br ><br >"+ this.model.get("name") + "<br >" + this.value;
 
         return this;
+    }
+
+    resize(size_x: number, size_y:number){
+
     }
 
 

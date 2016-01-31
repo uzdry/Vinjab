@@ -20,8 +20,10 @@ class SpeedGaugeWidgetConfig implements WidgetConfig{
 
 class SpeedGaugeWidget extends Widget{
 
+    static widgetCounter: number = 0;
+
     /** Tag name */
-    typeID: string = "speed_gauge";
+    typeID: string = "SpeedGauge";
 
     /** Main Element of the Gauge */
     gauge: Gauge;
@@ -67,10 +69,13 @@ class SpeedGaugeWidget extends Widget{
 
         super(options);
 
-        //Save the HTMLElements
-        this.htmlElement = "<li><canvas id=\""+ this.typeID + "-" + this.model.id + "\"></canvas></li>";
+        this.widgetID = this.typeID + "-" + this.model.id + "-" + SpeedGaugeWidget.widgetCounter;
+        SpeedGaugeWidget.widgetCounter++;
 
-        this.config.renderTo = "" + this.typeID + "-" + this.model.id;
+        //Save the HTMLElements
+        this.htmlElement = "<li><canvas id=\""+ this.widgetID + "\"></canvas></li>";
+
+        this.config.renderTo = this.widgetID;
 
         this.config.title = this.model.get("name");
 
@@ -99,7 +104,12 @@ class SpeedGaugeWidget extends Widget{
         this.gauge = new Gauge(this.config);
         this.gauge.draw();
 
-        this.htmlElement.on
+    }
+
+    resize(size_x: number, size_y:number){
+        this.config.height = size_y;
+        this.config.width = size_x;
+        this.gauge.updateConfig(this.config);
     }
 
 }

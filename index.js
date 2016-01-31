@@ -10,7 +10,7 @@ var io = require('socket.io')(http);
 app.use(express.static(__dirname ));
 app.use(express.static(__dirname + '/src'));
 app.use(express.static(__dirname + '/src/tsnode/ui' ));
-app.use(express.static(__dirname + '/src/tsnode/ui/widgets' ));
+app.use(express.static(__dirname + '/src/tsnode/ui/widgetsJQuery' ));
 app.use(express.static(__dirname + '/src/tsnode/settings'))
 
 app.get('/ui', function(req, res){

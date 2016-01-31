@@ -9,23 +9,23 @@ gridster-0.1.0.d.ts may be freely distributed under the MIT license.
 Copyright (c) 2013 Josh Baldwin https://github.com/jbaldwin/gridster.d.ts
 
 Permission is hereby granted, free of charge, to any person
-obtaining a copy of this software and associated documentation 
-files (the "Software"), to deal in the Software without 
-restriction, including without limitation the rights to use, 
-copy, modify, merge, publish, distribute, sublicense, and/or sell 
-copies of the Software, and to permit persons to whom the 
+obtaining a copy of this software and associated documentation
+files (the "Software"), to deal in the Software without
+restriction, including without limitation the rights to use,
+copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the
 Software is furnished to do so, subject to the following conditions:
 
-The above copyright notice and this permission notice shall be 
+The above copyright notice and this permission notice shall be
 included in all copies or substantial portions of the Software.
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, 
-EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES 
-OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND 
-NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT 
-HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, 
-WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING 
-FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR 
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 OTHER DEALINGS IN THE SOFTWARE.
 */
 
@@ -235,8 +235,8 @@ interface Gridster {
 
 
     /**
-     * Resize all the widgets in the grid.
-     * @param options The options to use to resize the widgets.
+     * Resize all the widgetsJQuery in the grid.
+     * @param options The options to use to resize the widgetsJQuery.
      * @return Returns the instance of the Gridster class.
      **/
     resize_widget_dimensions(options: GridsterOptions): Gridster;
@@ -244,7 +244,7 @@ interface Gridster {
 	/**
 	* Remove a widget from the grid.
 	* @param el The jQuery wrapped HTMLElement you want to remove.
-	* @param silent Boolean If true widgets below the removed one will not move up.
+	* @param silent Boolean If true widgetsJQuery below the removed one will not move up.
 	* @param callback Callback function executed when the widget is removed.
 	* @return Returns the instance of the Gridster class.
 	**/
@@ -274,14 +274,14 @@ interface Gridster {
     set_widget_min_size(widget: number, size: number[]): Gridster;
 
 	/**
-	* Returns a serialized array of the widgets in the grid.
-	* @param $widgets The collection of jQuery wrap ed HTMLElements you want to serialize.  If no argument is passed a l widgets will be serialized.
+	* Returns a serialized array of the widgetsJQuery in the grid.
+	* @param $widgets The collection of jQuery wrap ed HTMLElements you want to serialize.  If no argument is passed a l widgetsJQuery will be serialized.
 	* @return Returns an array of objects with the data specified in the serialized_params option.
 	**/
 	serialize<T>($widgets?: HTMLElement[]): T[];
 
 	/**
-	* Returns a serialized array of the widgets that have changed their position.
+	* Returns a serialized array of the widgetsJQuery that have changed their position.
 	* @return Returns an array of objects with the data specified in the serialized_params option.
 	**/
 	serialize_changed<T>(): T[];
@@ -291,7 +291,7 @@ interface Gridster {
 	* @return Returns the instance of the Gridster class.
 	**/
 	enable(): Gridster;
-	
+
 	/**
 	* Disables dragging.
 	* @return Returns the instance of the Gridster class.

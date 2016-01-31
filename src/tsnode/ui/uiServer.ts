@@ -1,9 +1,7 @@
 // Requires
-import {Topic} from "../Bus";
-import {ValueMessage} from "../Bus";
 import {Value} from "../Utils";
-import {Message} from "../Bus";
 import {Source} from "../Source";
+import {ValueMessage, Topic} from "../messages";
 var express = require('express');
 var socketio = require('socket.io');
 
@@ -54,7 +52,7 @@ io.sockets.on('connection', function (socket) {
         cnt3 %= 100;
     }, 1000);
     setInterval(function(){
-        socket.emit('message', JSON.stringify(new ValueMessage(Topic.TEMPERATURE, new Value(cnt4++, "celcius"))));
+        socket.emit('message', JSON.stringify(new ValueMessage(Topic.TEMP_OUT, new Value(cnt4++, "celcius"))));
         cnt4 %= 100;
     }, 500);
     setInterval(function(){
@@ -62,7 +60,7 @@ io.sockets.on('connection', function (socket) {
         cnt5 %= 220;
     }, 50);
     setInterval(function(){
-        socket.emit('message', JSON.stringify(new ValueMessage(Topic.RUNTIME, new Value(cnt6++, "s"))));
+        socket.emit('message', JSON.stringify(new ValueMessage(Topic.ENGINE_RUNTIME, new Value(cnt6++, "s"))));
         cnt6 %= 220;
     }, 10);
 
