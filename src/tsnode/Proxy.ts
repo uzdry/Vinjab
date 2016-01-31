@@ -13,6 +13,7 @@ class Proxy extends BusDevice {
      */
     private app;
     private io;
+    private id:string;
 
     constructor() {
         super();
@@ -51,6 +52,7 @@ class Proxy extends BusDevice {
             });
 
             socket.on('createChannel', function (){
+                this.id = socket.id.toString();
                 socket.join(socket.id.toString());
             })
 
@@ -71,9 +73,7 @@ class Proxy extends BusDevice {
      * @param socket the connection
      */
     public handleMessage(message: Message): void {
-        this.io.on('connection', function (socket) {
-            socket.to(socket.id.toString()).emit('message', JSON.stringify(message));
-        });
+        this.io.to(this.id).emit('message', JSON.stringify(message));
     }
 
 }
