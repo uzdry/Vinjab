@@ -11,7 +11,7 @@ class Topic {
 
     static SPEED =              new Topic(140, "value.speed");
     static MAF =                new Topic(350, "value.mass air flow");
-    static COOLANT_PRESSURE =   new Topic(110, "value.coolant temperature");
+    static CO0LANT_PRESSURE =   new Topic(110, "value.coolant temperature");
     static FUEL_PRESSURE =      new Topic(120, "value.fuel pressure");
     static RPM =                new Topic(130, "value.RPM");
     static STEERING =           new Topic(150, "value.steering");
@@ -38,9 +38,12 @@ class Topic {
     static AVG_SPEED =          new Topic(340, "value.aggregated.average speed");
     static FUEL_CONSUMPTION_H = new Topic(360, "value.aggregated.fuel per hour")
 
+    static DASHBOARD_MSG =      new Topic(370, "dashboard settings message");
+    static DASHBOARD_ANS_MSG =  new Topic(380, "dashboard settings message from database")
+
     static VALUES: Topic[] = [     Topic.SPEED,
         Topic.MAF,
-        Topic.COOLANT_PRESSURE,
+        Topic.CO0LANT_PRESSURE,
         Topic.FUEL_PRESSURE,
         Topic.RPM,
         Topic.STEERING,
@@ -88,7 +91,7 @@ class Topic {
 
 //super class for all Message Types
 class Message {
-    topic:Topic;
+    private topic:Topic;
 
     constructor(pTopic:Topic) {
         this.topic = pTopic;
@@ -100,8 +103,8 @@ class Message {
 }
 
 class ValueAnswerMessage extends Message {
-    times: number[];
-    values: any[];
+    private times: number[];
+    private values: any[];
     constructor(pTopic: Topic, times: number[], values: any[]) {
         super(pTopic);
         this.times = times;
@@ -117,8 +120,8 @@ class ValueAnswerMessage extends Message {
 }
 
 class ValueMessage extends Message {
-    public value: Value;
-    constructor(pTopic: Topic, pValue: Value ) {
+    public value: Utils.Value;
+    constructor(pTopic: Topic, pValue: Utils.Value ) {
         super(pTopic);
         this.value= pValue;
     }
@@ -128,7 +131,7 @@ class DBRequest {
 }
 
 class DBRequestMessage extends Message {
-    req: DBRequest;
+    private req: DBRequest;
 
     constructor(pReq: DBRequest) {
         super(Topic.DBREQ_MSG);
@@ -138,6 +141,31 @@ class DBRequestMessage extends Message {
     public getRequest():DBRequest {
         return this.req
     }
+}
+
+class DashboardMessage extends Message {
+    public request: Boolean;
+    public user: String;
+    public config: String;
+
+    constructor(usr: String, cnfg: String, req: Boolean) {
+        super(Topic.DASHBOARD_MSG);
+        this.request = req;
+        this.user = usr;
+        this.config = cnfg;
+    }
+}
+
+class DashboardRspMessage extends Message {
+    public user: String;
+    public config: String;
+
+    constructor(usr: String, cnfg: String) {
+        super(Topic.DASHBOARD_MSG);
+        this.user = usr;
+        this.config = cnfg;
+    }
+
 }
 
 class Value {
@@ -160,4 +188,4 @@ class Value {
 }
 
 
-export {Topic, Message, ValueMessage, ValueAnswerMessage, DBRequest, DBRequestMessage, Value};
+export {Topic, Message, ValueMessage, ValueAnswerMessage, DBRequest, DBRequestMessage, Value, DashboardMessage, DashboardRspMessage};
