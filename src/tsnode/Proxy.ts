@@ -1,6 +1,3 @@
-import * as Bus from "./Bus";
-//import SettingsMessage from "./Bus";
-//import ValueMessage from "./Bus";
 import {BusDevice} from "./Bus";
 import {ValueAnswerMessage, DBRequestMessage, Message, ValueMessage, Topic} from "./messages";
 
@@ -9,7 +6,7 @@ import {ValueAnswerMessage, DBRequestMessage, Message, ValueMessage, Topic} from
  */
 /// <reference path="../../typings/socket.io/socket.io.d.ts"/>
 
-class Proxy extends BusDevice{
+class Proxy extends BusDevice {
 
     /**
      * public constructor, set a server connection to the client
@@ -73,14 +70,12 @@ class Proxy extends BusDevice{
      * @param message the message should be delivered
      * @param socket the connection
      */
-    public handelMessage(message: Message): void {
-        this.io.on('', function (socket) {
+    public handleMessage(message: Message): void {
+        this.io.on('connection', function (socket) {
             socket.to(socket.id.toString()).emit('message', JSON.stringify(message));
-        })
+        });
     }
 
 }
 
-var proxy = new Proxy();
-
-
+export {Proxy}

@@ -6,6 +6,12 @@
     <link rel="stylesheet" type="text/css" href="../../../node_modules/gridster/dist/jquery.gridster.css">
     <link rel="stylesheet" type="text/css" href="test.css">
 
+    <script type="text/javascript" src="../../../bower/lodash/lodash.js"></script>
+    <script type="text/javascript" src="../../../bower/jquery/jquery.min.js"></script>
+    <script type="text/javascript" src="../../../bower/conduitjs/lib/conduit.min.js"></script>
+    <script type="text/javascript" src="../../lib/postal.js"></script>
+    <script type="text/javascript" src="../../../bower/postal.diagnostics/lib/postal.diagnostics.js"></script>
+
     <script src="http://underscorejs.org/underscore.js"></script>
     <script type="text/javascript" src="../../../node_modules/jquery/dist/jquery.js"></script>
     <script src="http://backbonejs.org/backbone.js"></script>
@@ -36,17 +42,8 @@
 
 
 
-<script type="text/javascript" src="../../tsnode/ui/dashboard.js"></script>
+<script type="text/javascript" src="../../tsnode/ui/browdash.js"></script>
 
-<script>
-    var socket = io();
-
-    socket.on('message', function(msg){
-        dashboard.decodeMessage(msg);
-    });
-
-
-</script>
 
 </body>
 </html>
