@@ -1,9 +1,6 @@
 import {BusDevice} from "./Bus";
 import {ValueAnswerMessage, DBRequestMessage, Message, ValueMessage, Topic} from "./messages";
 
-/**
- * Created by yimeng on 17/01/16.
- */
 /// <reference path="../../typings/socket.io/socket.io.d.ts"/>
 
 class Proxy extends BusDevice {
@@ -13,7 +10,7 @@ class Proxy extends BusDevice {
      */
     private app;
     private io;
-    private id:string;
+
 
     constructor() {
         super();
@@ -21,13 +18,15 @@ class Proxy extends BusDevice {
         var express = require('express');
         this.app = express();
         var http = require('http').Server(this.app);
-        this.io = require('socket.io')(http);
 
+        http.setMaxListeners(10000);
+
+        this.io = require('socket.io')(http);
 
         this.app.use(express.static(__dirname + '/../..'));
         this.app.use(express.static(__dirname + '/../'));
         this.app.use(express.static(__dirname + '/ui' ));
-        this.app.use(express.static(__dirname + '/widgetsJQuery' ));
+        this.app.use(express.static(__dirname + '/widgets' ));
         this.app.use(express.static(__dirname + '/settings'))
 
         this.app.get('/ui', function(req, res){
@@ -47,13 +46,14 @@ class Proxy extends BusDevice {
             });
 
             socket.on('message', function(msg):string{
-                console.log(msg);
+                // console.log(msg);
                 return msg;
             });
 
             socket.on('createChannel', function (){
                 this.id = socket.id.toString();
                 socket.join(socket.id.toString());
+                console.log('ch created');
             })
 
         });
@@ -62,8 +62,8 @@ class Proxy extends BusDevice {
             console.log('listening on *:3000');
         });
 
-        this.subscribe(Topic.SETTINGS_MSG);
-        this.subscribe(Topic.SPEED);
+//        this.subscribe(Topic.SETTINGS_MSG);
+//        this.subscribe(Topic.SPEED);
     }
 
 
@@ -73,11 +73,16 @@ class Proxy extends BusDevice {
      * @param socket the connection
      */
     public handleMessage(message: Message): void {
-        this.io.to(this.id).emit('message', JSON.stringify(message));
+        /*  this.io.on('connection', function (socket) {
+         socket.to(socket.id.toString()).emit('message', JSON.stringify(message));
+         });*/
+
+        this.io.sockets.send(JSON.stringify(message));
+        //    this.io.to(this.id).emit('message', JSON.stringify(message));
     }
 
-}
 
-var proxy = new Proxy();
+
+}
 
 export {Proxy}
