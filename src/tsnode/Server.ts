@@ -43,7 +43,7 @@ class Server {
         this.io.on('connection', function(socket){
             console.log('a user connected ' + socket.id);
             var p = new Proxy(socket);
-            Server.proxies.push(p);
+            Server.proxies.add(p);
 
             socket.on('disconnect', function(){
                 console.log('user disconnected');
