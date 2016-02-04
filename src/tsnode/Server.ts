@@ -12,7 +12,7 @@ class Server {
 
     private app;
     private io;
-    static proxies = new Array<Proxy>();
+    static proxies = new Set<Proxy>();
 
 
     constructor() {

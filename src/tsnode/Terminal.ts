@@ -28,9 +28,10 @@ class Terminal {
         var msg = this.connection.on('message', function(msg) {
             var message = JSON.parse(msg);
             channel.publish(message.topic.name, message);
-        });
+        })
 
-        channel.publish("value.speed", new ValueMessage(Topic.SPEED, new Value(123,"dd")));
+        var sub
+
 
     }
 
