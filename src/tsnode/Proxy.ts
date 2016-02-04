@@ -30,7 +30,8 @@ class Proxy extends BusDevice {
 
       //  this.io.sockets.send(JSON.stringify(message));
         //    this.io.to(this.id).emit('message', JSON.stringify(message));
-        this.socket.send(JSON.stringify(message));
+       // this.socket.send(JSON.stringify(message));
+        console.log(message);
     }
 
 

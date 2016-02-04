@@ -28,12 +28,7 @@ while((x = iter.next().value) != null) {
 }
 
 setInterval(function() {
-    console.log(Server.proxies);
-    if (Server.proxies.length > 3) {
-        for (var i = 2; i < Server.proxies.length; i++) {
-            Server.proxies[i].subscribe(Topic.SPEED)
-        }
-    }
+ //   console.log(Server.proxies);
 }, 2000);
 
 

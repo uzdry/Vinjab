@@ -47,11 +47,11 @@ class Server {
 
             socket.on('disconnect', function(){
                 console.log('user disconnected');
+                Server.proxies.delete(p);
             });
 
-            socket.on('message', function(msg):string{
-                // console.log(msg);
-                return msg;
+            socket.on('messagets', function(msg) {
+                p.handleMessage(msg);
             });
 
             socket.on('createChannel', function (){
