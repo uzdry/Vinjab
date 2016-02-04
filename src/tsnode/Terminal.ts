@@ -45,13 +45,6 @@ class Terminal {
     }
 
 
-    public giveMessage():Message {
-        var message = this.connection.on(message, function(msg) {
-            return msg;
-        })
-
-
-    }
 
 }
 
