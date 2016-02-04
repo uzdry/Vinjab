@@ -37,8 +37,8 @@ class Topic {
     static AVG_SPEED =          new Topic(340, "value.aggregated.average speed");
     static FUEL_CONSUMPTION_H = new Topic(360, "value.aggregated.fuel per hour")
 
-    static DASHBOARD_MSG =      new Topic(370, "dashboard settings message");
-    static DASHBOARD_ANS_MSG =  new Topic(380, "dashboard settings message from database")
+    static DASHBOARD_MSG =      new Topic(370, "settings.dashboard settings message");
+    static DASHBOARD_ANS_MSG =  new Topic(380, "settings.dashboard settings message from database")
 
     static VALUES: Topic[] = [     Topic.SPEED,
         Topic.MAF,
