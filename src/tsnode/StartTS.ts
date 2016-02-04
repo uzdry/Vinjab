@@ -6,7 +6,7 @@ import {FuelConsumption} from "./AggregatedFunctions";
 import {Proxy} from "./Proxy"
 
 var terProx: Proxy = new Proxy();
-terProx.subscribe(Topic.FUEL_CONSUMPTION);
+terProx.subscribe(Topic.SPEED);
 
 var sources: Set<BusDevice> = new Set<BusDevice>();
 
