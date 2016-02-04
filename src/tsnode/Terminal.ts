@@ -26,7 +26,6 @@ class Terminal {
         var channel = postal.channel("values");
 
         var msg = this.connection.on('message', function(msg) {
-            console.log("subscribed");
             var message = JSON.parse(msg);
             channel.publish(message.topic.name, message);
         });
