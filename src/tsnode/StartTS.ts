@@ -28,7 +28,7 @@ while((x = iter.next().value) != null) {
 }
 
 setInterval(function() {
- //   console.log(Server.proxies);
+    console.log(Server.proxies);
 }, 2000);
 
 

@@ -13,7 +13,7 @@ class Proxy extends BusDevice {
     constructor(pSocket) {
         super();
         this.socket = pSocket;
-   //     this.subscribe(Topic.SPEED);
+        //this.subscribe(Topic.SPEED);
 
     }
 
@@ -30,8 +30,12 @@ class Proxy extends BusDevice {
 
       //  this.io.sockets.send(JSON.stringify(message));
         //    this.io.to(this.id).emit('message', JSON.stringify(message));
-       // this.socket.send(JSON.stringify(message));
-        console.log(message);
+       this.socket.send(JSON.stringify(message));
+       // console.log(message);
+    }
+
+    public request(message: Message) {
+
     }
 
 

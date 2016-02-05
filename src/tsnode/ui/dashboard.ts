@@ -122,7 +122,6 @@ class Dashboard{
 
 }
 
-
 var terminal = new Terminal();
 var dashboard: Dashboard = new Dashboard();
 dashboard.startSelector();

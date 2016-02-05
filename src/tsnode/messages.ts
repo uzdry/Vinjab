@@ -40,6 +40,8 @@ class Topic {
     static DASHBOARD_MSG =      new Topic(370, "settings.dashboard settings message");
     static DASHBOARD_ANS_MSG =  new Topic(380, "settings.dashboard settings message from database")
 
+    static TOPIC_REQ =          new Topic(600, "request.topic");
+
     static VALUES: Topic[] = [     Topic.SPEED,
         Topic.MAF,
         Topic.CO0LANT_PRESSURE,
@@ -67,8 +69,8 @@ class Topic {
         Topic.AVG_SPEED,
         Topic.FUEL_CONSUMPTION_H];
 
-    private id:number;
-    private name:string;
+    id:number;
+    name:string;
 
     //instantiates a new Topic with ID and name
     constructor(pID:number, pName:string) {
@@ -184,6 +186,15 @@ class Value {
         return this.identifier;
     }
 
+}
+
+class TopicRequestMessageClientToServer extends Message {
+
+
+
+    constructor(topicToReq) {
+        super(Topic.TOPIC_REQ);
+    }
 }
 
 

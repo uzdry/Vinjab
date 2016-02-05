@@ -21,7 +21,7 @@ class Terminal {
     constructor() {
 
         this.connection = io();
-     //   this.connection.emit('createChannel');
+        this.connection.emit('createChannel');
 
         var channel = postal.channel("values");
 
@@ -30,7 +30,9 @@ class Terminal {
             channel.publish(message.topic.name, message);
         })
 
-        this.sendMessage(new ValueMessage(Topic.VALUE_MSG, new Value(23, "k")));
+        var sub = channel.subscribe("request.*", function(data) {
+            this.connection.emit('messagets', JSON.stringify(JSON.stringify(data)));
+        });
 
 
     }
@@ -41,7 +43,7 @@ class Terminal {
      * @param message the message, which will be sent.
      */
     public sendMessage(message : Message) {
-        this.connection.emit('message', JSON.stringify(message));
+        this.connection.emit('messagets', JSON.stringify(message));
     }
 
 

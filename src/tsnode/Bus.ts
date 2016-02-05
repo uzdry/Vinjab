@@ -24,8 +24,8 @@ class BusDevice {
         throw new Error('This method is abstract and must be overridden');
     }
 
-    public subscribe(t:Msg.Topic) {
-        this.broker.subscribe(t, this);
+    public subscribe(t: Msg.Topic) {
+        this.broker.subscribe(t.name, this);
     }
 
     public subscribeAll(topics: Msg.Topic[]): void {
@@ -36,7 +36,7 @@ class BusDevice {
 
 
     public unsubscribe(t:Msg.Topic) {
-        this.broker.unsubscribe(t, this);
+        this.broker.unsubscribe(t.name, this);
     }
 
     public getID():number {
@@ -50,10 +50,10 @@ class Broker {
 
 
     private static instance:Broker;
-    private subscribers: Map<Msg.Topic, Set<BusDevice>>;
+    private subscribers: Map<string, Set<BusDevice>>;
 
     constructor() {
-        this.subscribers = new Map<Msg.Topic, Set<BusDevice>>();
+        this.subscribers = new Map<string, Set<BusDevice>>();
     }
 
     public static get():Broker {
@@ -68,7 +68,7 @@ class Broker {
     }
 
 
-    public subscribe(topic:Msg.Topic, sub:BusDevice):void {
+    public subscribe(topic:string, sub:BusDevice):void {
         if (this.subscribers.get(topic) == null) {
             this.subscribers.set(topic, new Set<BusDevice>());
             console.log('Set created');
@@ -76,18 +76,18 @@ class Broker {
         this.subscribers.get(topic).add(sub);
     }
 
-    public unsubscribe(topic:Msg.Topic, sub:BusDevice):void {
+    public unsubscribe(topic:string, sub:BusDevice):void {
 
         this.subscribers.get(topic).delete(sub);
 
     }
 
     private distribute(m:Msg.Message) {
-        if (this.subscribers.get(m.getTopic()) == null) {
+        if (this.subscribers.get(m.getTopic().name) == null) {
             return;
         }
 
-        var iter = this.subscribers.get(m.getTopic()).entries();
+        var iter = this.subscribers.get(m.getTopic().name).entries();
 
         var x;
         while((x = iter.next().value) != null) {

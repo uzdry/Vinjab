@@ -21,7 +21,7 @@ class Server {
         this.app = express();
         var http = require('http').Server(this.app);
 
-        http.setMaxListeners(10000);
+        http.setMaxListeners(100);
 
         this.io = require('socket.io')(http);
 
@@ -51,11 +51,12 @@ class Server {
             });
 
             socket.on('messagets', function(msg) {
-                p.handleMessage(msg);
+                console.log("uniq");
+                p.request(msg);
             });
 
             socket.on('createChannel', function (){
-                console.log('ch created');
+                console.log('ch created' + p);
             });
 
         });
