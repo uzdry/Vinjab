@@ -1,7 +1,6 @@
 // Requires
-import {Value} from "../Utils";
 import {Source} from "../Source";
-import {ValueMessage, Topic} from "../messages";
+import {ValueMessage, Topic, Value} from "../messages";
 var express = require('express');
 var socketio = require('socket.io');
 

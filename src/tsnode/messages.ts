@@ -1,5 +1,4 @@
 
-import * as Utils from "./Utils";
 
 //Topic defines the Topic of a message. BusDevices subscribe to Topics
 class Topic {
@@ -120,8 +119,8 @@ class ValueAnswerMessage extends Message {
 }
 
 class ValueMessage extends Message {
-    public value: Utils.Value;
-    constructor(pTopic: Topic, pValue: Utils.Value ) {
+    public value: Value;
+    constructor(pTopic: Topic, pValue: Value ) {
         super(pTopic);
         this.value= pValue;
     }

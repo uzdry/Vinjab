@@ -2,7 +2,7 @@
 /// <reference path="../../../typings/postal/postal.d.ts"/>
 
 
-import {ValueMessage} from "../messages";
+//import {ValueMessage} from "../messages";
 class DataModel extends Backbone.Model{
 
     subscription: ISubscriptionDefinition<any>;
