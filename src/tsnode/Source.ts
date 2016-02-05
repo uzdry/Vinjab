@@ -43,15 +43,4 @@ class Source extends BusDevice {
     }
 
 }
-
-class TerminalProxy extends BusDevice {
-
-    public handleMessage(m: Message) {
-        if (m instanceof ValueMessage) {
-            console.log(m.value.numericalValue());
-        }
-    }
-
-}
-
-export {Source, TerminalProxy};
+export {Source};
