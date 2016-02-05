@@ -37,8 +37,10 @@ class Topic {
     static AVG_SPEED =          new Topic(340, "value.aggregated.average speed");
     static FUEL_CONSUMPTION_H = new Topic(360, "value.aggregated.fuel per hour")
 
-    static DASHBOARD_MSG =      new Topic(370, "dashboard settings message");
-    static DASHBOARD_ANS_MSG =  new Topic(380, "dashboard settings message from database")
+    static DASHBOARD_MSG =      new Topic(370, "dashboard settings");
+    static DASHBOARD_ANS_MSG =  new Topic(380, "dashboard settings from database");
+    static REPLAY_REQ =         new Topic(390, "replay request");
+    static REPLAY_ANS =         new Topic(400, "replay answer");
 
     static VALUES: Topic[] = [     Topic.SPEED,
         Topic.MAF,
@@ -83,6 +85,10 @@ class Topic {
         return this.id
     }
 
+    public getName(): string {
+        return this.name
+    }
+
     public equals(topic: Topic): boolean {
         return this.getID() === topic.getID();
     }
@@ -104,8 +110,8 @@ class Message {
 class ValueAnswerMessage extends Message {
     private times: number[];
     private values: any[];
-    constructor(pTopic: Topic, times: number[], values: any[]) {
-        super(pTopic);
+    constructor(times: number[], values: any[]) {
+        super(Topic.VALUE_ANSWER_MSG);
         this.times = times;
         this.values = values;
     }
@@ -126,28 +132,56 @@ class ValueMessage extends Message {
     }
 }
 
-class DBRequest {
+class DBRequestMessage extends Message {
+    beginDate: Date;
+    endDate: Date;
+    driveNr: number;
+    reqTopic: Topic;
+
+    constructor (driveNr: number, beginDate: Date, endDate: Date, reqTopic: Topic) {
+        super(Topic.DBREQ_MSG);
+        this.beginDate = beginDate;
+        this.endDate = endDate;
+        this.driveNr = driveNr;
+        this.reqTopic = reqTopic;
+    }
 }
 
-class DBRequestMessage extends Message {
-    private req: DBRequest;
+class ReplayRequestMessage extends Message {
+    beginDate: Date;
+    endDate: Date;
+    driveNr: number;
 
-    constructor(pReq: DBRequest) {
-        super(Topic.DBREQ_MSG);
-        this.req = pReq;
+    constructor(driveNr: number, beginDate: Date, endDate: Date) {
+        super(Topic.REPLAY_REQ);
+        this.driveNr = driveNr;
+        if(!(beginDate === undefined)) {
+            this.beginDate = beginDate;
+        }
+        if(!(endDate === undefined)) {
+            this.endDate = endDate;
+        }
     }
+}
 
-    public getRequest():DBRequest {
-        return this.req
+class ReplayValueMessage extends Message {
+    public value: Value;
+    constructor(pValue: Value ) {
+        super(Topic.REPLAY_ANS);
+        this.value= pValue;
     }
+}
+
+class DBRequestInfoMessage extends Message {
+
 }
 
 class DashboardMessage extends Message {
     public request: Boolean;
-    public user: String;
-    public config: String;
+    public user: string;
+    public config: string;
 
-    constructor(usr: String, cnfg: String, req: Boolean) {
+    constructor(usr: string, cnfg: string, req: Boolean) {
         super(Topic.DASHBOARD_MSG);
         this.request = req;
         this.user = usr;
@@ -156,10 +190,10 @@ class DashboardMessage extends Message {
 }
 
 class DashboardRspMessage extends Message {
-    public user: String;
-    public config: String;
+    public user: string;
+    public config: string;
 
-    constructor(usr: String, cnfg: String) {
+    constructor(usr: string, cnfg: string) {
         super(Topic.DASHBOARD_MSG);
         this.user = usr;
         this.config = cnfg;
@@ -187,4 +221,4 @@ class Value {
 }
 
 
-export {Topic, Message, ValueMessage, ValueAnswerMessage, DBRequest, DBRequestMessage, Value, DashboardMessage, DashboardRspMessage};
+export {Topic, Message, ValueMessage, ValueAnswerMessage, DBRequestMessage, ReplayValueMessage, ReplayRequestMessage, Value, DashboardMessage, DashboardRspMessage};
