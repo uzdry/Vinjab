@@ -5,7 +5,7 @@
 import {BusDevice} from "./../Bus";
 import {ValueAnswerMessage, DBRequestMessage, Message, ValueMessage, Topic} from "./../messages";
 
-class BluetoothObd2 {
+class BluetoothObd2 extends BusDevice{
 
     /**
      * the OBDReader Object to find OBD-Device and receive data
@@ -18,6 +18,8 @@ class BluetoothObd2 {
     private dataReceivedMarker;
 
     constructor() {
+        super();
+
         var OBDReader = require('bluetooth-obd');
         this.btOBDReader = new OBDReader();
         this.dataReceivedMarker = {};
@@ -26,7 +28,7 @@ class BluetoothObd2 {
         this.btOBDReader.on('connected', function () {
 
             //vss = vehicle speed sensor
-            this.btOBDReader.requestValueByName("vss");
+            //this.btOBDReader.requestValueByName("vss");
             this.addPoller("vss");
 
             //Request all values each second.
@@ -43,9 +45,8 @@ class BluetoothObd2 {
 
         //receive the data from OBD
         this.btOBDReader.on('dataReceived', function (data) {
-            console.log(data);
-            this.dataReceivedMarker = data;
-            //this.handleMessage();
+            console.log(JSON.stringify(data));
+            //this.handleMessage(data);
         });
 
         // Use first device with 'obd' in the name
@@ -63,13 +64,9 @@ class BluetoothObd2 {
     }
 
 
-//    public handleMessage(): void {
-//        postal.publish({
-//            channel : "MyChannel",
-//            topic   : "name.change",
-//            data    : {
-//                message : JSON.stringify(this.dataReceivedMarker)
-//            }
+    //public handleMessage(m : Message): void {
+    //    this.broker.handleMessage(m);
+    //}
 
 
 }
