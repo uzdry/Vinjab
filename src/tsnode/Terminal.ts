@@ -30,9 +30,9 @@ class Terminal {
             channel.publish(message.topic.name, message);
         })
 
-        var sub = channel.subscribe("request.*", function(data) {
-            this.connection.emit('messagets', JSON.stringify(JSON.stringify(data)));
-        });
+        var channelsub = postal.channel("reqsubs");
+
+        var sub = channelsub.subscribe("request.#", this.sendMessage.bind(this))
 
 
     }

@@ -1,4 +1,4 @@
-import {Source, TerminalProxy} from "./Source";
+import {Source} from "./Source";
 import {BusDevice} from "./Bus";
 import {Topic, Message} from "./messages";
 import * as DBAccess from "./DBAccess";
@@ -26,10 +26,6 @@ var x;
 while((x = iter.next().value) != null) {
     x.fire();
 }
-
-setInterval(function() {
-    console.log(Server.proxies);
-}, 2000);
 
 
 //console.log("Gokkk");
