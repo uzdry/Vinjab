@@ -35,7 +35,7 @@ class Topic {
     static FUEL_CONSUMPTION =   new Topic(320, "value.aggregated.fuel consumption.aggregated");
     static MILEAGE =            new Topic(330, "value.aggregated.mileage");
     static AVG_SPEED =          new Topic(340, "value.aggregated.average speed");
-    static FUEL_CONSUMPTION_H = new Topic(360, "value.aggregated.fuel per hour")
+    static FUEL_CONSUMPTION_H = new Topic(360, "value.aggregated.fuel per hour");
 
     static DASHBOARD_MSG =      new Topic(370, "dashboard settings");
     static DASHBOARD_ANS_MSG =  new Topic(380, "dashboard settings from database");
@@ -148,24 +148,22 @@ class DBRequestMessage extends Message {
 }
 
 class ReplayRequestMessage extends Message {
-    beginDate: Date;
-    endDate: Date;
     driveNr: number;
+    callerID: string;
+    //true <-> start, false <-> stop:
+    startStop: Boolean;
 
-    constructor(driveNr: number, beginDate: Date, endDate: Date) {
+    constructor(driveNr: number, callerID: string, startStop: boolean) { //last param: true = start, false = stop
         super(Topic.REPLAY_REQ);
         this.driveNr = driveNr;
-        if(!(beginDate === undefined)) {
-            this.beginDate = beginDate;
-        }
-        if(!(endDate === undefined)) {
-            this.endDate = endDate;
-        }
+        this.callerID = callerID;
+        this.startStop = startStop;
     }
 }
 
 class ReplayValueMessage extends Message {
     public value: Value;
+
     constructor(pValue: Value ) {
         super(Topic.REPLAY_ANS);
         this.value= pValue;

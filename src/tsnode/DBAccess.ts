@@ -67,7 +67,7 @@ class LevelDBAccess {
     private currentDriver: string;
     private db;
     private busDevice: DBBusDevice;
-    private replayInfo: ReplayInfo;
+    replayInfo: ReplayInfo;
     private driveBegin: number;
 
     //constructor, initialises the LevelDBAccess with a given DBBusDevice;
@@ -239,6 +239,7 @@ class DBBusDevice extends BusDevice {
         this.subscribe(Topic.DBREQ_MSG);
         this.subscribeAll(Topic.VALUES);
         this.subscribe(Topic.DASHBOARD_MSG);
+        this.subscribe(Topic.REPLAY_REQ);
     }
 
     public sendValueMessage(content: SensorValueEntry[], times: number[]) {
@@ -274,7 +275,7 @@ class DBBusDevice extends BusDevice {
             } else {
                 this.dbAccess.getDriverEntry(dbm.user, function(value, err) {
                     if(err.notFound) {
-                        this.dbAccess.putDriverInfo(dbm.user, dbm.config, function(err) { //TODO: Insert string for standard config where currently dbm.config is
+                        this.dbAccess.putDriverInfo(dbm.user, "", function(err) { //TODO: Insert string for standard config where currently dbm.config is
                             console.log(err);
                         });
                     } else if (err) {
@@ -288,17 +289,19 @@ class DBBusDevice extends BusDevice {
         }
         //if the given Message is a replay request, a new Replay is started
         else if(m instanceof ReplayRequestMessage) {
-            this.dbAccess.getEntries("value.*", m.driveNr, m.beginDate.getDate(),
-                m.endDate.getDate(), function(res, tim) {
-                new Replay(this.dbAccess.replayInfo).replay(res, tim);
-            });
+            if(m.startStop) {
+                this.dbAccess.getEntries("value.*", m.driveNr, this.dbAccess.replayInfo.beginnings[m.driveNr],
+                    this.dbAccess.replayInfo.endings[m.driveNr], function (res, tim) {
+                        new Replay(this.dbAccess.replayInfo, m.callerID).replay(res, tim);
+                    });
+            }
         }
-      //  } else if (m instanceof SettingsMessage) {
-            //TODO: understand the organisation of settingsMessages and put them to the db accordingly
+        //  } else if (m instanceof SettingsMessage) {
+        // TODO: understand the organisation David's Settings Message and put them to the db accordingly
+        // }
     }
 }
 
-//TODO: find a way to stop the replay; possibly via a message containing the caller id
 class Replay extends BusDevice {
 
     private replayInfo: ReplayInfo;
@@ -306,27 +309,40 @@ class Replay extends BusDevice {
     private slp: number;
     private vals: SensorValueEntry[];
     private times: number[];
+    private continueLoop: Boolean;
+    private callerID: string;
 
-    constructor (ri: ReplayInfo) {
+    constructor (ri: ReplayInfo, callerID: string) {
         super();
         this.replayInfo = ri;
         this.cnt = 0;
+        this.continueLoop = true;
+        this.callerID = callerID;
+        this.subscribe(Topic.REPLAY_REQ);
     }
 
     public handleMessage(m: Message) {
-
+        if(m instanceof ReplayRequestMessage && !m.startStop && m.callerID == this.callerID) {
+            this.continueLoop = false;
+        }
     }
 
     public replay(vals: SensorValueEntry[], times: number[]) {
         this.vals = vals;
         this.times = times;
-        setInterval(this.send.bind(this), this.slp);
+        while(this.continueLoop) {
+            setInterval(this.send.bind(this), this.slp);
+        }
     }
 
     private send() {
         this.cnt++;
-        this.slp = this.times[this.cnt + 1] - this.times[this.cnt];
         this.broker.handleMessage(new ReplayValueMessage(new Value(this.vals[this.cnt].value, this.vals[this.cnt].topic)));
+        if(this.cnt + 1 == this.times.length) {
+            this.continueLoop = false;
+        } else {
+            this.slp = this.times[this.cnt + 1] - this.times[this.cnt];
+        }
     }
 }
 
