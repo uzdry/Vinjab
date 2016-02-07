@@ -6,23 +6,46 @@
  * License(s): MIT
  */
 
+
 ( function( root, factory ) {
+	var createPartialWrapper = require( "lodash/internal/createPartialWrapper" );
+
+var _ = {
+	after: require( "lodash/function/after" ),
+	any: require( "lodash/internal/arraySome" ),
+	bind: function( func, thisArg, arg ) {
+		return createPartialWrapper( func, 33, thisArg, [ arg ] );
+	},
+	debounce: require( "lodash/function/debounce" ),
+	each: require( "lodash/internal/createForEach" )(
+		require( "lodash/internal/arrayEach" ),
+		require( "lodash/internal/baseEach" )
+	),
+	extend: require( "lodash/internal/baseAssign" ),
+	filter: require( "lodash/internal/arrayFilter" ),
+	isEqual: require( "lodash/lang/isEqual" ),
+	keys: require( "lodash/object/keys" ),
+	map: require( "lodash/internal/arrayMap" ),
+	throttle: require( "lodash/function/throttle" )
+};
+
+
 	
 	if ( typeof define === "function" && define.amd ) {
 		// AMD. Register as an anonymous module.
-		define( [ "lodash" ], function( _ ) {
+		define( function() {
 			return factory( _, root );
 		} );
 	
 	} else if ( typeof module === "object" && module.exports ) {
 		// Node, or CommonJS-Like environments
-		module.exports = factory( require( "lodash" ), this );
+		module.exports = factory( _, this );
 	} else {
 		// Browser globals
-		root.postal = factory( root._, root );
+		root.postal = factory( _, root );
 	}
 }( this, function( _, global, undefined ) {
-	var prevPostal = global && global.postal;
+	var prevPostal = global.postal;
 	var _defaultConfig = {
 		DEFAULT_CHANNEL: "/",
 		SYSTEM_CHANNEL: "postal",
