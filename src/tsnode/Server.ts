@@ -27,7 +27,11 @@ class Server {
         this.app.use(express.static(__dirname + '/../'));
         this.app.use(express.static(__dirname + '/ui' ));
         this.app.use(express.static(__dirname + '/widgets' ));
+<<<<<<< HEAD
         this.app.use(express.static(__dirname + '/settings'))
+=======
+        this.app.use(express.static(__dirname + '/settings'));
+>>>>>>> 787875892866785adce68d5c893bf4b7af074f3c
 
         this.app.get('/ui', function(req, res){
             res.sendFile(__dirname + '/ui/index.html');
@@ -46,10 +50,21 @@ class Server {
                 console.log('user disconnected');
             });
 
+<<<<<<< HEAD
             socket.on('messagets', function(msg) {
                 p.subscribe(new Topic(200, msg));
             });
 
+=======
+            socket.on('subscribe', function(msg) {
+                p.subscribe(new Topic(200, msg));
+            });
+
+            socket.on('unsubscribe', function(msg) {
+                p.unsubscribe(new Topic(200, msg));
+            });
+
+>>>>>>> 787875892866785adce68d5c893bf4b7af074f3c
             socket.on('createChannel', function (){
                 console.log('ch created' + p);
             });

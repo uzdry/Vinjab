@@ -37,8 +37,8 @@ class Source extends BusDevice {
     }
 
     /*
-    te
-    */
+     te
+     */
     public publish(t: Topic): void {
         var m: Message = new ValueMessage(t, this.value);
         Broker.get().handleMessage(m);
