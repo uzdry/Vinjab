@@ -43,7 +43,7 @@ class Terminal {
      * @param message the message, which will be sent.
      */
     public sendMessage(data) {
-        this.connection.emit('messagets', JSON.stringify(data));
+        this.connection.emit('messagets', data);
     }
 
 

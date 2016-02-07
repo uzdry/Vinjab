@@ -48,7 +48,7 @@ class Server {
 
             socket.on('messagets', function(msg) {
                 console.log("uniq");
-                p.request(msg);
+                p.subscribe(new Topic(200, msg));
             });
 
             socket.on('createChannel', function (){
