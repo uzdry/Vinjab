@@ -20,11 +20,11 @@ class Source extends BusDevice {
     }
 
     public fire() {
-        setInterval(this.update.bind(this),10);
+        setInterval(this.update.bind(this),100);
     }
 
     private update(): void {
-        this.value = new Value(this.cnt++ % 200, 'km/h');
+        this.value = new Value((this.cnt+=10) % 200, 'km/h');
         var m: Message = new ValueMessage(this.topic, this.value);
         this.broker.handleMessage(m);
     }

@@ -28,7 +28,7 @@ class Terminal {
         var msg = this.connection.on('message', function(msg) {
             var message = JSON.parse(msg);
             channel.publish(message.topic.name, message);
-        })
+        });
 
         var channelsub = postal.channel("reqsubs");
 
@@ -42,8 +42,8 @@ class Terminal {
      * send a message to the server.
      * @param message the message, which will be sent.
      */
-    public sendMessage(message : Message) {
-        this.connection.emit('messagets', JSON.stringify(message));
+    public sendMessage(data) {
+        this.connection.emit('messagets', JSON.stringify(data));
     }
 
 

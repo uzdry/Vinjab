@@ -13,11 +13,14 @@ var server = new Server();
 
 var sources: Set<BusDevice> = new Set<BusDevice>();
 
-sources.add(new Source(Topic.SPEED));
-sources.add(new Source(Topic.MAF));
 
-var af = new FuelConsumption();
-af.init();
+for (var i = 0; i < Topic.VALUES.length; i++) {
+    var s: Source = new Source(Topic.VALUES[i]);
+    sources.add(s);
+    s.fire();
+}
+
+console.log(sources);
 
 
 var iter = sources.values();
