@@ -1452,7 +1452,7 @@ class MessageBuffer extends BusDevice {
      * May be fine tuned later to allow the change of single parameters.
      */
     private onReceiveData() : void {
-        SCommunicator.openXMLfromURL("settingsDS.xml", this, this.valueChangeListener, this.container);
+        SCommunicator.openXMLfromURL("/src/tsnode/settings/settingsDS.xml", this, this.valueChangeListener, this.container);
     }
 }
 

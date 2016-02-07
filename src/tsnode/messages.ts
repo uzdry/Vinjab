@@ -70,8 +70,8 @@ class Topic {
         Topic.AVG_SPEED,
         Topic.FUEL_CONSUMPTION_H];
 
-    private id:number;
-    private name:string;
+    id:number;
+    name:string;
 
     //instantiates a new Topic with ID and name
     constructor(pID:number, pName:string) {
