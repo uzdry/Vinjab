@@ -10,6 +10,7 @@
 
 
 import {Terminal} from "../Terminal"
+import {DashboardMessage} from "../messages";
 
 
 class Dashboard{
@@ -49,8 +50,8 @@ class Dashboard{
             document.cookie = "user=" + this.cookie;
         }
 
-        console.log("user=" + this.cookie);
-
+        var message: DashboardMessage = new DashboardMessage(this.cookie, "", true);
+        postal.channel("toServer").publish("", message);
 
         this.startSelector();
         $(document).on( "click", ".gridster ul li", function() {
