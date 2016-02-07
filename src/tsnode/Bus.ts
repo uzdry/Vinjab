@@ -8,7 +8,7 @@ import * as Msg from "./messages"
 //A BusDevice has acces to the Bus
 class BusDevice {
     broker:Broker;
-    private id:number;
+    id:number;
     static cnt:number = 0;
 
     constructor() {
@@ -71,9 +71,10 @@ class Broker {
     public subscribe(topic:string, sub:BusDevice):void {
         if (this.subscribers.get(topic) == null) {
             this.subscribers.set(topic, new Set<BusDevice>());
-            console.log('Set created');
+            console.log('Set created' + topic);
         }
         this.subscribers.get(topic).add(sub);
+        console.log(this.subscribers.get(topic));
     }
 
     public unsubscribe(topic:string, sub:BusDevice):void {
@@ -87,7 +88,7 @@ class Broker {
             return;
         }
 
-        var iter = this.subscribers.get(m.getTopic().name).entries();
+        var iter = this.subscribers.get(m.topic.name).entries();
 
         var x;
         while((x = iter.next().value) != null) {

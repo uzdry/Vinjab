@@ -92,7 +92,7 @@ class Topic {
 
 //super class for all Message Types
 class Message {
-    private topic:Topic;
+    topic:Topic;
 
     constructor(pTopic:Topic) {
         this.topic = pTopic;

@@ -6,15 +6,12 @@ import {Server} from "./Server";
 
 class Proxy extends BusDevice {
 
-    private server: Server;
     private socket;
 
 
     constructor(pSocket) {
         super();
         this.socket = pSocket;
-        //this.subscribe(Topic.SPEED);
-
     }
 
 
@@ -31,11 +28,12 @@ class Proxy extends BusDevice {
       //  this.io.sockets.send(JSON.stringify(message));
         //    this.io.to(this.id).emit('message', JSON.stringify(message));
        this.socket.send(JSON.stringify(message));
-       // console.log(message);
+      //  console.log(message);
     }
 
-    public request(message: Message) {
-
+    public request(message) {
+        console.log('msg recieved ' + message);
+        this.broker.subscribe(message, this);
     }
 
 

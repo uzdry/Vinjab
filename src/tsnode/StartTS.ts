@@ -1,4 +1,3 @@
-/// <reference path="/home/nutzio/PSE/WebStorm/plugins/JavaScriptLanguage/typescriptCompiler/external/lib.es6.d.ts" />
 import {Source} from "./Source";
 import {BusDevice} from "./Bus";
 import {Topic, Message} from "./messages";
@@ -12,25 +11,29 @@ import {Server} from "./Server";
 
 var server = new Server();
 
-var sources: Set<BusDevice> = new Set<BusDevice>();
-
-sources.add(new Source(Topic.SPEED));
-sources.add(new Source(Topic.MAF));
-
-var af = new FuelConsumption();
-af.init();
+var sources: Array<Source> = new Array<Source>();
 
 
-var iter = sources.values();
-
-var x;
-while((x = iter.next().value) != null) {
-    x.fire();
+for (var i = 0; i < Topic.VALUES.length; i++) {
+    var s: Source = new Source(Topic.VALUES[i], i);
+    sources.push(s);
 }
 
-setInterval(function() {
-    console.log(Server.proxies);
-}, 2000);
+console.log(sources);
+
+
+for (var i = 0; i < sources.length; i++) {
+    sources[i].fire();
+}
+
+function sleep(milliseconds) {
+    var start = new Date().getTime();
+    for (var i = 0; i < 1e7; i++) {
+        if ((new Date().getTime() - start) > milliseconds){
+            break;
+        }
+    }
+}
 
 
 //console.log("Gokkk");

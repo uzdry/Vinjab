@@ -12,8 +12,6 @@ class Server {
 
     private app;
     private io;
-    static proxies = new Set<Proxy>();
-
 
     constructor() {
 
@@ -43,16 +41,14 @@ class Server {
         this.io.on('connection', function(socket){
             console.log('a user connected ' + socket.id);
             var p = new Proxy(socket);
-            Server.proxies.add(p);
 
             socket.on('disconnect', function(){
                 console.log('user disconnected');
-                Server.proxies.delete(p);
             });
 
             socket.on('messagets', function(msg) {
                 console.log("uniq");
-                p.request(msg);
+                p.subscribe(new Topic(200, msg));
             });
 
             socket.on('createChannel', function (){
