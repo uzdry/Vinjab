@@ -11,23 +11,28 @@ import {Server} from "./Server";
 
 var server = new Server();
 
-var sources: Set<BusDevice> = new Set<BusDevice>();
+var sources: Array<Source> = new Array<Source>();
 
 
 for (var i = 0; i < Topic.VALUES.length; i++) {
-    var s: Source = new Source(Topic.VALUES[i]);
-    sources.add(s);
-    s.fire();
+    var s: Source = new Source(Topic.VALUES[i], i);
+    sources.push(s);
 }
 
 console.log(sources);
 
 
-var iter = sources.values();
+for (var i = 0; i < sources.length; i++) {
+    sources[i].fire();
+}
 
-var x;
-while((x = iter.next().value) != null) {
-    x.fire();
+function sleep(milliseconds) {
+    var start = new Date().getTime();
+    for (var i = 0; i < 1e7; i++) {
+        if ((new Date().getTime() - start) > milliseconds){
+            break;
+        }
+    }
 }
 
 
