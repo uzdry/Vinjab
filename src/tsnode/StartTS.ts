@@ -1,4 +1,5 @@
-import {Source, TerminalProxy} from "./Source";
+/// <reference path="/home/nutzio/PSE/WebStorm/plugins/JavaScriptLanguage/typescriptCompiler/external/lib.es6.d.ts" />
+import {Source} from "./Source";
 import {BusDevice} from "./Bus";
 import {Topic, Message} from "./messages";
 import * as DBAccess from "./DBAccess";
