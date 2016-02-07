@@ -122,6 +122,12 @@ class LineChartWidget extends Widget{
 
     }
 
+    destroy(){
+        super.destroy();
+        this.chart.destroy();
+        delete this;
+    }
+
 
 }
 
