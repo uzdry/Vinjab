@@ -7,15 +7,6 @@
  */
 
 ( function( root, factory ) {
-<<<<<<< HEAD
-	
-	if ( typeof define === "function" && define.amd ) {
-		// AMD. Register as an anonymous module.
-		define( [ "lodash" ], function( _ ) {
-			return factory( _, root );
-		} );
-	
-=======
 
 	if ( typeof define === "function" && define.amd ) {
 		// AMD. Register as an anonymous module.
@@ -23,7 +14,6 @@
 			return factory( _, root );
 		} );
 
->>>>>>> 787875892866785adce68d5c893bf4b7af074f3c
 	} else if ( typeof module === "object" && module.exports ) {
 		// Node, or CommonJS-Like environments
 		module.exports = factory( require( "lodash" ), this );
@@ -44,12 +34,6 @@
 		configuration: _.extend( {}, _defaultConfig )
 	};
 	var _config = postal.configuration;
-
-<<<<<<< HEAD
-	
-=======
-
->>>>>>> 787875892866785adce68d5c893bf4b7af074f3c
 
 var ChannelDefinition = function( channelName, bus ) {
 	this.bus = bus;
@@ -86,11 +70,6 @@ ChannelDefinition.prototype.publish = function() {
 	this.bus.publish( envelope, callback );
 };
 
-<<<<<<< HEAD
-	
-=======
-
->>>>>>> 787875892866785adce68d5c893bf4b7af074f3c
 var SubscriptionDefinition = function( channel, topic, callback ) {
 	if ( arguments.length !== 3 ) {
 		throw new Error( "You must provide a channel, topic and callback when creating a SubscriptionDefinition instance." );
@@ -205,11 +184,7 @@ SubscriptionDefinition.prototype = {
 	},
 
 	logError: function logError() {
-<<<<<<< HEAD
-		
-=======
 
->>>>>>> 787875892866785adce68d5c893bf4b7af074f3c
 		if ( console ) {
 			var report;
 			if ( console.warn ) {
@@ -232,11 +207,7 @@ SubscriptionDefinition.prototype = {
 	},
 
 	unsubscribe: function unsubscribe() {
-<<<<<<< HEAD
-		
-=======
 
->>>>>>> 787875892866785adce68d5c893bf4b7af074f3c
 		if ( !this.inactive ) {
 			postal.unsubscribe( this );
 		}
@@ -256,11 +227,7 @@ SubscriptionDefinition.prototype = {
 
 	constraints: function constraints( predicates ) {
 		var self = this;
-<<<<<<< HEAD
-		
-=======
 
->>>>>>> 787875892866785adce68d5c893bf4b7af074f3c
 		_.each( predicates, function( predicate ) {
 			self.constraint( predicate );
 		} );
@@ -335,11 +302,6 @@ for ( var i = 0; i < 6; i++ ) {
 	SubscriptionDefinition.prototype[ oldMethod ] = warnOnDeprecation( oldMethod, newMethods[ i ] );
 }
 
-<<<<<<< HEAD
-	
-=======
-
->>>>>>> 787875892866785adce68d5c893bf4b7af074f3c
 
 
 var bindingsResolver = _config.resolver = {
@@ -426,12 +388,6 @@ var bindingsResolver = _config.resolver = {
 		}
 	}
 };
-
-<<<<<<< HEAD
-	
-=======
-
->>>>>>> 787875892866785adce68d5c893bf4b7af074f3c
 
 
 var pubInProgress = 0;
@@ -538,11 +494,7 @@ _.extend( postal, {
 	},
 
 	noConflict: function noConflict() {
-<<<<<<< HEAD
-		
-=======
 
->>>>>>> 787875892866785adce68d5c893bf4b7af074f3c
 		if ( typeof window === "undefined" || ( typeof window !== "undefined" && typeof define === "function" && define.amd ) ) {
 			throw new Error( "noConflict can only be used in browser clients which aren't using AMD modules" );
 		}
@@ -643,11 +595,7 @@ _.extend( postal, {
 					cacheKey )( subDef );
 			}
 		}, this );
-<<<<<<< HEAD
-		
-=======
 
->>>>>>> 787875892866785adce68d5c893bf4b7af074f3c
 		if ( _config.enableSystemMessages ) {
 			this.publish( sysCreatedMessage( subDef ) );
 		}
@@ -670,21 +618,12 @@ _.extend( postal, {
 			}
 			channelSubs = this.subscriptions[ subDef.channel ];
 			topicSubs = channelSubs && channelSubs[ subDef.topic ];
-<<<<<<< HEAD
-			
-=======
 
->>>>>>> 787875892866785adce68d5c893bf4b7af074f3c
 			if ( topicSubs ) {
 				var len = topicSubs.length;
 				idx = 0;
 				// remove SubscriptionDefinition from channel list
 				while ( idx < len ) {
-<<<<<<< HEAD
-					
-=======
-
->>>>>>> 787875892866785adce68d5c893bf4b7af074f3c
 					if ( topicSubs[ idx ] === subDef ) {
 						topicSubs.splice( idx, 1 );
 						break;
@@ -725,11 +664,7 @@ _.extend( postal, {
 
 	unsubscribeFor: function unsubscribeFor( options ) {
 		var toDispose = [];
-<<<<<<< HEAD
-		
-=======
 
->>>>>>> 787875892866785adce68d5c893bf4b7af074f3c
 		if ( this.subscriptions ) {
 			toDispose = this.getSubscribersFor( options );
 			this.unsubscribe.apply( this, toDispose );
@@ -737,22 +672,11 @@ _.extend( postal, {
 	}
 } );
 
-
-<<<<<<< HEAD
-	
-=======
-
->>>>>>> 787875892866785adce68d5c893bf4b7af074f3c
 	if ( global && Object.prototype.hasOwnProperty.call( global, "__postalReady__" ) && _.isArray( global.__postalReady__ ) ) {
 		while ( global.__postalReady__.length ) {
 			global.__postalReady__.shift().onReady( postal );
 		}
 	}
-<<<<<<< HEAD
-	
-=======
-
->>>>>>> 787875892866785adce68d5c893bf4b7af074f3c
 
 	return postal;
 } ) );

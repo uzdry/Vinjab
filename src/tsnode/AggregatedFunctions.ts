@@ -1,8 +1,5 @@
-<<<<<<< HEAD
-///<reference path="/home/nutzio/PSE/WebStorm/plugins/JavaScriptLanguage/typescriptCompiler/external/lib.es6.d.ts" />
-=======
+
 ///<reference path="C:\Program Files (x86)\JetBrains\WebStorm 11.0.3\plugins\JavaScriptLanguage\typescriptCompiler\external\lib.es6.d.ts"/>
->>>>>>> 787875892866785adce68d5c893bf4b7af074f3c
 
 import {DBRequestMessage, ValueAnswerMessage, ValueMessage, Value, Topic, Message} from "./messages";
 import {BusDevice} from "./Bus";
