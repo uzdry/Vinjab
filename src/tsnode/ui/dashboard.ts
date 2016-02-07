@@ -6,6 +6,7 @@
 ///<reference path="../../../typings/socket.io/socket.io.d.ts" />
 ///<reference path="widgets/textWidget.ts"/>
 ///<reference path="../Terminal.ts"/>
+///<reference path="widgets/lineChartWidget.ts"/>
 
 
 import {Terminal} from "../Terminal"
@@ -38,6 +39,7 @@ class Dashboard{
         this.widgetFactory.addWidget(new SpeedGaugeWidgetConfig());
         this.widgetFactory.addWidget(new TextWidgetConfig());
         this.widgetFactory.addWidget(new PercentGaugeWidgetConfig());
+        this.widgetFactory.addWidget(new LineChartWidgetConfig());
 
         this.cookie = Dashboard.getCookie("user");
 
@@ -124,7 +126,6 @@ class Dashboard{
 
 var terminal = new Terminal();
 var dashboard: Dashboard = new Dashboard();
-dashboard.startSelector();
 dashboard.widgetFactory.getSignals();
 
 
