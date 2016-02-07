@@ -1,7 +1,7 @@
 /**
  * postal - Pub/Sub library providing wildcard subscriptions, complex message handling, etc.  Works server and client-side.
  * Author: Jim Cowart (http://ifandelse.com)
- * Version: v1.0.7
+ * Version: v1.0.8
  * Url: http://github.com/postaljs/postal.js
  * License(s): MIT
  */
@@ -22,7 +22,7 @@
 		root.postal = factory( root._, root );
 	}
 }( this, function( _, global, undefined ) {
-	var prevPostal = global.postal;
+	var prevPostal = global && global.postal;
 	var _defaultConfig = {
 		DEFAULT_CHANNEL: "/",
 		SYSTEM_CHANNEL: "postal",
