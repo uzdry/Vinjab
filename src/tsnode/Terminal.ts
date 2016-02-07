@@ -16,6 +16,8 @@ class Terminal {
 
     private channelsub;
 
+    private toServerChannel;
+
 
     /**
      * public constructor
@@ -38,8 +40,20 @@ class Terminal {
         var subreq = this.channelsub.subscribe("request.#", this.subscribeFromServer.bind(this));
         var unsubreq = this.channelsub.subscribe("stop.#", this.unsubscribeFromServer.bind(this));
 
+        this.toServerChannel = postal.channel("toServer");
+        var subToServer = this.toServerChannel.subscribe("#", this.toServer.bind(this));
+
+
     }
 
+    /**
+     * send a message to the server that is to be put on the bus
+     * @param data the data that is to be send
+     */
+    public toServer(data){
+        console.log(data);
+        this.connection.emit('message', {mName: data.constructor.name, m: data});
+    }
 
     /**
      * send a message to the server.

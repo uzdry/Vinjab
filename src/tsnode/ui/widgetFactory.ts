@@ -94,7 +94,6 @@ class WidgetFactory{
         var xmlDoc = xhttp.responseXML;
         var elements = xmlDoc.getElementsByTagName("signal");
 
-        console.log(elements);
 
         for(var i = 0; i < elements.length; i++){
 
@@ -109,7 +108,6 @@ class WidgetFactory{
         }
 
         this.dashboard.setAvailableSignals(WidgetFactory.signalsDesc);
-        console.log(WidgetFactory.signalsDesc);
     }
 
 

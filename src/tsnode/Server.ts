@@ -6,14 +6,16 @@
 
 import {ValueAnswerMessage, DBRequestMessage, Message, ValueMessage, Topic} from "./messages";
 import{Proxy} from "./Proxy";
+import{BusDevice} from "./Bus";
 
 
-class Server {
+class Server extends BusDevice{
 
     private app;
     private io;
 
     constructor() {
+        super();
 
         var express = require('express');
         this.app = express();
@@ -46,6 +48,9 @@ class Server {
                 console.log('user disconnected');
             });
 
+            socket.on('message', function(msg){
+                console.log(msg);
+            }).bind(this);
 
             socket.on('subscribe', function(msg) {
                 p.subscribe(new Topic(200, msg));
@@ -57,7 +62,7 @@ class Server {
 
             socket.on('createChannel', function (){
                 console.log('ch created' + p);
-            });
+            }).bind(this);
 
         });
 
