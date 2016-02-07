@@ -37,7 +37,7 @@ class PercentGaugeWidget extends Widget{
         units: '%',
         title: false,
         minValue: 0,
-        maxValue: 220,
+        maxValue: 100,
     };
 
 
@@ -89,4 +89,3 @@ class PercentGaugeWidget extends Widget{
     }
 
 }
-

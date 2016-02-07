@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 ///<reference path="/home/nutzio/PSE/WebStorm/plugins/JavaScriptLanguage/typescriptCompiler/external/lib.es6.d.ts"/>
+=======
+///<reference path="C:\Program Files (x86)\JetBrains\WebStorm 11.0.3\plugins\JavaScriptLanguage\typescriptCompiler\external\lib.es6.d.ts" />
+>>>>>>> 19fd6550a7dccb6b5122e2a20d432787c1825199
 ///<reference path="../../typings/node/node.d.ts"/>
 
 import {DBRequest} from "./DBAccess";

@@ -40,6 +40,3 @@ function sleep(milliseconds) {
 
 
 
-
-//process.exit(1);
-
