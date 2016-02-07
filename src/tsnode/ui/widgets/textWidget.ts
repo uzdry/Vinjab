@@ -57,7 +57,7 @@ class TextWidget extends Widget{
 
     /** Gets called shortly after the constructor */
     initialize(){
-        this.listenTo(this.model, 'change', this.render);
+        this.listenTo(this.model, 'change:value', this.render);
     }
 
     /** The render function that gets called when the value changes */
@@ -71,6 +71,11 @@ class TextWidget extends Widget{
 
     resize(size_x: number, size_y:number){
 
+    }
+
+    destroy(){
+        super.destroy();
+        delete this;
     }
 
 

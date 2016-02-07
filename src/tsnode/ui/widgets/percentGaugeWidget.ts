@@ -88,4 +88,9 @@ class PercentGaugeWidget extends Widget{
         this.gauge.updateConfig(this.config);
     }
 
+    destroy(){
+        super.destroy();
+        delete this;
+    }
+
 }

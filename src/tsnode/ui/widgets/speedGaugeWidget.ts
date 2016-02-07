@@ -84,7 +84,7 @@ class SpeedGaugeWidget extends Widget{
 
     /** Gets called shortly after the constructor */
     initialize(){
-        this.listenTo(this.model, 'change', this.render);
+        this.listenTo(this.model, 'change:value', this.render);
     }
 
     /** Gets called after a update of the value */
@@ -110,6 +110,12 @@ class SpeedGaugeWidget extends Widget{
         this.config.height = size_y;
         this.config.width = size_x;
         this.gauge.updateConfig(this.config);
+    }
+
+    destroy(){
+        super.destroy();
+        delete this.gauge;
+        delete this;
     }
 
 }

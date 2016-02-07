@@ -36,10 +36,12 @@
 <body>
 <p><button id="bDashboard">Dashboard</button><button id="bEditMode">EditMode</button><button id="bSettings">Settings</button></p>
 <div id="dEditMode" style="display: none;">
-<select id="WidgetSelect"></select> <select id="valueSelect"></select> <button id="addButton">Add</button>
+    <select id="WidgetSelect"></select> <select id="valueSelect"></select> <button id="addButton">Add</button>
+    <br>
+    DeleteMode: <input type="checkbox" id="cDeleteMode">
 </div>
 
-<div id="dDashboard">
+<div id="dDashboard" >
 <div class="gridster">
     <ul></ul>
 </div>
@@ -56,7 +58,6 @@
 
 
 <script>
-
     $( "#bDashboard" ).click(function() {
         $( "#dDashboard" ).show( "slow" );
         $( "#dSettings").hide("slow");

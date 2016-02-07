@@ -51,6 +51,10 @@ abstract class Widget extends Backbone.View<DataModel> {
 
     abstract render();
 
+    destroy(){
+        this.stopListening(this.model);
+    }
+
 }
 
 interface WidgetConfig {

@@ -23,6 +23,7 @@ class Dashboard{
     selector:HTMLSelectElement = <HTMLSelectElement>document.getElementById("WidgetSelect");
     idSelector:HTMLSelectElement = <HTMLSelectElement>document.getElementById("valueSelect");
     button:HTMLButtonElement = <HTMLButtonElement>document.getElementById("addButton");
+    deleteCheck: HTMLInputElement = <HTMLInputElement>document.getElementById("cDeleteMode");
 
     options:string[];
 
@@ -52,6 +53,13 @@ class Dashboard{
 
 
         this.startSelector();
+        $(document).on( "click", ".gridster ul li", function() {
+            if(document.getElementById("cDeleteMode").checked) {
+                $(this).addClass("activ");
+                dashboard.grid.gridster.remove_widget($('.activ'));
+                dashboard.grid.removeWidget(this.children[0].getAttribute("id"));
+            }
+        });
     }
 
     static getCookie(cname: string): string {

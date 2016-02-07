@@ -22,7 +22,7 @@ class Grid {
     widgetFactory: WidgetFactory;
     dashboard: Dashboard;
 
-    constructor(factory: WidgetFactory, dashboard: Dashboard) {
+    constructor(factory: WidgetFactory, dashboard: Dashboard){
 
         // Save the Objects for later use
         this.dashboard = dashboard;
@@ -35,7 +35,7 @@ class Grid {
             resize: {
                 enabled: true,
 
-                stop: function (e, ui, $widget) {
+                stop: function(e, ui, $widget) {
 
                     var outerHTML = $widget[0].outerHTML;
                     var size_x:number = parseInt(outerHTML.match("data-sizex=\"(.*?)\"")[1]);
@@ -49,6 +49,12 @@ class Grid {
             }
         }).data('gridster');
 
+
+    }
+
+    removeWidget(id: string){
+        var widget: Widget = this.widgets[id];
+        widget.destroy();
     }
 
     addWidget(widget: Widget){
