@@ -53,6 +53,7 @@ class Server extends BusDevice{
             }).bind(this);
 
             socket.on('subscribe', function(msg) {
+                console.log("msg rcvd");
                 p.subscribe(new Topic(200, msg));
             });
 

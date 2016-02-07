@@ -19,21 +19,11 @@ for (var i = 0; i < Topic.VALUES.length; i++) {
     sources.push(s);
 }
 
-console.log(sources);
-
 
 for (var i = 0; i < sources.length; i++) {
     sources[i].fire();
 }
 
-function sleep(milliseconds) {
-    var start = new Date().getTime();
-    for (var i = 0; i < 1e7; i++) {
-        if ((new Date().getTime() - start) > milliseconds){
-            break;
-        }
-    }
-}
 
 
 //console.log("Gokkk");
