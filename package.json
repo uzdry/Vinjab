@@ -25,6 +25,7 @@
     "browserify": "~13.0.0"
   },
   "dependencies": {
+    "bluetooth-obd": "^0.2.2",
     "bower": "^1.7.7",
     "express": "^4.13.4",
     "gridster": "^0.5.6",
