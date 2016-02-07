@@ -41,6 +41,7 @@ class Topic {
     static DASHBOARD_ANS_MSG =  new Topic(380, "dashboard settings from database");
     static REPLAY_REQ =         new Topic(390, "replay request");
     static REPLAY_ANS =         new Topic(400, "replay answer");
+    static REPLAY_INFO =        new Topic(410, "replay information");
 
     static VALUES: Topic[] = [     Topic.SPEED,
         Topic.MAF,
@@ -132,6 +133,17 @@ class ValueMessage extends Message {
     }
 }
 
+class ReplayInfoMessage extends Message {
+    beginnings: number[];
+    endings: number[];
+
+    constructor(beg: number[], end: number[]) {
+        super(Topic.REPLAY_INFO);
+        this.beginnings = beg;
+        this.endings = end;
+    }
+}
+
 class DBRequestMessage extends Message {
     beginDate: Date;
     endDate: Date;
@@ -168,10 +180,6 @@ class ReplayValueMessage extends Message {
         super(Topic.REPLAY_ANS);
         this.value= pValue;
     }
-}
-
-class DBRequestInfoMessage extends Message {
-
 }
 
 class DashboardMessage extends Message {
@@ -219,4 +227,4 @@ class Value {
 }
 
 
-export {Topic, Message, ValueMessage, ValueAnswerMessage, DBRequestMessage, ReplayValueMessage, ReplayRequestMessage, Value, DashboardMessage, DashboardRspMessage};
+export {Topic, Message, ValueMessage, ReplayInfoMessage, ValueAnswerMessage, DBRequestMessage, ReplayValueMessage, ReplayRequestMessage, Value, DashboardMessage, DashboardRspMessage};
