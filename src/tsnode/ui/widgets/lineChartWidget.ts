@@ -40,7 +40,7 @@ class LineChartWidget extends Widget{
     chart: LinearInstance;
 
     startingData: LinearChartData = {
-        labels: [1, 2, 3, 4, 5, 6, 7],
+        labels: [],
         datasets: [
             {
                 label: "",
@@ -48,15 +48,7 @@ class LineChartWidget extends Widget{
                 strokeColor: "rgba(220,220,220,1)",
                 pointColor: "rgba(220,220,220,1)",
                 pointStrokeColor: "#fff",
-                data: [65, 59, 80, 81, 56, 55, 40]
-            },
-            {
-                label: "",
-                fillColor: "rgba(151,187,205,0.2)",
-                strokeColor: "rgba(151,187,205,1)",
-                pointColor: "rgba(151,187,205,1)",
-                pointStrokeColor: "#fff",
-                data: [28, 48, 40, 19, 86, 27, 90]
+                data: []
             }
         ]
     };
@@ -70,38 +62,56 @@ class LineChartWidget extends Widget{
     /** Init gets called after the widget has been added to the grid */
     init() {
         this.htmlText = <HTMLCanvasElement> document.getElementById(this.widgetID)
-        this.chart = new Chart(this.htmlText.getContext("2d")).Line(this.startingData);
-        //TODO Initialise the Widget
 
+        if (this.model.get("data") != null) {
+            this.startingData.labels = this.model.get("time");
+            this.startingData.datasets[0].data = this.model.get("data");
+            this.chart = new Chart(this.htmlText.getContext("2d")).Line(this.model.get("data"));
+        }else{
+            this.listenToOnce(this.model, "change:data", function(){
+                this.startingData.labels = this.model.get("time");
+                this.startingData.datasets[0].data = this.model.get("data");
+                this.chart = new Chart(this.htmlText.getContext("2d")).Line(this.model.get("data"));
+            });
+        }
     }
 
     constructor(options?){
         super(options);
 
+        /** Chart settings */
         Chart.defaults.global.responsive = true;
         Chart.defaults.global.maintainAspectRatio = false;
 
+        /** Create different IDs */
         this.widgetID = this.typeID + "-" + this.model.id + "-" + LineChartWidget.widgetCounter;
         LineChartWidget.widgetCounter++;
 
         this.htmlElement = "<li><canvas align=\"center\" id=\"" + this.widgetID  + "\" > </canvas></li>";
         this.value = options.value;
         this.id = options.id;
+
+        /** */
     }
 
     /** Gets called shortly after the constructor */
     initialize(){
-        this.listenTo(this.model, 'change', this.render);
+        this.listenTo(this.model, 'change:data', this.render);
     }
 
     /** The render function that gets called when the value changes */
     render():LineChartWidget{
 
-        //TODO
+        if(this.chart == null){
+            return this;
+        }
+
+        this.chart.addData(this.model.get("time"), this.model.get("value"));
 
         return this;
     }
 
+    /** Resizes the Widget */
     resize(size_x: number, size_y:number){
 
         this.htmlText.width = size_x;

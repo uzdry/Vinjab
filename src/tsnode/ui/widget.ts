@@ -30,6 +30,27 @@ abstract class Widget extends Backbone.View<DataModel> {
      * attributes are the size in pixels*/
     abstract resize(size_x: number, size_y: number);
 
+    listenTo(object: any, events: string, callback: Function): any{
+        super.listenTo(object, events, callback);
+        var subCounter = this.model.get("subCounter");
+        if(subCounter <= 0){
+            postal.channel("reqsubs").publish("request." + this.model.get("tagName"), this.model.get("tagName"))
+        }
+        this.model.set("subCounter", ++subCounter);
+    }
+
+    /** Should only be called before destroying the Widget */
+    stopListening(object: any){
+        super.stopListening(object);
+        var subCounter = this.model.get("subCounter");
+        if(subCounter <= 1){
+            postal.channel("reqsubs").publish("stop." + this.model.get("tagName"), this.model.get("tagName"));
+            this.model.destroy();
+        }
+    }
+
+    abstract render();
+
 }
 
 interface WidgetConfig {

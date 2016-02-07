@@ -60,7 +60,7 @@ class PercentGaugeWidget extends Widget{
 
     /** Gets called shortly after the constructor */
     initialize(){
-        this.listenTo(this.model, 'change', this.render);
+        this.listenTo(this.model, 'change:value', this.render);
     }
 
     /** Gets called after a update of the value */

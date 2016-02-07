@@ -22,9 +22,11 @@ class Grid {
     widgetFactory: WidgetFactory;
     dashboard: Dashboard;
 
-    constructor(factory: WidgetFactory, dashboard: Dashboard){
+    constructor(factory: WidgetFactory, dashboard: Dashboard) {
 
+        // Save the Objects for later use
         this.dashboard = dashboard;
+        this.widgetFactory = factory;
 
         // Create the gridster instance
         this.gridster = $(".gridster ul").gridster({
@@ -33,7 +35,7 @@ class Grid {
             resize: {
                 enabled: true,
 
-                stop: function(e, ui, $widget) {
+                stop: function (e, ui, $widget) {
 
                     var outerHTML = $widget[0].outerHTML;
                     var size_x:number = parseInt(outerHTML.match("data-sizex=\"(.*?)\"")[1]);
@@ -46,16 +48,8 @@ class Grid {
                 }.bind(this)
             }
         }).data('gridster');
-            /*{widget_base_dimensions: [100, 100],
-            widget_margins: [5, 5],
-                resize: new Resize()}).data('gridster');*/
-
-        // Save the factory
-        this.widgetFactory = factory;
 
     }
-
-
 
     addWidget(widget: Widget){
 
@@ -67,6 +61,7 @@ class Grid {
 
         widget.init();
 
+        console.log(this.serialize());
 
     }
 
@@ -109,10 +104,6 @@ class Grid {
             widget.init();
 
         }
-    }
-
-    sendDashboardConfig(){
-
     }
 
 }
