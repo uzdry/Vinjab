@@ -5,6 +5,7 @@ import * as DBAccess from "./DBAccess";
 import {FuelConsumption} from "./AggregatedFunctions";
 import {Proxy} from "./Proxy"
 import {Server} from "./Server";
+import {DBBusDevice} from "./DBAccess";
 
 //var terProx: Proxy = new Proxy();
 //terProx.subscribe(Topic.SPEED);
@@ -24,7 +25,7 @@ for (var i = 0; i < sources.length; i++) {
     sources[i].fire();
 }
 
-
+var busDevice = new DBBusDevice();
 
 //console.log("Gokkk");
 
