@@ -47,7 +47,6 @@ class Server {
             });
 
             socket.on('messagets', function(msg) {
-                console.log("uniq");
                 p.subscribe(new Topic(200, msg));
             });
 

@@ -31,11 +31,6 @@ class Proxy extends BusDevice {
       //  console.log(message);
     }
 
-    public request(message) {
-        console.log('msg recieved ' + message);
-        this.broker.subscribe(message, this);
-    }
-
 
 
 }
