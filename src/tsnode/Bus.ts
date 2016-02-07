@@ -1,4 +1,4 @@
-
+///<reference path="/Applications/WebStorm.app/Contents/plugins/JavaScriptLanguage/typescriptCompiler/external/lib.es6.d.ts"/>
 ///<reference path="../../typings/node/node.d.ts"/>
 
 import * as Msg from "./messages"
@@ -83,7 +83,7 @@ class Broker {
     }
 
     private distribute(m:Msg.Message) {
-        if (this.subscribers.get(m.getTopic().name) == null) {
+        if (this.subscribers.get(m.topic.name) == null) {
             return;
         }
 
