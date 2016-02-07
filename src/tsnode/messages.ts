@@ -35,12 +35,13 @@ class Topic {
     static FUEL_CONSUMPTION =   new Topic(320, "value.aggregated.fuel consumption.aggregated");
     static MILEAGE =            new Topic(330, "value.aggregated.mileage");
     static AVG_SPEED =          new Topic(340, "value.aggregated.average speed");
-    static FUEL_CONSUMPTION_H = new Topic(360, "value.aggregated.fuel per hour")
+    static FUEL_CONSUMPTION_H = new Topic(360, "value.aggregated.fuel per hour");
 
     static DASHBOARD_MSG =      new Topic(370, "dashboard settings");
     static DASHBOARD_ANS_MSG =  new Topic(380, "dashboard settings from database");
     static REPLAY_REQ =         new Topic(390, "replay request");
     static REPLAY_ANS =         new Topic(400, "replay answer");
+    static REPLAY_INFO =        new Topic(410, "replay information");
 
     static VALUES: Topic[] = [     Topic.SPEED,
         Topic.MAF,
@@ -132,6 +133,17 @@ class ValueMessage extends Message {
     }
 }
 
+class ReplayInfoMessage extends Message {
+    beginnings: number[];
+    endings: number[];
+
+    constructor(beg: number[], end: number[]) {
+        super(Topic.REPLAY_INFO);
+        this.beginnings = beg;
+        this.endings = end;
+    }
+}
+
 class DBRequestMessage extends Message {
     beginDate: Date;
     endDate: Date;
@@ -148,32 +160,26 @@ class DBRequestMessage extends Message {
 }
 
 class ReplayRequestMessage extends Message {
-    beginDate: Date;
-    endDate: Date;
     driveNr: number;
+    callerID: string;
+    //true <-> start, false <-> stop:
+    startStop: Boolean;
 
-    constructor(driveNr: number, beginDate: Date, endDate: Date) {
+    constructor(driveNr: number, callerID: string, startStop: boolean) { //last param: true = start, false = stop
         super(Topic.REPLAY_REQ);
         this.driveNr = driveNr;
-        if(!(beginDate === undefined)) {
-            this.beginDate = beginDate;
-        }
-        if(!(endDate === undefined)) {
-            this.endDate = endDate;
-        }
+        this.callerID = callerID;
+        this.startStop = startStop;
     }
 }
 
 class ReplayValueMessage extends Message {
     public value: Value;
+
     constructor(pValue: Value ) {
         super(Topic.REPLAY_ANS);
         this.value= pValue;
     }
-}
-
-class DBRequestInfoMessage extends Message {
-
 }
 
 class DashboardMessage extends Message {
@@ -221,4 +227,4 @@ class Value {
 }
 
 
-export {Topic, Message, ValueMessage, ValueAnswerMessage, DBRequestMessage, ReplayValueMessage, ReplayRequestMessage, Value, DashboardMessage, DashboardRspMessage};
+export {Topic, Message, ValueMessage, ReplayInfoMessage, ValueAnswerMessage, DBRequestMessage, ReplayValueMessage, ReplayRequestMessage, Value, DashboardMessage, DashboardRspMessage};

@@ -1,7 +1,6 @@
 ///<reference path="C:\Program Files (x86)\JetBrains\WebStorm 11.0.3\plugins\JavaScriptLanguage\typescriptCompiler\external\lib.es6.d.ts" />
 ///<reference path="../../typings/node/node.d.ts"/>
 
-import {DBRequest} from "./DBAccess";
 import * as Msg from "./messages"
 
 
