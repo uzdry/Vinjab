@@ -25,7 +25,8 @@
     "lib/postal.js"
   ],
   "dependencies": {
-    "lodash": "^4.2.1"
+    "lodash": "^4.2.1",
+    "conduitjs": "^0.3.3"
   },
   "devDependencies": {
     "jquery": "~1.10.2",
