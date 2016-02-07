@@ -1,5 +1,5 @@
 ///<reference path="../../../typings/backbone/backbone.d.ts" />
-/// <reference path="../../../typings/postal/postal.d.ts"/>
+///<reference path="../../../typings/postal/postal.d.ts"/>
 
 
 //import {ValueMessage} from "../messages";
