@@ -12,7 +12,7 @@ class DataModel extends Backbone.Model{
     constructor(options?){
         super(options);
         this.channel = postal.channel("values");
-        this.subscription = this.channel.subscribe(this.get("tagName"), this.update.bind(this));
+        this.subscription = this.channel.subscribe("request." + this.get("tagName"), this.update.bind(this));
     }
 
     update(data, envelope){
