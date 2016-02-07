@@ -1,4 +1,6 @@
 ///<reference path="/home/nutzio/PSE/WebStorm/plugins/JavaScriptLanguage/typescriptCompiler/external/lib.es6.d.ts"/>
+/// <reference path="../../../typings/postal/postal.d.ts"/>
+
 /**
  * @author: David G.
  */
@@ -143,6 +145,7 @@ class Message {
 /**
  * 1:1 import of the class SettingsMessage.
  */
+
 class SettingsMessage extends Message {
     private configs: Map<Topic, Value>;
 
@@ -1499,10 +1502,32 @@ class Startup {
 
         var database = new DummyDatabase();
         messageBuffer.initialize();
+
+        var div = document.createElement("msgDIV");
+        div.innerHTML = "No messages received yet.";
+        container.appendChild(div);
     }
 }
+
+class Communicator {
+    private mychannel;
+    public subscribe() : void {
+        this.mychannel = postal.channel("values");
+
+        this.mychannel.subscribe("values.steering", this.onMessageReceived.bind(this));
+    }
+
+    public onMessageReceived(data) : void {
+        var msgdiv = document.getElementById("msgDIV");
+        msgdiv.innerHTML = "Message received: " + data;
+    }
+}
+
 
 /**
  * Starts the initialization process...
  */
 Startup.initialize(document.getElementById("div1"));
+
+var com : Communicator = new Communicator();
+com.subscribe();
