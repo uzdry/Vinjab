@@ -1,4 +1,4 @@
-///<reference path="/home/nutzio/PSE/WebStorm/plugins/JavaScriptLanguage/typescriptCompiler/external/lib.es6.d.ts"/>
+///<reference path="S:\Program Files (x86)\JetBrains\WebStorm 11.0.3\plugins/JavaScriptLanguage/typescriptCompiler/external/lib.es6.d.ts"/>
 /// <reference path="../../../typings/postal/postal.d.ts"/>
 
 /**
@@ -1504,6 +1504,7 @@ class Startup {
         messageBuffer.initialize();
 
         var div = document.createElement("msgDIV");
+        div.id = "msgDIV";
         div.innerHTML = "No messages received yet.";
         container.appendChild(div);
     }
@@ -1514,12 +1515,12 @@ class Communicator {
     public subscribe() : void {
         this.mychannel = postal.channel("values");
 
-        this.mychannel.subscribe("values.steering", this.onMessageReceived.bind(this));
+        this.mychannel.subscribe("value.steering", this.onMessageReceived.bind(this));
     }
 
     public onMessageReceived(data) : void {
         var msgdiv = document.getElementById("msgDIV");
-        msgdiv.innerHTML = "Message received: " + data;
+        msgdiv.innerHTML = "Message received: " + data.value.value;
     }
 }
 
