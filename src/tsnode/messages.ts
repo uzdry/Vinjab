@@ -69,8 +69,8 @@ class Topic {
         Topic.AVG_SPEED,
         Topic.FUEL_CONSUMPTION_H];
 
-    private id:number;
-    private name:string;
+    id:number;
+    name:string;
 
     //instantiates a new Topic with ID and name
     constructor(pID:number, pName:string) {
@@ -96,7 +96,7 @@ class Topic {
 
 //super class for all Message Types
 class Message {
-    private topic:Topic;
+    topic:Topic;
 
     constructor(pTopic:Topic) {
         this.topic = pTopic;

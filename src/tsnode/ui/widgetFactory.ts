@@ -94,10 +94,7 @@ class WidgetFactory{
         var xmlDoc = xhttp.responseXML;
         var elements = xmlDoc.getElementsByTagName("signal");
 
-        console.log(elements);
-
         for(var i = 0; i < elements.length; i++){
-
 
             var tagName: string = xmlDoc.getElementsByTagName("signal")[i].getAttribute("category");
             var name: string = elements[i].getElementsByTagName("name")[0].textContent;
@@ -105,11 +102,11 @@ class WidgetFactory{
             var maxValue: number = parseInt(elements[i].getElementsByTagName("maxValue")[0].textContent);
             var minValue: number = parseInt(elements[i].getElementsByTagName("minValue")[0].textContent);
             var desc: string = elements[i].getElementsByTagName("description")[0].textContent;
-            WidgetFactory.signalsDesc[id] = new SignalDescription(name, tagName, id, maxValue, minValue, desc);
+            var unit: string = elements[i].getElementsByTagName("unit")[0].textContent;
+            WidgetFactory.signalsDesc[id] = new SignalDescription(name, tagName, id, maxValue, minValue, desc, unit);
         }
 
         this.dashboard.setAvailableSignals(WidgetFactory.signalsDesc);
-        console.log(WidgetFactory.signalsDesc);
     }
 
 
@@ -124,15 +121,17 @@ class SignalDescription{
     maxValue: number;
     minValue: number;
     description: string;
+    unit: string;
 
 
-    constructor(name:string, tagName: string, id:number, maxValue:number, minValue:number, description:string) {
+    constructor(name:string, tagName: string, id:number, maxValue:number, minValue:number, description:string, unit:string) {
         this.tagName = tagName;
         this.name = name;
         this.id = id;
         this.maxValue = maxValue;
         this.minValue = minValue;
         this.description = description;
+        this.unit = unit;
     }
 }
 

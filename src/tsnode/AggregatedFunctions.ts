@@ -1,4 +1,3 @@
-///<reference path="/Applications/WebStorm.app/Contents/plugins/JavaScriptLanguage/typescriptCompiler/external/lib.es6.d.ts"/>
 
 import {DBRequestMessage, ValueAnswerMessage, ValueMessage, Value, Topic, Message} from "./messages";
 import {BusDevice} from "./Bus";
@@ -128,4 +127,4 @@ class FuelConsumption extends BusDevice {
     }
 }
 
-export {FuelConsumption};
+export {FuelConsumption, AverageSpeed, AvgFuelConsumption, Distance};

@@ -12,22 +12,24 @@
 import {Terminal} from "../Terminal"
 
 
+/** Main class that starts the Dashboard */
 class Dashboard{
-    /** MVC Stuff */
+
+    /** The used dataCollection */
     dataCollection: DataCollection = new DataCollection();
 
     /** Widget Stuff */
     widgetFactory: WidgetFactory;
     grid: Grid;
 
+    /** Used GUI-Buttons and Elements */
     selector:HTMLSelectElement = <HTMLSelectElement>document.getElementById("WidgetSelect");
     idSelector:HTMLSelectElement = <HTMLSelectElement>document.getElementById("valueSelect");
     button:HTMLButtonElement = <HTMLButtonElement>document.getElementById("addButton");
 
-    options:string[];
 
     /** Cookie Stuff */
-    cookie: string;
+    userName: string;
 
 
     constructor(){
@@ -41,14 +43,14 @@ class Dashboard{
         this.widgetFactory.addWidget(new PercentGaugeWidgetConfig());
         this.widgetFactory.addWidget(new LineChartWidgetConfig());
 
-        this.cookie = Dashboard.getCookie("user");
+        this.userName = Dashboard.getCookie("user");
 
-        if(this.cookie === ""){
-            this.cookie = Dashboard.makeid();
-            document.cookie = "user=" + this.cookie;
+        if(this.userName === ""){
+            this.userName = Dashboard.makeid();
+            document.cookie = "user=" + this.userName;
         }
 
-        console.log("user=" + this.cookie);
+        console.log("user=" + this.userName);
 
 
         this.startSelector();
@@ -78,6 +80,14 @@ class Dashboard{
 
     startSelector() {
 
+        //Reset both selectors
+        for(var i in this.selector.options){
+            this.selector.options.remove(i);
+        }
+        for(var i in this.idSelector.options){
+            this.idSelector.options.remove(i);
+        }
+
         //========= Widgets
 
         var options:string[] = this.widgetFactory.getOptions();
@@ -104,6 +114,7 @@ class Dashboard{
 
     }
 
+    /** Gets called on AddButtonClick */
     click(){
         var valueName = this.idSelector[this.idSelector.selectedIndex].text;
 
@@ -112,38 +123,11 @@ class Dashboard{
         this.grid.addWidget(widget);
     }
 
-    setAvailableSignals(signals:{[id: number]: SignalDescription;}){
 
-        for(var i in signals){
-            var c = document.createElement("option");
-            c.text = signals[i].name + ":" + signals[i].id;
-            this.idSelector.options.add(c);
-        }
-
-    }
 
 }
 
+/** Start the Dashboards */
 var terminal = new Terminal();
 var dashboard: Dashboard = new Dashboard();
-dashboard.widgetFactory.getSignals();
 
-
-
-//==========================
-
-
-
-
-
-/** Test Code */
-/*
- /var widget = widgetFactory.createWidget("GaugeWidget", "123");
- grid.addWidget(widget);
-
- var secondWidget = widgetFactory.createWidget("GaugeWidget", "456");
- grid.addWidget(secondWidget);
-
- var cnt: number = 0;
- setInterval(function(){widget.updateValue(cnt++)}, 500);
- */

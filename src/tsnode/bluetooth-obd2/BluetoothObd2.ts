@@ -70,6 +70,8 @@ class BluetoothObd2 extends BusDevice{
 
 
 }
+
+export{BluetoothObd2};
 var obd = new BluetoothObd2();
 
 

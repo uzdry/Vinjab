@@ -1,7 +1,5 @@
-///<reference path="C:\Program Files (x86)\JetBrains\WebStorm 11.0.3\plugins\JavaScriptLanguage\typescriptCompiler\external\lib.es6.d.ts" />
 ///<reference path="../../typings/node/node.d.ts"/>
 
-import {DBRequest} from "./DBAccess";
 import * as Msg from "./messages"
 
 
@@ -71,10 +69,10 @@ class Broker {
     public subscribe(topic:string, sub:BusDevice):void {
         if (this.subscribers.get(topic) == null) {
             this.subscribers.set(topic, new Set<BusDevice>());
-            console.log('Set created' + topic);
+            console.log('Set created ' + topic);
         }
         this.subscribers.get(topic).add(sub);
-        console.log(this.subscribers.get(topic));
+        //console.log(this.subscribers.get(topic));
     }
 
     public unsubscribe(topic:string, sub:BusDevice):void {

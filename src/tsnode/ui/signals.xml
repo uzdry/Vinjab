@@ -2,38 +2,192 @@
 <signals>
     <signal category="value.speed" id="140">
         <name>Geschwindigkeit</name>
-        <description>Geschwindigkeit vom Auto</description>
+        <description>Geschwindigkeit des Autos</description>
         <minValue>0</minValue>
         <maxValue>220</maxValue>
+        <unit>km/h</unit>
     </signal>
     <signal category="value.mass air flow" id="350">
         <name>MAF</name>
-        <description>Massen Luftfluss</description>
+        <description>Luftmassenstrom</description>
         <minValue>0</minValue>
         <maxValue>100</maxValue>
+        <unit>SI</unit>
     </signal>
     <signal category="value.coolant temperature" id="110">
-        <name>Kuehlertemperatur</name>
-        <description>Temperatur des Kuehlers</description>
+        <name>Kühlertemperatur</name>
+        <description>Temperatur des Kühlers</description>
         <minValue>0</minValue>
         <maxValue>100</maxValue>
+        <unit>°C</unit>
     </signal>
     <signal category="value.fuel pressure" id="120">
         <name>Treibstoffdruck</name>
-        <description>Treibstoffdruck</description>
+        <description>Treibstoffdruck in bar</description>
         <minValue>0</minValue>
         <maxValue>10</maxValue>
+        <unit>bar</unit>
     </signal>
     <signal category="value.RPM" id="130">
         <name>Drehzahl</name>
         <description>Motordrehzahl in RPM</description>
         <minValue>0</minValue>
-        <maxValue>3000</maxValue>
+        <maxValue>30000</maxValue>
+        <unit>RPM</unit>
     </signal>
     <signal category="value.steering" id="150">
         <name>Lenkung</name>
         <description>Lenkungswinkel in Grad</description>
         <minValue>-30</minValue>
         <maxValue>30</maxValue>
+        <unit>°</unit>
+    </signal>
+    <signal category="value.intake air temperature" id="160">
+        <name>Lufttemperatur</name>
+        <description>Temperatur der eingezogenen Luft</description>
+        <minValue>0</minValue>
+        <maxValue>60</maxValue>
+        <unit>°C</unit>
+    </signal>
+    <signal category="value.engine runtime" id="170">
+        <name>Motorlaufzeit</name>
+        <description>Zeit seit dem letzten Start des Motors</description>
+        <minValue>0</minValue>
+        <maxValue>3600</maxValue>
+        <unit>Minuten</unit>
+    </signal>
+    <signal category="value.fuel" id="180">
+        <name>Tankfüllstand</name>
+        <description>Aktueller Tankfüllstand</description>
+        <minValue>0</minValue>
+        <maxValue>100</maxValue>
+        <unit>%</unit>
+        <picture></picture>
+    </signal>
+    <signal category="" id="">
+        <name></name>
+        <description></description>
+        <minValue></minValue>
+        <maxValue></maxValue>
+        <unit></unit>
+    </signal>
+    <signal category="value.exhaust gas recirculation state" id="190">
+        <name>EGRS</name>
+        <description>Status des Gas TODO</description>
+        <minValue></minValue>
+        <maxValue></maxValue>
+        <unit></unit>
+    </signal>
+    <signal category="value.injection pressure State" id="200">
+        <name>IPS</name>
+        <description>Treibstoffeinspritzungs Status</description>
+        <minValue></minValue>
+        <maxValue></maxValue>
+        <unit></unit>
+    </signal>
+    <signal category="value.fuel pressure control state" id="210">
+        <name>Treibstoffdruck</name>
+        <description>Status des Treibstoffdrucks</description>
+        <minValue></minValue>
+        <maxValue></maxValue>
+        <unit></unit>
+    </signal>
+    <signal category="value.gas pressure vaporizer" id="220">
+        <name>GasDruck</name>
+        <description>Gas Druck Vaporisierer</description>
+        <minValue></minValue>
+        <maxValue></maxValue>
+        <unit></unit>
+    </signal>
+    <signal category="value.catalyst temperature" id="230">
+        <name>KatalysatorTemperatur</name>
+        <description>Temperatur des Katalysators</description>
+        <minValue>0</minValue>
+        <maxValue>100</maxValue>
+        <unit>°C</unit>
+    </signal>
+    <signal category="value.throttle" id="240">
+        <name>Beschleunigung</name>
+        <description>Beschleunigungs des Autos</description>
+        <minValue>0</minValue>
+        <maxValue>100</maxValue>
+        <unit>%</unit>
+    </signal>
+    <signal category="value.accelerator pedal position" id="250">
+        <name>GaspedalPos</name>
+        <description>Position des Gaspedals</description>
+        <minValue></minValue>
+        <maxValue></maxValue>
+        <unit>%</unit>
+    </signal>
+    <signal category="value.temperature outside" id="260">
+        <name>Außentemperatur</name>
+        <description>Temperatur außerhalb des Autos</description>
+        <minValue>-20</minValue>
+        <maxValue>60</maxValue>
+        <unit>°</unit>
+    </signal>
+    <signal category="value.engine torque" id="270">
+        <name>Motormoment</name>
+        <description>Moment des Motors</description>
+        <minValue>0</minValue>
+        <maxValue>3000</maxValue>
+        <unit>TODO</unit>
+    </signal>
+    <signal category="value.exhaust gas temperature" id="280">
+        <name>GasTemperatur</name>
+        <description>Austoßtemperatur der Abgase</description>
+        <minValue>0</minValue>
+        <maxValue>200</maxValue>
+        <unit>°C</unit>
+    </signal>
+    <signal category="value.exhaust gas pressure" id="290">
+        <name>GasDruck</name>
+        <description>Druck des Abgases</description>
+        <minValue>0</minValue>
+        <maxValue>10</maxValue>
+        <unit>bar</unit>
+    </signal>
+    <signal category="value.ultrasonic sensor distance" id="300">
+        <name>UltraschallAbstand</name>
+        <description>Abstandswerte des Ultraschalls</description>
+        <minValue>0</minValue>
+        <maxValue>100</maxValue>
+        <unit>cm</unit>
+    </signal>
+    <signal category="value.aggregated.average fuel consumption" id="310">
+        <name>Durchschnittverbrauch</name>
+        <description>Durschnittlicher Treibstoffverbrauch</description>
+        <minValue>0</minValue>
+        <maxValue>20</maxValue>
+        <unit>l/100km</unit>
+    </signal>
+    <signal category="value.aggregated.fuel consumption.aggregated" id="320">
+        <name>Treibstoffverbrauch</name>
+        <description>Aktueller Treibstoffverbrauch</description>
+        <minValue>0</minValue>
+        <maxValue>20</maxValue>
+        <unit>l/100km</unit>
+    </signal>
+    <signal category="value.aggregated.mileage" id="330">
+        <name>Distanz</name>
+        <description>Gefahrene Distanz seit Motorstart</description>
+        <minValue>0</minValue>
+        <maxValue>10000</maxValue>
+        <unit>km</unit>
+    </signal>
+    <signal category="value.aggregated.average speed" id="340">
+        <name>Durchschnittsgeschwindigkeit</name>
+        <description>Durchschnittliche Geschwindigkeit</description>
+        <minValue>0</minValue>
+        <maxValue>220</maxValue>
+        <unit>km/h</unit>
+    </signal>
+    <signal category="value.aggregated.fuel per hour" id="360">
+        <name>Treibstoff</name>
+        <description>Verbrauchter Treibstoff in einer Stunde</description>
+        <minValue>0</minValue>
+        <maxValue>100</maxValue>
+        <unit>l</unit>
     </signal>
 </signals>

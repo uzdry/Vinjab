@@ -398,7 +398,7 @@ declare module "express" {
             authenticatedUser: any;
 
             /**
-             * Clear cookie `name`.
+             * Clear userName `name`.
              *
              * @param name
              * @param options
@@ -414,9 +414,9 @@ declare module "express" {
             originalUrl: string;
 
             url: string;
-            
+
             baseUrl: string;
-            
+
             app: Application;
         }
 
@@ -707,7 +707,7 @@ declare module "express" {
             get (field: string): string;
 
             /**
-             * Clear cookie `name`.
+             * Clear userName `name`.
              *
              * @param name
              * @param options
@@ -715,21 +715,21 @@ declare module "express" {
             clearCookie(name: string, options?: any): Response;
 
             /**
-             * Set cookie `name` to `val`, with the given `options`.
+             * Set userName `name` to `val`, with the given `options`.
              *
              * Options:
              *
              *    - `maxAge`   max-age in milliseconds, converted to `expires`
-             *    - `signed`   sign the cookie
+             *    - `signed`   sign the userName
              *    - `path`     defaults to "/"
              *
              * Examples:
              *
              *    // "Remember Me" for 15 minutes
-             *    res.cookie('rememberme', '1', { expires: new Date(Date.now() + 900000), httpOnly: true });
+             *    res.userName('rememberme', '1', { expires: new Date(Date.now() + 900000), httpOnly: true });
              *
              *    // save as above
-             *    res.cookie('rememberme', '1', { maxAge: 900000, httpOnly: true })
+             *    res.userName('rememberme', '1', { maxAge: 900000, httpOnly: true })
              */
             cookie(name: string, val: string, options: CookieOptions): Response;
             cookie(name: string, val: any, options: CookieOptions): Response;
