@@ -2076,6 +2076,39 @@ module Debug {
 
             tbody.appendChild(tr);
 
+            tr = document.createElement('tr');
+            td = document.createElement('td');
+
+            td.innerHTML = "Steering Ratio (turns SteeringWheel/Wheel): ";
+            tr.appendChild(td);
+
+            td = document.createElement('td');
+
+            var form;
+            var input;
+
+            form = document.createElement('form');
+            input = document.createElement('input');
+            input.type = 'number';
+            input.style.height = "16px";
+            input.style.fontSize = "12px";
+            input.style.width = "60px";
+            input.value = CarParameters.steeringRatio;
+            input.id = 'steeringRatio';
+            input.min = 1;
+            input.max = 30;
+            input.onchange = function() {
+                CarParameters.steeringRatio = this.value;
+                DebugGUI.redrawTracks();
+            };
+
+            form.appendChild(document.createTextNode('rat.: '));
+            form.appendChild(input);
+            td.appendChild(form);
+            tr.appendChild(td);
+
+            tbody.appendChild(tr);
+
             DebugGUI.drawDebugGUIAppendCamera(tbody);
 
             table.appendChild(tbody);
