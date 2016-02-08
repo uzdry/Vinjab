@@ -52,7 +52,8 @@ class Terminal {
      */
     public toServer(data){
         console.log(data);
-        this.connection.emit('message', {mName: data.constructor.name, m: data});
+        var msgstr = JSON.stringify(data);
+        this.connection.emit('message', msgstr);
     }
 
     /**

@@ -29,7 +29,7 @@ class BusDevice {
 
     public subscribeAll(topics: Msg.Topic[]): void {
         for (var x in topics) {
-            this.broker.subscribe(x, this);
+            this.broker.subscribe(x.name, this);
         }
     }
 
@@ -70,10 +70,9 @@ class Broker {
     public subscribe(topic:string, sub:BusDevice):void {
         if (this.subscribers.get(topic) == null) {
             this.subscribers.set(topic, new Set<BusDevice>());
-            console.log('Set created' + topic);
+            console.log('Set created: ' + topic);
         }
         this.subscribers.get(topic).add(sub);
-        console.log(this.subscribers.get(topic));
     }
 
     public unsubscribe(topic:string, sub:BusDevice):void {

@@ -49,8 +49,10 @@ class Server extends BusDevice{
             });
 
             socket.on('message', function(msg){
-                console.log(msg);
-            }).bind(this);
+                var message = JSON.parse(msg);
+                console.log(message);
+                p.broker.handleMessage(message);
+            });
 
             socket.on('subscribe', function(msg) {
                 console.log("msg rcvd");
@@ -63,7 +65,7 @@ class Server extends BusDevice{
 
             socket.on('createChannel', function (){
                 console.log('ch created' + p);
-            }).bind(this);
+            });
 
         });
 
