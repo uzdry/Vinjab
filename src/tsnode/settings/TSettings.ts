@@ -1,4 +1,5 @@
-///<reference path="/home/nutzio/PSE/WebStorm/plugins/JavaScriptLanguage/typescriptCompiler/external/lib.es6.d.ts"/>
+///<reference path="/Applications/WebStorm.app/Contents/plugins/JavaScriptLanguage/typescriptCompiler/external/lib.es6.d.ts"/>
+
 /// <reference path="../../../typings/postal/postal.d.ts"/>
 
 /**
@@ -105,8 +106,8 @@ class Topic {
         Topic.AVG_SPEED,
         Topic.FUEL_CONSUMPTION_H];
 
-    private id:number;
-    private name:string;
+    id:number;
+    name:string;
 
     //instantiates a new Topic with ID and name
     constructor(pID:number, pName:string) {
@@ -1504,6 +1505,7 @@ class Startup {
         messageBuffer.initialize();
 
         var div = document.createElement("msgDIV");
+        div.id = "msgDIV";
         div.innerHTML = "No messages received yet.";
         container.appendChild(div);
     }
@@ -1514,7 +1516,7 @@ class Communicator {
     public subscribe() : void {
         this.mychannel = postal.channel("values");
 
-        this.mychannel.subscribe("values.steering", this.onMessageReceived.bind(this));
+        this.mychannel.subscribe("value.steering", this.onMessageReceived.bind(this));
     }
 
     public onMessageReceived(data) : void {
