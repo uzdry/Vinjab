@@ -1,5 +1,4 @@
-///<reference path="/Applications/WebStorm.app/Contents/plugins/JavaScriptLanguage/typescriptCompiler/external/lib.es6.d.ts"/>
-
+///<reference path="S:\Program Files (x86)\JetBrains\WebStorm 11.0.3\plugins/JavaScriptLanguage/typescriptCompiler/external/lib.es6.d.ts"/>
 /// <reference path="../../../typings/postal/postal.d.ts"/>
 
 /**
@@ -106,8 +105,8 @@ class Topic {
         Topic.AVG_SPEED,
         Topic.FUEL_CONSUMPTION_H];
 
-    id:number;
-    name:string;
+    private id:number;
+    private name:string;
 
     //instantiates a new Topic with ID and name
     constructor(pID:number, pName:string) {
@@ -1514,14 +1513,16 @@ class Startup {
 class Communicator {
     private mychannel;
     public subscribe() : void {
-        this.mychannel = postal.channel("values");
+        var channelsub = postal.channel("reqsubs");
+        var reqsub = channelsub.publish("request." + "value.steering", "value.steering");
 
+        this.mychannel = postal.channel("values");
         this.mychannel.subscribe("value.steering", this.onMessageReceived.bind(this));
     }
 
     public onMessageReceived(data) : void {
         var msgdiv = document.getElementById("msgDIV");
-        msgdiv.innerHTML = "Message received: " + data;
+        msgdiv.innerHTML = "Message received: " + data.value.value;
     }
 }
 
