@@ -77,10 +77,6 @@ class Topic {
         this.name = pName;
     }
 
-    public getID():number {
-        return this.id
-    }
-
     public getName(): string {
         return this.name
     }
@@ -180,7 +176,7 @@ class DashboardMessage extends Message {
     public user: string;
     public config: string;
 
-    constructor(usr: string, cnfg: string, req: Boolean) {
+    constructor(usr: string, cnfg: string, req: boolean) {
         super(Topic.DASHBOARD_MSG);
         this.request = req;
         this.user = usr;

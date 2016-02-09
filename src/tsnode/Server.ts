@@ -54,7 +54,7 @@ class Server extends BusDevice{
             socket.on('message', function(msg){
                 var message = JSON.parse(msg);
                 if (message.topic.name.startsWith('value.')) {
-                    message = new ValueMessage(new Topic(99, message.topic.name), message.value);
+                    message = new ValueMessage(new Topic(message.topic.name), message.value);
                 } else if (message.topic.name.startsWith('dashboard')) {
                     message = new DashboardMessage(message.user, message.config, message.request);
                 } else if (message.topic.name.startsWith('replay')) {
@@ -66,11 +66,11 @@ class Server extends BusDevice{
 
             socket.on('subscribe', function(msg) {
                 console.log("msg rcvd");
-                p.subscribe(new Topic(200, msg));
+                p.subscribe(new Topic(msg));
             });
 
             socket.on('unsubscribe', function(msg) {
-                p.unsubscribe(new Topic(200, msg));
+                p.unsubscribe(new Topic(msg));
             });
 
             socket.on('createChannel', function (){
