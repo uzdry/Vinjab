@@ -1,3 +1,7 @@
+/**
+ * @author David G.
+ */
+
 /// <reference path="../../../typings/postal/postal.d.ts"/>
 
 class Communicator {

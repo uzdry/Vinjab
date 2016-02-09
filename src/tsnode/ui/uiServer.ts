@@ -24,7 +24,7 @@ var io = socketio.listen(server);
 // Middlewares
 app.use(express.static(appConfig.staticPath));
 app.use(function(req,res,next){
-    res.send(404, '404 Not Found. Sorry.\n');
+    res.status(404).send('404 Not Found. Sorry.\n');
 });
 
 // Socket

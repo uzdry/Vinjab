@@ -1,4 +1,4 @@
-///<reference path="/Applications/WebStorm.app/Contents/plugins/JavaScriptLanguage/typescriptCompiler/external/lib.es6.d.ts"/>
+
 ///<reference path="../../typings/node/node.d.ts"/>
 
 import * as Msg from "./messages"

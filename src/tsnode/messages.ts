@@ -134,13 +134,11 @@ class ValueMessage extends Message {
 }
 
 class ReplayInfoMessage extends Message {
-    beginnings: number[];
-    endings: number[];
+    finishTime: number[];
 
-    constructor(beg: number[], end: number[]) {
+    constructor(end: number[]) {
         super(Topic.REPLAY_INFO);
-        this.beginnings = beg;
-        this.endings = end;
+        this.finishTime = end;
     }
 }
 
@@ -200,7 +198,7 @@ class DashboardRspMessage extends Message {
     public config: string;
 
     constructor(usr: string, cnfg: string) {
-        super(Topic.DASHBOARD_MSG);
+        super(Topic.DASHBOARD_ANS_MSG);
         this.user = usr;
         this.config = cnfg;
     }
