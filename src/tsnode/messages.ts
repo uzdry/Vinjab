@@ -161,7 +161,7 @@ class ReplayRequestMessage extends Message {
     driveNr: number;
     callerID: string;
     //true <-> start, false <-> stop:
-    startStop: Boolean;
+    startStop: boolean;
 
     constructor(driveNr: number, callerID: string, startStop: boolean) { //last param: true = start, false = stop
         super(Topic.REPLAY_REQ);
@@ -181,7 +181,7 @@ class ReplayValueMessage extends Message {
 }
 
 class DashboardMessage extends Message {
-    public request: Boolean;
+    public request: boolean;
     public user: string;
     public config: string;
 

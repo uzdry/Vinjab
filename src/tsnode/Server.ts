@@ -7,6 +7,9 @@
 import {ValueAnswerMessage, DBRequestMessage, Message, ValueMessage, Topic} from "./messages";
 import{Proxy} from "./Proxy";
 import{BusDevice} from "./Bus";
+import {Utils} from "./Utils";
+import {DashboardMessage} from "./messages";
+import {ReplayRequestMessage} from "./messages";
 
 
 class Server extends BusDevice{
@@ -50,6 +53,13 @@ class Server extends BusDevice{
 
             socket.on('message', function(msg){
                 var message = JSON.parse(msg);
+                if (message.topic.name.startsWith('value.')) {
+                    message = new ValueMessage(new Topic(99, message.topic.name), message.value);
+                } else if (message.topic.name.startsWith('dashboard')) {
+                    message = new DashboardMessage(message.user, message.config, message.request);
+                } else if (message.topic.name.startsWith('replay')) {
+                    message = new ReplayRequestMessage(message.driverNr, message.callerID, message.startStop);
+                }
                 console.log(message);
                 p.broker.handleMessage(message);
             });
@@ -74,7 +84,6 @@ class Server extends BusDevice{
         });
 
     }
-
 }
 
 export {Server}
