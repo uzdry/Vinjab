@@ -1,4 +1,4 @@
-
+///<reference path="/Applications/WebStorm.app/Contents/plugins/JavaScriptLanguage/typescriptCompiler/external/lib.es6.d.ts"/>
 ///<reference path="../../typings/node/node.d.ts"/>
 
 import * as Msg from "./messages"
@@ -70,7 +70,7 @@ class Broker {
     public subscribe(topic:string, sub:BusDevice):void {
         if (this.subscribers.get(topic) == null) {
             this.subscribers.set(topic, new Set<BusDevice>());
-            console.log('Set created: ' + topic);
+            console.log('Set created: ' + topic + sub.constructor.name);
         }
         this.subscribers.get(topic).add(sub);
     }
