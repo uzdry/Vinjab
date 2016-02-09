@@ -1,5 +1,5 @@
 /**
- * @author David G.
+ * Created by Ray on 07.02.2016.
  */
 
 module Format {
@@ -938,7 +938,7 @@ module ARFactory {
 
             camera.toImage(image);
 
-            //document.body.appendChild(image);
+            //document.getElementById("divPS").appendChild(image);
         }
 
 
@@ -1096,7 +1096,7 @@ module Debug {
             tbody.appendChild(tr);
             table.appendChild(tbody);
 
-            document.body.appendChild(table);
+            document.getElementById("divPS").appendChild(table);
         }
 
         public static drawDebugGUIAppendCamera(tbody : HTMLElement) {
@@ -1468,7 +1468,7 @@ module Debug {
 
             var oldTable = document.getElementById("table_dbg_gui");
             while (oldTable != null) {
-                document.body.removeChild(oldTable);
+                document.getElementById("divPS").removeChild(oldTable);
                 oldTable = document.getElementById("table_dbg_gui");
             }
 
@@ -1487,7 +1487,7 @@ module Debug {
 
             DebugGUI.drawDebugGUIAppendCamera(tbody);
             table.appendChild(tbody);
-            document.body.appendChild(table);
+            document.getElementById("divPS").appendChild(table);
 
             myisvg.clear();
             camera.toImage(myisvg);
@@ -1531,7 +1531,7 @@ module Debug {
             DebugGUI.mode = DebugGUIMode.simpleCircle;
             var oldTable = document.getElementById("table_dbg_gui");
             while (oldTable != null) {
-                document.body.removeChild(oldTable);
+                document.getElementById("divPS").removeChild(oldTable);
                 oldTable = document.getElementById("table_dbg_gui");
             }
 
@@ -1945,7 +1945,7 @@ module Debug {
             DebugGUI.drawDebugGUIAppendCamera(tbody);
 
             table.appendChild(tbody);
-            document.body.appendChild(table);
+            document.getElementById("divPS").appendChild(table);
 
             ARFactory.Drawer.drawSimpleCircleAutoClear(myisvg);
         }
@@ -2026,7 +2026,7 @@ module Debug {
 
             var oldTable = document.getElementById("table_dbg_gui");
             while (oldTable != null) {
-                document.body.removeChild(oldTable);
+                document.getElementById("divPS").removeChild(oldTable);
                 oldTable = document.getElementById("table_dbg_gui");
             }
 
@@ -2076,43 +2076,10 @@ module Debug {
 
             tbody.appendChild(tr);
 
-            tr = document.createElement('tr');
-            td = document.createElement('td');
-
-            td.innerHTML = "Steering Ratio (turns SteeringWheel/Wheel): ";
-            tr.appendChild(td);
-
-            td = document.createElement('td');
-
-            var form;
-            var input;
-
-            form = document.createElement('form');
-            input = document.createElement('input');
-            input.type = 'number';
-            input.style.height = "16px";
-            input.style.fontSize = "12px";
-            input.style.width = "60px";
-            input.value = CarParameters.steeringRatio;
-            input.id = 'steeringRatio';
-            input.min = 1;
-            input.max = 30;
-            input.onchange = function() {
-                CarParameters.steeringRatio = this.value;
-                DebugGUI.redrawTracks();
-            };
-
-            form.appendChild(document.createTextNode('rat.: '));
-            form.appendChild(input);
-            td.appendChild(form);
-            tr.appendChild(td);
-
-            tbody.appendChild(tr);
-
             DebugGUI.drawDebugGUIAppendCamera(tbody);
 
             table.appendChild(tbody);
-            document.body.appendChild(table);
+            document.getElementById("divPS").appendChild(table);
 
             DebugGUI.redrawTracks();
         }

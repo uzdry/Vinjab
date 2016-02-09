@@ -644,6 +644,8 @@ class TableFactory {
 
 
         this.table.appendChild(this.tableBody);
+        this.table.style.height = "auto";
+        this.table.style.paddingBottom = "0px";
         this.container.appendChild(this.table);
     }
 
@@ -1523,6 +1525,9 @@ class Communicator {
     public onMessageReceived(data) : void {
         var msgdiv = document.getElementById("msgDIV");
         msgdiv.innerHTML = "Message received: " + data.value.value;
+        // var swRotation = document.getElementById("swRotation");
+        // swRotation.value = data.value.value;
+        //  Event: swRotation value changed!
     }
 }
 
@@ -1530,7 +1535,11 @@ class Communicator {
 /**
  * Starts the initialization process...
  */
-Startup.initialize(document.getElementById("div1"));
+var div1 = document.getElementById("div1");
+var div2 = document.createElement("div");
+div2.style.height = "300px";
+div1.appendChild(div2);
+Startup.initialize(div2);
 
 var com : Communicator = new Communicator();
 com.subscribe();
