@@ -53,12 +53,10 @@ class ValueEntryKey {
 }
 
 class ReplayInfo {
-    beginnings: number[];
-    endings: number[];
+    finishTime: number[];
 
     constructor() {
-        this.beginnings = [];
-        this.endings = [];
+        this.finishTime = [];
     }
 }
 
@@ -96,22 +94,14 @@ class LevelDBAccess {
         // scans the db for replay information and writes it to the replay information object:
         this.replayInfo = new ReplayInfo();
         this.db.createReadStream().on('data', function(data) {
-            try {
+            if((<string> data.key).startsWith('{"')) {
                 var parsed = JSON.parse(data.key);
                 if (parsed.hasOwnProperty('time') && parsed.hasOwnProperty('driveNr')) {
-                    if (typeof this.replayInfo.beginnings[parsed.driveNr] === 'undefined') {
-                        this.replayInfo.beginnings[parsed.driveNr] = parsed.time;
-                        this.replayInfo.endings[parsed.driveNr] = parsed.time;
-                    } else {
-                        if (this.replayInfo.beginnings[parsed.driveNr] > parsed.time) {
-                            this.replayInfo.beginnings[parsed.driveNr] = parsed.time;
-                        } else if (this.replayInfo.endings[parsed.driveNr] < parsed.time) {
-                            this.replayInfo.endings[parsed.driveNr] = parsed.time;
-                        }
+                    if (typeof this.replayInfo.finishTime[parsed.driveNr] == 'undefined' ||
+                            this.replayInfo.finishTime[parsed.driveNr] < parsed.time) {
+                        this.replayInfo.finishTime[parsed.driveNr] = parsed.time;
                     }
                 }
-            } catch (err) {
-                // empty catch, because driver and info strings cannot be parsed. not sure how to handle this without try/catch.
             }
         }.bind(this));
         this.currentDriver = null;
@@ -258,7 +248,7 @@ class DBBusDevice extends BusDevice {
     //the overriden handleMessage-function. depending on the type of the message, a different action is performed.
     public handleMessage(m: Message): void {
         //If the given message is a DBRequestMessage, the Request is handled and a response message is sent.
-        if(m instanceof DBRequestMessage) {
+        if(m.topic.name == Topic.DBREQ_MSG.name) {
             //handling of a Value Request: Values are fetched from the DB and a value response is sent
             var dbValueReq = <DBRequestMessage> m;
             this.dbAccess.getEntries(dbValueReq.reqTopic.getName(), dbValueReq.driveNr, dbValueReq.beginDate.getDate(), dbValueReq.endDate.getDate(), function(res, tim){
@@ -266,11 +256,12 @@ class DBBusDevice extends BusDevice {
             }.bind(this));
         }
         //If the given message is a regular value message, it is written to the db
-        else if (m instanceof ValueMessage) {
-            this.dbAccess.putSensorValue(m.value.getIdentifier(), m.value.numericalValue);
+        else if (m.topic.name.startsWith("value.")) {
+            var valuemes = <ValueMessage> m;
+            this.dbAccess.putSensorValue(valuemes.value.getIdentifier(), valuemes.value.numericalValue);
         }
         //If the given message is a DashboardMessage, it is either written to the db or fetched from the db
-        else if(m instanceof DashboardMessage) {
+        else if(m.topic.name == Topic.DASHBOARD_MSG.name) {
             var dbm = <DashboardMessage> m;
             if(dbm.request) {
                 this.dbAccess.getDriverEntry(dbm.user, function(value, err) {
@@ -288,8 +279,7 @@ class DBBusDevice extends BusDevice {
                         this.sendDashboardRspMessage(value.dashboardConfig);
                     }
                 }.bind(this));
-                this.broker.handleMessage(new ReplayInfoMessage(this.dbAccess.replayInfo.beginnings,
-                    this.dbAccess.replayInfo.endings));
+                this.broker.handleMessage(new ReplayInfoMessage(this.dbAccess.replayInfo.finishTime));
             } else {
                 this.dbAccess.getDriverEntry(dbm.user, function(value, err) {
                     if(err.notFound) {
@@ -310,11 +300,12 @@ class DBBusDevice extends BusDevice {
             }
         }
         //if the given Message is a replay request, a new Replay is started
-        else if(m instanceof ReplayRequestMessage) {
-            if(m.startStop) {
-                this.dbAccess.getEntries("value.*", m.driveNr, this.dbAccess.replayInfo.beginnings[m.driveNr],
-                    this.dbAccess.replayInfo.endings[m.driveNr], function (res, tim) {
-                        new Replay(this.dbAccess.replayInfo, m.callerID).replay(res, tim);
+        else if(m.topic.name == Topic.REPLAY_REQ.name) {
+            var rreq = <ReplayRequestMessage> m;
+            if(rreq.startStop) {
+                this.dbAccess.getEntries("value.*", rreq.driveNr, 0,
+                    this.dbAccess.replayInfo.finishTime[rreq.driveNr], function (res, tim) {
+                        new Replay(this.dbAccess.replayInfo, rreq.callerID).replay(res, tim);
                     }.bind(this));
             }
         }
@@ -344,8 +335,11 @@ class Replay extends BusDevice {
     }
 
     public handleMessage(m: Message) {
-        if(m instanceof ReplayRequestMessage && !m.startStop && m.callerID == this.callerID) {
-            this.continueLoop = false;
+        if(m.topic.name == Topic.REPLAY_REQ.name) {
+            var rreq = <ReplayRequestMessage> m;
+            if (!rreq.startStop && rreq.callerID == this.callerID) {
+                this.continueLoop = false;
+            }
         }
     }
 

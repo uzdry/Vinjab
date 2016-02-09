@@ -134,13 +134,11 @@ class ValueMessage extends Message {
 }
 
 class ReplayInfoMessage extends Message {
-    beginnings: number[];
-    endings: number[];
+    finishTime: number[];
 
-    constructor(beg: number[], end: number[]) {
+    constructor(end: number[]) {
         super(Topic.REPLAY_INFO);
-        this.beginnings = beg;
-        this.endings = end;
+        this.finishTime = end;
     }
 }
 
