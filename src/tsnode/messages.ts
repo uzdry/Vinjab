@@ -200,7 +200,7 @@ class DashboardRspMessage extends Message {
     public config: string;
 
     constructor(usr: string, cnfg: string) {
-        super(Topic.DASHBOARD_MSG);
+        super(Topic.DASHBOARD_ANS_MSG);
         this.user = usr;
         this.config = cnfg;
     }

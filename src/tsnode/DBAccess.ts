@@ -111,7 +111,7 @@ class LevelDBAccess {
                     }
                 }
             } catch (err) {
-                // empty catch, because driver strings cannot be parsed. not sure how to handle this without try/catch.
+                // empty catch, because driver and info strings cannot be parsed. not sure how to handle this without try/catch.
             }
         }.bind(this));
         this.currentDriver = null;
@@ -274,16 +274,30 @@ class DBBusDevice extends BusDevice {
             var dbm = <DashboardMessage> m;
             if(dbm.request) {
                 this.dbAccess.getDriverEntry(dbm.user, function(value, err) {
-                    if (err) console.log(err);
-                    else this.sendDashboardRspMessage(value.dashboardConfig);
+                    if(err.notFound) {
+                        var standardConfig: string = '[{"row":1,"col":1,"size_x":4,"size_y":4,"name":' +
+                            '"SpeedGauge","id":140},{"row":1,"col":5,"size_x":3,"size_y":3,' +
+                            '"name":"PercentGauge","id":150},{"row":1,"col":8,"size_x":4,"size_y":4,' +
+                            '"name":"PercentGauge","id":350}]';
+                        this.dbAccess.putDriverInfo(dbm.user, standardConfig, function(err) {
+                            console.log(err);
+                        });
+                    } else if (err) {
+                        console.log(err);
+                    } else {
+                        this.sendDashboardRspMessage(value.dashboardConfig);
+                    }
                 }.bind(this));
+                this.broker.handleMessage(new ReplayInfoMessage(this.dbAccess.replayInfo.beginnings,
+                    this.dbAccess.replayInfo.endings));
             } else {
                 this.dbAccess.getDriverEntry(dbm.user, function(value, err) {
                     if(err.notFound) {
-                        var standard: string = '[{"row":1,"col":1,"size_x":4,"size_y":4,"name":"SpeedGauge","id":140}' +
-                            ',{"row":1,"col":5,"size_x":3,"size_y":3,"name":"PercentGauge","id":150},' +
-                            '{"row":1,"col":8,"size_x":4,"size_y":4,"name":"PercentGauge","id":350}]';
-                        this.dbAccess.putDriverInfo(dbm.user, standard, function(err) {
+                        var standardConfig: string = '[{"row":1,"col":1,"size_x":4,"size_y":4,"name":' +
+                            '"SpeedGauge","id":140},{"row":1,"col":5,"size_x":3,"size_y":3,' +
+                            '"name":"PercentGauge","id":150},{"row":1,"col":8,"size_x":4,"size_y":4,' +
+                            '"name":"PercentGauge","id":350}]';
+                        this.dbAccess.putDriverInfo(dbm.user, standardConfig, function(err) {
                             console.log(err);
                         });
                     } else if (err) {
@@ -292,7 +306,7 @@ class DBBusDevice extends BusDevice {
                         this.dbAccess.deleteFromKey(dbm.user);
                         this.dbAccess.putDriverInfo(dbm.user, dbm.config);
                     }
-                }.bind(this))
+                }.bind(this));
             }
         }
         //if the given Message is a replay request, a new Replay is started
