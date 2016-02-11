@@ -7,6 +7,9 @@
 import {ValueAnswerMessage, DBRequestMessage, Message, ValueMessage, Topic} from "./messages";
 import{Proxy} from "./Proxy";
 import{BusDevice} from "./Bus";
+import {Utils} from "./Utils";
+import {DashboardMessage} from "./messages";
+import {ReplayRequestMessage} from "./messages";
 
 
 class Server extends BusDevice{
@@ -49,21 +52,30 @@ class Server extends BusDevice{
             });
 
             socket.on('message', function(msg){
-                console.log(msg);
-            }).bind(this);
+                var message = JSON.parse(msg);
+                if (message.topic.name.startsWith('value.')) {
+                    message = new ValueMessage(new Topic(message.topic.name), message.value);
+                } else if (message.topic.name.startsWith('dashboard')) {
+                    message = new DashboardMessage(message.user, message.config, message.request);
+                } else if (message.topic.name.startsWith('replay')) {
+                    message = new ReplayRequestMessage(message.driverNr, message.callerID, message.startStop);
+                }
+                console.log(message);
+                p.broker.handleMessage(message);
+            });
 
             socket.on('subscribe', function(msg) {
                 console.log("msg rcvd");
-                p.subscribe(new Topic(200, msg));
+                p.subscribe(new Topic(msg));
             });
 
             socket.on('unsubscribe', function(msg) {
-                p.unsubscribe(new Topic(200, msg));
+                p.unsubscribe(new Topic(msg));
             });
 
             socket.on('createChannel', function (){
                 console.log('ch created' + p);
-            }).bind(this);
+            });
 
         });
 
@@ -72,7 +84,6 @@ class Server extends BusDevice{
         });
 
     }
-
 }
 
 export {Server}

@@ -1,4 +1,5 @@
-///<reference path="S:\Program Files (x86)\JetBrains\WebStorm 11.0.3\plugins/JavaScriptLanguage/typescriptCompiler/external/lib.es6.d.ts"/>
+///<reference path="/Applications/WebStorm.app/Contents/plugins/JavaScriptLanguage/typescriptCompiler/external/lib.es6.d.ts"/>
+
 /// <reference path="../../../typings/postal/postal.d.ts"/>
 
 /**

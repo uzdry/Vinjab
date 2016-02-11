@@ -3,49 +3,49 @@
 //Topic defines the Topic of a message. BusDevices subscribe to Topics
 class Topic {
 
-    static VALUE_MSG =          new Topic(10, "value.*");
-    static DBREQ_MSG =          new Topic(20, "database request message");
-    static VALUE_ANSWER_MSG =   new Topic(30, "value answer message");
-    static SETTINGS_MSG =       new Topic(40, "settings message");
+    static VALUE_MSG =          new Topic("value.*");
+    static DBREQ_MSG =          new Topic("database request message");
+    static VALUE_ANSWER_MSG =   new Topic("value answer message");
+    static SETTINGS_MSG =       new Topic("settings message");
 
-    static SPEED =              new Topic(140, "value.speed");
-    static MAF =                new Topic(350, "value.mass air flow");
-    static CO0LANT_PRESSURE =   new Topic(110, "value.coolant temperature");
-    static FUEL_PRESSURE =      new Topic(120, "value.fuel pressure");
-    static RPM =                new Topic(130, "value.RPM");
-    static STEERING =           new Topic(150, "value.steering");
-    static INTAKE_TEMP =        new Topic(160, "value.intake air temperature");
-    static ENGINE_RUNTIME =     new Topic(170, "value.engine runtime");
-    static FUEL =               new Topic(180, "value.fuel");
-    static EGR_STATE =          new Topic(190, "value.exhaust gas recirculation state");
-    static INJ_PRESSURE =       new Topic(200, "value.injection pressure State");
-    static FPC_STATE =          new Topic(210, "value.fuel pressure control state");
-    static GPV =                new Topic(220, "value.gas pressure vaporizer");
-    static CAT_TEMP =           new Topic(230, "value.catalyst temperature");
-    static THROTTLE =           new Topic(240, "value.throttle");
-    static ACCELERATOR =        new Topic(250, "value.accelerator pedal position");
-    static TEMP_OUT =           new Topic(260, "value.temperature outside");
-    static TORQUE =             new Topic(270, "value.engine torque");
-    static EGT =                new Topic(280, "value.exhaust gas temperature");
-    static EGP =                new Topic(290, "value.exhaust gas pressure");
-    static ULTRASONIC =         new Topic(300, "value.ultrasonic sensor distance");
+    static SPEED =              new Topic("value.speed");
+    static MAF =                new Topic("value.mass air flow");
+    static COOLANT_PRESSURE =   new Topic("value.coolant temperature");
+    static FUEL_PRESSURE =      new Topic("value.fuel pressure");
+    static RPM =                new Topic("value.RPM");
+    static STEERING =           new Topic("value.steering");
+    static INTAKE_TEMP =        new Topic("value.intake air temperature");
+    static ENGINE_RUNTIME =     new Topic("value.engine runtime");
+    static FUEL =               new Topic("value.fuel");
+    static EGR_STATE =          new Topic("value.exhaust gas recirculation state");
+    static INJ_PRESSURE =       new Topic("value.injection pressure State");
+    static FPC_STATE =          new Topic("value.fuel pressure control state");
+    static GPV =                new Topic("value.gas pressure vaporizer");
+    static CAT_TEMP =           new Topic("value.catalyst temperature");
+    static THROTTLE =           new Topic("value.throttle");
+    static ACCELERATOR =        new Topic("value.accelerator pedal position");
+    static TEMP_OUT =           new Topic("value.temperature outside");
+    static TORQUE =             new Topic("value.engine torque");
+    static EGT =                new Topic("value.exhaust gas temperature");
+    static EGP =                new Topic("value.exhaust gas pressure");
+    static ULTRASONIC =         new Topic("value.ultrasonic sensor distance");
 
 
-    static AVG_FUEL =           new Topic(310, "value.aggregated.average fuel consumption");
-    static FUEL_CONSUMPTION =   new Topic(320, "value.aggregated.fuel consumption.aggregated");
-    static MILEAGE =            new Topic(330, "value.aggregated.mileage");
-    static AVG_SPEED =          new Topic(340, "value.aggregated.average speed");
-    static FUEL_CONSUMPTION_H = new Topic(360, "value.aggregated.fuel per hour");
+    static AVG_FUEL =           new Topic("value.aggregated.average fuel consumption");
+    static FUEL_CONSUMPTION =   new Topic("value.aggregated.fuel consumption.aggregated");
+    static MILEAGE =            new Topic("value.aggregated.mileage");
+    static AVG_SPEED =          new Topic("value.aggregated.average speed");
+    static FUEL_CONSUMPTION_H = new Topic("value.aggregated.fuel per hour");
 
-    static DASHBOARD_MSG =      new Topic(370, "dashboard settings");
-    static DASHBOARD_ANS_MSG =  new Topic(380, "dashboard settings from database");
-    static REPLAY_REQ =         new Topic(390, "replay request");
-    static REPLAY_ANS =         new Topic(400, "replay answer");
-    static REPLAY_INFO =        new Topic(410, "replay information");
+    static DASHBOARD_MSG =      new Topic("dashboard settings");
+    static DASHBOARD_ANS_MSG =  new Topic("dashboard settings from database");
+    static REPLAY_REQ =         new Topic("replay request");
+    static REPLAY_ANS =         new Topic("replay answer");
+    static REPLAY_INFO =        new Topic("replay information");
 
     static VALUES: Topic[] = [     Topic.SPEED,
         Topic.MAF,
-        Topic.CO0LANT_PRESSURE,
+        Topic.COOLANT_PRESSURE,
         Topic.FUEL_PRESSURE,
         Topic.RPM,
         Topic.STEERING,
@@ -70,20 +70,11 @@ class Topic {
         Topic.AVG_SPEED,
         Topic.FUEL_CONSUMPTION_H];
 
-    id:number;
     name:string;
 
     //instantiates a new Topic with ID and name
-    constructor(pID:number, pName:string) {
-        if (pID < 0) {
-            return null;
-        }
-        this.id = pID;
+    constructor(pName:string) {
         this.name = pName;
-    }
-
-    public getID():number {
-        return this.id
     }
 
     public getName(): string {
@@ -91,7 +82,7 @@ class Topic {
     }
 
     public equals(topic: Topic): boolean {
-        return this.getID() === topic.getID();
+        return this.name === topic.name;
     }
 }
 
@@ -161,7 +152,7 @@ class ReplayRequestMessage extends Message {
     driveNr: number;
     callerID: string;
     //true <-> start, false <-> stop:
-    startStop: Boolean;
+    startStop: boolean;
 
     constructor(driveNr: number, callerID: string, startStop: boolean) { //last param: true = start, false = stop
         super(Topic.REPLAY_REQ);
@@ -181,11 +172,11 @@ class ReplayValueMessage extends Message {
 }
 
 class DashboardMessage extends Message {
-    public request: Boolean;
+    public request: boolean;
     public user: string;
     public config: string;
 
-    constructor(usr: string, cnfg: string, req: Boolean) {
+    constructor(usr: string, cnfg: string, req: boolean) {
         super(Topic.DASHBOARD_MSG);
         this.request = req;
         this.user = usr;
