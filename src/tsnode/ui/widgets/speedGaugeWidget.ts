@@ -69,7 +69,7 @@ class SpeedGaugeWidget extends Widget{
 
         super(options);
 
-        this.widgetID = this.typeID + "-" + this.model.id + "-" + SpeedGaugeWidget.widgetCounter;
+        this.widgetID = this.typeID + "-" + this.model.get("tagName") + "-" + SpeedGaugeWidget.widgetCounter;
         SpeedGaugeWidget.widgetCounter++;
 
         //Save the HTMLElements

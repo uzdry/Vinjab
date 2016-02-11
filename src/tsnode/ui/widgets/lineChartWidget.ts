@@ -84,7 +84,7 @@ class LineChartWidget extends Widget{
         Chart.defaults.global.maintainAspectRatio = false;
 
         /** Create different IDs */
-        this.widgetID = this.typeID + "-" + this.model.id + "-" + LineChartWidget.widgetCounter;
+        this.widgetID = this.typeID + "-" + this.model.get("tagName") + "-" + LineChartWidget.widgetCounter;
         LineChartWidget.widgetCounter++;
 
         this.htmlElement = "<li><canvas align=\"center\" id=\"" + this.widgetID  + "\" > </canvas></li>";

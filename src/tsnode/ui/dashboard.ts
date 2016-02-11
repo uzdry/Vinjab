@@ -11,7 +11,8 @@
 
 import {Terminal} from "../Terminal"
 import {DashboardMessage} from "../messages";
-
+import {WidgetFactory, SignalDescription} from "./widgetFactory";
+import {Grid} from "./grid";
 
 class Dashboard{
     /** MVC Stuff */
@@ -37,12 +38,6 @@ class Dashboard{
         this.widgetFactory = new WidgetFactory(this.dataCollection, this);
         this.grid = new Grid(this.widgetFactory, this);
 
-        //Add all default widgetsJQuery
-        this.widgetFactory.addWidget(new SpeedGaugeWidgetConfig());
-        this.widgetFactory.addWidget(new TextWidgetConfig());
-        this.widgetFactory.addWidget(new PercentGaugeWidgetConfig());
-        this.widgetFactory.addWidget(new LineChartWidgetConfig());
-
         this.cookie = Dashboard.getCookie("user");
 
         if(this.cookie === ""){
@@ -54,7 +49,6 @@ class Dashboard{
         postal.channel("toServer").publish("", message);
         postal.channel("request").publish("request.#", "dashboard settings from database");
 
-        this.startSelector();
         $(document).on( "click", ".gridster ul li", function() {
             if(document.getElementById("cDeleteMode").checked) {
                 $(this).addClass("activ");
@@ -62,6 +56,8 @@ class Dashboard{
                 dashboard.grid.removeWidget(this.children[0].getAttribute("id"));
             }
         });
+
+        this.button.onclick = this.addWidget.bind(this);
     }
 
     static getCookie(cname: string): string {
@@ -86,74 +82,92 @@ class Dashboard{
         return text;
     }
 
-    startSelector() {
 
-        //========= Widgets
+    /**
+     * Adds a Widget to the Grid
+     */
+    private addWidget(){
+        var signalName = $('#dSignals').data('ddslick');
+        var widgetName = $('#dWidgets').data('ddslick');
 
-        var options:string[] = this.widgetFactory.getOptions();
-        for (var i in options) {
-            var c = document.createElement("option");
-            c.text = options[i];
-            this.selector.options.add(c);
-        }
+        if(signalName.selectedIndex < 0) return;
+        if(widgetName.selectedIndex < 0) return;
 
-        //========= Values
-
-        var names:string[] = this.dataCollection.getAllNames();
-
-        if(!names){
-            for (var i in names){
-                var c = document.createElement("option");
-                c.text = names[i];
-                this.idSelector.options.add(c);
-            }
-        }
-
-
-        this.button.onclick = this.click.bind(this);
-
-    }
-
-    click(){
-        var valueName = this.idSelector[this.idSelector.selectedIndex].text;
-
-        var widget = this.widgetFactory.createWidget(this.selector[this.selector.selectedIndex].text,
-            parseInt(valueName.split(":")[1]));
+        var widget = this.widgetFactory.createWidget(widgetName.selectedData.value, signalName.selectedData.value);
         this.grid.addWidget(widget);
     }
 
-    setAvailableSignals(signals:{[id: number]: SignalDescription;}){
+    /**
+     * Updates the Signal selectors
+     * @param signals All Signals that are supposed to be shown, not only the new ones
+     */
+    updateSignalSelector(signals: {[id: string]: SignalDescription;}){
+        var signalsData: Array<DDSlickOptions> = [];
 
         for(var i in signals){
-            var c = document.createElement("option");
-            c.text = signals[i].name + ":" + signals[i].id;
-            this.idSelector.options.add(c);
+            if(!signals.hasOwnProperty(i)) continue;
+
+            var option = new DDSlickOptions();
+            option.text = signals[i].name;
+            option.description = signals[i].description;
+            option.value = signals[i].tagName;
+
+            signalsData.push(option);
         }
 
+        $('#dSignals').ddslick('destroy');
+
+        //Demo 1---------------------
+        $('#dSignals').ddslick({
+            data: signalsData,
+            selectText: "Select the Signal to be shown"
+        });
+    }
+
+    /**
+     * Updates the widget selectors
+     * @param widgets All widgets that are supposed to be shown, not only the new ones
+     */
+    updateWidgetSelector(widgets: {[id: string]: WidgetConfig;}){
+        var widgetData: Array<DDSlickOptions> = [];
+
+        for(var i in widgets){
+            if(!widgets.hasOwnProperty(i)) continue;
+
+            var option = new DDSlickOptions();
+            option.text = widgets[i].display_name;
+            option.description = widgets[i].description;
+            option.value = widgets[i].type_name;
+            option.imageSrc = widgets[i].img_src;
+
+            widgetData.push(option);
+        }
+
+        $('#dWidgets').ddslick('destroy');
+
+        $('#dWidgets').ddslick({
+            data: widgetData,
+            selectText: "Select the Widget to be shown"
+        });
     }
 
 }
 
+class DDSlickOptions{
+    text:string;
+    value:string;
+    description:string;
+    imageSrc:string;
+}
+
+
 var terminal = new Terminal();
 var dashboard: Dashboard = new Dashboard();
-dashboard.widgetFactory.getSignals();
+dashboard.widgetFactory.addWidget(new SpeedGaugeWidgetConfig());
+dashboard.widgetFactory.addWidget(new TextWidgetConfig());
+dashboard.widgetFactory.addWidget(new PercentGaugeWidgetConfig());
+dashboard.widgetFactory.addWidget(new LineChartWidgetConfig());
 
-
-
+export {DDSlickOptions, Dashboard}
 //==========================
 
-
-
-
-
-/** Test Code */
-/*
- /var widget = widgetFactory.createWidget("GaugeWidget", "123");
- grid.addWidget(widget);
-
- var secondWidget = widgetFactory.createWidget("GaugeWidget", "456");
- grid.addWidget(secondWidget);
-
- var cnt: number = 0;
- setInterval(function(){widget.updateValue(cnt++)}, 500);
- */

@@ -1,41 +1,15 @@
+var DBAccess_1 = require("./src/tsnode/DBAccess");
+var AggregatedFunctions_1 = require("./src/tsnode/AggregatedFunctions");
+var Server_1 = require("./src/tsnode/Server");
+var BluetoothObd2_1 = require("./src/tsnode/bluetooth-obd2/BluetoothObd2");
 /**
- * Created by yimeng on 17/01/16.
+ * Created by soads_000 on 08.02.2016.
  */
-var express = require('express');
-var app = express();
-var http = require('http').Server(app);
-var io = require('socket.io')(http);
-
-
-app.use(express.static(__dirname ));
-app.use(express.static(__dirname + '/src'));
-app.use(express.static(__dirname + '/src/tsnode/ui' ));
-app.use(express.static(__dirname + '/src/tsnode/ui/widgetsJQuery' ));
-app.use(express.static(__dirname + '/src/tsnode/settings'))
-
-app.get('/ui', function(req, res){
-    res.sendFile(__dirname + '/src/tsnode/ui/index.html');
-});
-
-app.get('/setting', function(req, res){
-    res.sendFile(__dirname + '/src/tsnode/settings/test.html');
-});
-
-
-io.on('connection', function(socket){
-    console.log('a user connected');
-    socket.on('disconnect', function(){
-        console.log('user disconnected');
-    });
-    socket.on('message', function(msg, id){
-        console.log("Required message : " + msg + ', from: ' + id);
-        io.to(id).emit(msg);
-        //processing the message
-        //io.emit('message', "the asked message (" + msg  + ") is blablabla.");
-
-    });
-});
-
-http.listen(3000, function(){
-    console.log('listening on *:3000');
-});
+/** Start the database first so that there will no data be lost */
+var database = new DBAccess_1.DBBusDevice();
+/** Start the aggregated functions second, so that the first values will be used in the calculation as well*/
+var aggregatedFunctions = [new AggregatedFunctions_1.Distance(), new AggregatedFunctions_1.AverageSpeed(), new AggregatedFunctions_1.AvgFuelConsumption(), new AggregatedFunctions_1.FuelConsumption()];
+/** Start the Server */
+var server = new Server_1.Server();
+/** Start the bluetooth-obd receiver */
+var bluetooth = new BluetoothObd2_1.BluetoothObd2();
