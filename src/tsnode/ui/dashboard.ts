@@ -7,6 +7,7 @@
 ///<reference path="widgets/textWidget.ts"/>
 ///<reference path="../Terminal.ts"/>
 ///<reference path="widgets/lineChartWidget.ts"/>
+///<reference path="Map.ts"/>
 
 
 import {Terminal} from "../Terminal"
@@ -42,6 +43,7 @@ class Dashboard{
         this.widgetFactory.addWidget(new TextWidgetConfig());
         this.widgetFactory.addWidget(new PercentGaugeWidgetConfig());
         this.widgetFactory.addWidget(new LineChartWidgetConfig());
+        this.widgetFactory.addWidget(new GoogleMapWidgetConfig());
 
         this.cookie = Dashboard.getCookie("user");
 
