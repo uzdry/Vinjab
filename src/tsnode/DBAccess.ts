@@ -391,7 +391,7 @@ class DBBusDevice extends BusDevice {
                 }.bind(this));
                 this.broker.handleMessage(new ReplayInfoMessage(this.dbAccess.replayInfo.finishTime));
             } else {
-                this.dbAccess.getDriverEntry(dbm.user, function(value) {
+                this.dbAccess.getDriverEntry(dbm.user, function() {
                     this.dbAccess.deleteFromKey(dbm.user);
                     this.dbAccess.putUserInfo(dbm.user, dbm.config);
                 }.bind(this));
@@ -488,7 +488,7 @@ class Replay extends BusDevice {
     }
 
     /**
-     * Assisting method, sends a new SensorValueMessage to the Bus containing the next value. It is called in intervalls
+     * Assisting method, sends a new SensorValueMessage to the Bus containing the next value. It is called in intervals
      * according to the temporal difference between the timestamps of two sensor values.
      */
     private send() {
