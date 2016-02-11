@@ -19,13 +19,16 @@
     <script src="../../../node_modules/socket.io-client/socket.io.js"></script>
     <script src="../../js/canv-gauge/gauge.js"></script>
     <script src="../../lib/Chart.js"></script>
+    <script src="widgetFactory.js"></script>
     <script src="dataCollection.js"></script>
     <script src="dataModel.js"></script>
+    <script src="grid.js"></script>
     <script src="widget.js"></script>
     <script src="widgets/speedGaugeWidget.js"></script>
     <script src="widgets/percentGaugeWidget.js"></script>
     <script src="widgets/textWidget.js"></script>
     <script src="widgets/lineChartWidget.js"></script>
+    <script src="Map.js"></script>
     <script src="../../lib/jquery.ddslick.js"></script>
 
 
@@ -47,7 +50,6 @@
     DeleteMode: <input type="checkbox" id="cDeleteMode">
 </div>
 
-
 <div id="dDashboard" >
 <div class="gridster">
     <ul></ul>
@@ -60,15 +62,6 @@
 
 <div id="dParkingSensor" style="display: none;">
     <div id="divPS" style="margin-left:40px; margin-right:40px"></div>
-</div>
-
-<div class="demo-content">
-    <div id="dSignals">
-    </div>
-</div>
-<div class="demo-content">
-    <div id="dWidgets">
-    </div>
 </div>
 
 
@@ -103,7 +96,6 @@
         $( "#dParkingSensor").show("slow");
     });
 </script>
-
 
 </body>
 </html>

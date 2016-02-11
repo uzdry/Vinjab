@@ -7,6 +7,7 @@
 ///<reference path="widgets/textWidget.ts"/>
 ///<reference path="../Terminal.ts"/>
 ///<reference path="widgets/lineChartWidget.ts"/>
+///<reference path="Map.ts"/>
 
 
 import {Terminal} from "../Terminal"
@@ -167,6 +168,7 @@ dashboard.widgetFactory.addWidget(new SpeedGaugeWidgetConfig());
 dashboard.widgetFactory.addWidget(new TextWidgetConfig());
 dashboard.widgetFactory.addWidget(new PercentGaugeWidgetConfig());
 dashboard.widgetFactory.addWidget(new LineChartWidgetConfig());
+dashboard.widgetFactory.addWidget(new GoogleMapWidgetConfig());
 
 export {DDSlickOptions, Dashboard}
 //==========================
