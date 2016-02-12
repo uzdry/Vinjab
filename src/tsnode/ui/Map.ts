@@ -35,7 +35,7 @@ class GoogleMapWidget extends Widget {
         GoogleMapWidget.widgetCounter++;
 
         //Save the HTMLElements
-        this.htmlElement = "<div id=\"" + this.widgetID + "\" width=\"200\" height=\"200\"></div>";
+        this.htmlElement = "<div id=\"" + this.widgetID + "\" width=\"400\" height=\"400\"></div>";
     }
 
     initialize(){
@@ -65,11 +65,12 @@ class GoogleMapWidget extends Widget {
     init() {
         var opt: google.maps.MapOptions = {
             center: new google.maps.LatLng(49.012940, 8.424294),
-            zoom: 6
+            zoom: 6,
+            draggable: false
         };
-        this.map = new google.maps.Map(document.getElementById(this.model.id), opt);
+        this.map = new google.maps.Map(document.getElementById(this.widgetID), opt);
         this.infoWind = new google.maps.InfoWindow(this.map);
-        setInterval(this.updateLocation, 2000);
+        this.updateLocation();
     }
 
     private handleLocationError(locAvailable: Boolean, iw: google.maps.InfoWindow, pos: google.maps.LatLng) {
@@ -90,8 +91,6 @@ class GoogleMapWidget extends Widget {
     }
 
     resize(size_x: number, size_y:number) {
-        this.htmlElement = "<div id =\"" + this.widgetID + "\" width =\"" + size_x +
-            "\" height=\"" + size_y + "\"></div>"
     }
 
     destroy(){
