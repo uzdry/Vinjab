@@ -7,13 +7,14 @@
 ///<reference path="widgets/textWidget.ts"/>
 ///<reference path="../Terminal.ts"/>
 ///<reference path="widgets/lineChartWidget.ts"/>
-///<reference path="Map.ts"/>
+///<reference path="./Map.ts"/>
 
 
 import {Terminal} from "../Terminal"
 import {DashboardMessage} from "../messages";
 import {WidgetFactory, SignalDescription} from "./widgetFactory";
 import {Grid} from "./grid";
+import {GoogleMapWidgetConfig} from "./Map";
 
 class Dashboard{
     /** MVC Stuff */
