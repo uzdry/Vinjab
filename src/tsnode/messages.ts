@@ -31,11 +31,12 @@ class Topic {
     static ULTRASONIC =         new Topic("value.ultrasonic sensor distance");
 
 
-    static AVG_FUEL =           new Topic("value.aggregated.average fuel consumption");
-    static FUEL_CONSUMPTION =   new Topic("value.aggregated.fuel consumption.aggregated");
+    static FUEL_CONSUMPTION =   new Topic("value.aggregated.fuel consumption");
     static MILEAGE =            new Topic("value.aggregated.mileage");
-    static AVG_SPEED =          new Topic("value.aggregated.average speed");
     static FUEL_CONSUMPTION_H = new Topic("value.aggregated.fuel per hour");
+
+    static AVG_FUEL =           new Topic("value.avg.aggregated.fuel consumption");
+    static AVG_SPEED =          new Topic("value.avg.speed");
 
     static DASHBOARD_MSG =      new Topic("dashboard settings");
     static DASHBOARD_ANS_MSG =  new Topic("dashboard settings from database");
@@ -197,8 +198,8 @@ class DashboardRspMessage extends Message {
 }
 
 class Value {
-    private value: number;
-    private identifier: string;
+    value: number;
+    identifier: string;
 
     constructor(pValue:number, pID: string) {
         this.value = pValue;

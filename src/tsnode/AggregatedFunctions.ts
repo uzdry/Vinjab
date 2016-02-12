@@ -48,7 +48,7 @@ class AverageSpeed extends BusDevice {
     }
 }
 
-class AvgFuelConsumption extends BusDevice {
+/*class AvgFuelConsumption extends BusDevice {
     private avgFuelConsumption: number;
     private currentDistanceInMeters: number;
     private currentTankContentsInPercent: number;
@@ -69,10 +69,16 @@ class AvgFuelConsumption extends BusDevice {
             }
         }
     }
-}
+}*/
 
+/**
+ * implements the calculation of the average value of goven topic.
+ */
 class AverageComputation extends BusDevice {
     avgOf: Topic;
+
+    avg: number;
+    numberOfValues: number;
 
     constructor(t: Topic) {
         super();
@@ -82,8 +88,12 @@ class AverageComputation extends BusDevice {
 
     public handleMesage(m: Message) {
         if (m instanceof ValueMessage) {
-            if (m.getTopic().getID() == this.avgOf.getID()) {
-
+            if (m.topic.equals(this.avgOf)) {
+                this.numberOfValues++;
+                this.avg = this.avg * 1-(1/this.numberOfValues) + m.value.value / this.numberOfValues;
+                var i = m.topic.name.indexOf(".");
+                var l = m.topic.name.length;
+                this.broker.handleMessage(new ValueMessage(new Topic(m.topic.name.substring(0, i) + "avg." + m.topic.name.substring(i, l)), new Value(this.avg, m.value.identifier)));
             }
         }
     }
@@ -111,13 +121,13 @@ class FuelConsumption extends BusDevice {
     public handleMessage(m: Message) {
         if (m instanceof ValueMessage) {
             // Mass Air Flow in gramms per second
-            if (m.getTopic().getID() == 350) {
+            if (m.topic.equals(Topic.MAF)) {
                 var maf = m.value.numericalValue();
                 this.lph = (maf / 14.7 / 750) * 3600; //liter
             }
             // vehicle speed
             else {
-                if (m.getTopic().getID() == 140) {
+                if (m.topic.equals(Topic.SPEED)) {
                     this.lphkm = this.lph / this.speed;
                 }
             }
@@ -127,4 +137,4 @@ class FuelConsumption extends BusDevice {
     }
 }
 
-export {FuelConsumption};
+export {FuelConsumption, AverageComputation};
