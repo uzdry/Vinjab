@@ -46,7 +46,7 @@ class PercentGaugeWidget extends Widget{
 
         super(options);
 
-        this.widgetID = this.typeID + "-" + this.model.id + "-" + PercentGaugeWidget.widgetCounter;
+        this.widgetID = this.typeID + "-" + this.model.get("tagName") + "-" + PercentGaugeWidget.widgetCounter;
         PercentGaugeWidget.widgetCounter++;
 
         //Save the HTMLElements

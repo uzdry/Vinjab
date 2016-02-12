@@ -3,32 +3,43 @@
 ///<reference path="dashboard.ts" />
 ///<reference path="dataModel.ts" />
 
-
+import {Dashboard} from "./dashboard";
 
 class WidgetFactory{
 
     /** All available signals */
-    private static signalsDesc: {[id: number]: SignalDescription;} = {};
+    private signalsDesc: {[id: string]: SignalDescription;} = {};
+    private signalsReady: boolean = false;
     /** All available widgets */
     private widgetConfigurations: { [id: string] : WidgetConfig; } = {};
+    private widgetsReady: boolean = false;
+
     /** Used DataCollection */
     private dataCollection: DataCollection;
 
-    private dashboard;
+    private dashboard: Dashboard;
 
 
+    /**
+     * The Constructor of the widget factory saves some objects
+     * for later use and initiates the reading of the signals-xml
+     * @param dataCollection The datacollection with the used data
+     * @param dashboard the used dashboard object
+     */
     constructor(dataCollection: DataCollection, dashboard: Dashboard){
-        this.dashboard = dashboard;
         this.dataCollection = dataCollection;
-
+        this.dashboard = dashboard;
+        this.getSignalsInit();
     }
 
     /** Creates widget from the serialized config */
     createWidgetFromConfig(conf: WidgetSerConfig):Widget{
 
-        var model: DataModel = this.dataCollection.getOrCreate(conf.id);
+        //TODO Rebuild serialize-function to value.name something
+        //var model: DataModel = this.dataCollection.getOrCreate(conf.id);
 
-        return this.createWidgetFromModel(conf.name, model);
+        //return this.createWidgetFromModel(conf.name, model);
+        return null;
 
     }
 
@@ -43,9 +54,9 @@ class WidgetFactory{
     }
 
     /** Creates widget by the signalNumber */
-    createWidget(widgetTagName: string, signalNumber: number, options?){
+    createWidget(widgetTagName: string, signal: string, options?){
         var widgetConfig = this.widgetConfigurations[widgetTagName];
-        var signalConfig = WidgetFactory.signalsDesc[signalNumber];
+        var signalConfig = this.signalsDesc[signal];
         var model: Model = this.dataCollection.getOrCreate(signalConfig);
 
         model.set({name: signalConfig.name, description: signalConfig.description,
@@ -62,20 +73,21 @@ class WidgetFactory{
     /** Adds a widget prototype */
     addWidget(widgetConfig: WidgetConfig){
         this.widgetConfigurations[widgetConfig.type_name] = widgetConfig;
+        this.dashboard.updateWidgetSelector(this.widgetConfigurations);
     }
 
     /** Get all available widget options */
-    getOptions():string[]{
-        var array: string[] = [];
-        for(var key in this.widgetConfigurations){
-            if(!this.widgetConfigurations.hasOwnProperty(key)) continue;
-            array.push(key);
-        }
-        return array;
+    getOptions():{ [id: string] : WidgetConfig;}{
+        return this.widgetConfigurations;
+    }
+
+    getSignals():{[id: string]: SignalDescription;}{
+        if(!this.signalsReady) return null;
+        return this.signalsDesc;
     }
 
     /** Decode all possible signals */
-    getSignals(){
+    private getSignalsInit(){
         var xhttp = new XMLHttpRequest();
 
         xhttp.onreadystatechange = function() {
@@ -100,14 +112,12 @@ class WidgetFactory{
 
             var tagName: string = xmlDoc.getElementsByTagName("signal")[i].getAttribute("category");
             var name: string = elements[i].getElementsByTagName("name")[0].textContent;
-            var id: number = parseInt(xmlDoc.getElementsByTagName("signal")[i].getAttribute("id"));
             var maxValue: number = parseInt(elements[i].getElementsByTagName("maxValue")[0].textContent);
             var minValue: number = parseInt(elements[i].getElementsByTagName("minValue")[0].textContent);
             var desc: string = elements[i].getElementsByTagName("description")[0].textContent;
-            WidgetFactory.signalsDesc[id] = new SignalDescription(name, tagName, id, maxValue, minValue, desc);
+            this.signalsDesc[tagName] = new SignalDescription(name, tagName, maxValue, minValue, desc);
         }
-
-        this.dashboard.setAvailableSignals(WidgetFactory.signalsDesc);
+        this.dashboard.updateSignalSelector(this.signalsDesc);
     }
 
 
@@ -118,19 +128,18 @@ class SignalDescription{
 
     tagName: string;
     name: string;
-    id: number;
     maxValue: number;
     minValue: number;
     description: string;
 
 
-    constructor(name:string, tagName: string, id:number, maxValue:number, minValue:number, description:string) {
+    constructor(name:string, tagName: string, maxValue:number, minValue:number, description:string) {
         this.tagName = tagName;
         this.name = name;
-        this.id = id;
         this.maxValue = maxValue;
         this.minValue = minValue;
         this.description = description;
     }
 }
 
+export{SignalDescription, WidgetFactory};

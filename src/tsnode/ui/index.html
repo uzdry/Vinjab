@@ -28,7 +28,8 @@
     <script src="widgets/percentGaugeWidget.js"></script>
     <script src="widgets/textWidget.js"></script>
     <script src="widgets/lineChartWidget.js"></script>
-
+    <script src="Map.js"></script>
+    <script src="../../lib/jquery.ddslick.js"></script>
 
 
 </head>
@@ -36,7 +37,15 @@
 <body>
 <p><button id="bDashboard">Dashboard</button><button id="bEditMode">EditMode</button><button id="bSettings">Settings</button><button id="bParkingSensor">ParkingSensor</button></p>
 <div id="dEditMode" style="display: none;">
-    <select id="WidgetSelect"></select> <select id="valueSelect"></select> <button id="addButton">Add</button>
+    <div class="demo-content">
+        <div id="dSignals">
+        </div>
+    </div>
+    <div class="demo-content">
+        <div id="dWidgets">
+        </div>
+    </div>
+    <button id="addButton">Add</button>
     <br>
     DeleteMode: <input type="checkbox" id="cDeleteMode">
 </div>

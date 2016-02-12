@@ -25,9 +25,7 @@ for (var i = 0; i < sources.length; i++) {
     sources[i].fire();
 }
 
-var busDevice = new DBBusDevice();
 
-//console.log("Gokkk");
 
 
 

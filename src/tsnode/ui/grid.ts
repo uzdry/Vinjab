@@ -4,6 +4,8 @@
 /// <reference path="widgetFactory.ts" />
 /// <reference path="dashboard.ts" />
 
+import {WidgetFactory} from "./widgetFactory";
+import {Dashboard} from "./dashboard";
 class Grid {
 
     /** gridster instance */
@@ -114,17 +116,6 @@ class Grid {
 
 }
 
-class Resize implements GridsterResizable{
-
-    // Let it be available
-    enabled:boolean  = true;
-
-    stop (event: Event, ui: { helper: JQuery; }, $el: JQuery): void{
-        console.log(event);
-        console.log(ui);
-        console.log($el);
-    }
-}
-
+export {Grid}
 
 

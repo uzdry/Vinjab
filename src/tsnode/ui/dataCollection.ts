@@ -26,7 +26,7 @@ class DataCollection extends Backbone.Collection<DataModel> {
     }
 
     getOrCreate(options){
-        var model:DataModel = this.get(options.id);
+        var model:DataModel = this.findWhere({tagName: options.tagName});
         if(model == undefined){
             model = new DataModel(options);
             this.add(model);

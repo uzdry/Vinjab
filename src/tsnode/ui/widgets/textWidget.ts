@@ -47,7 +47,7 @@ class TextWidget extends Widget{
     constructor(options?){
         super(options);
 
-        this.widgetID = this.typeID + "-" + this.model.id + "-" + TextWidget.widgetCounter;
+        this.widgetID = this.typeID + "-" + this.model.get("tagName") + "-" + TextWidget.widgetCounter;
         TextWidget.widgetCounter++;
 
         this.htmlElement = "<li><p align=\"center\" id=\"" + this.widgetID  + "\"> </p></li>";
