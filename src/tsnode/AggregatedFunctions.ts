@@ -36,6 +36,7 @@ class AverageSpeed extends BusDevice {
     constructor () {
         super();
         this.avgSpeed = 0;
+        this.numberOfValues = 0;
         this.subscribe(Topic.SPEED)
     }
 
@@ -83,17 +84,21 @@ class AverageComputation extends BusDevice {
     constructor(t: Topic) {
         super();
         this.avgOf = t;
+        this.avg = 0;
+        this.numberOfValues = 0;
         this.subscribe(t);
     }
 
-    public handleMesage(m: Message) {
+    public handleMessage(m: Message): void {
         if (m instanceof ValueMessage) {
             if (m.topic.equals(this.avgOf)) {
                 this.numberOfValues++;
-                this.avg = this.avg * 1-(1/this.numberOfValues) + m.value.value / this.numberOfValues;
+                this.avg = this.avg * (1-(1/this.numberOfValues)) + m.value.value / this.numberOfValues;
                 var i = m.topic.name.indexOf(".");
                 var l = m.topic.name.length;
-                this.broker.handleMessage(new ValueMessage(new Topic(m.topic.name.substring(0, i) + "avg." + m.topic.name.substring(i, l)), new Value(this.avg, m.value.identifier)));
+                console.log(m.topic.name.substring(0, i) + ".avg" + m.topic.name.substring(i, l));
+
+                this.broker.handleMessage(new ValueMessage(new Topic(m.topic.name.substring(0, i) + ".avg" + m.topic.name.substring(i, l)), new Value(this.avg, m.value.identifier)));
             }
         }
     }
