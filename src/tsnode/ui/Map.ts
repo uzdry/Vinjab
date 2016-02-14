@@ -60,7 +60,7 @@ class GoogleMapWidget extends Widget {
 
         this.gasStations = new google.maps.places.PlacesService(this.map);
         //to be deleted:
-        this.updateValue();
+        this.updateValue(5);
         this.infoWind = new google.maps.InfoWindow(this.map);
         if (navigator.geolocation) {
             navigator.geolocation.getCurrentPosition(function(position) {
@@ -95,7 +95,7 @@ class GoogleMapWidget extends Widget {
     }
 
     updateValue(value: number){
-        //if(value < 10) {
+        if(value < 10) {
             if(navigator.geolocation) {
                 var pos;
                 navigator.geolocation.getCurrentPosition(function(position) {
@@ -120,7 +120,7 @@ class GoogleMapWidget extends Widget {
                     }.bind(this))
                 }.bind(this));
             }
-        //}
+        }
     }
 
     resize(size_x: number, size_y:number) {

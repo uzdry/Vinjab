@@ -12,8 +12,11 @@ describe("init", function () {
         leveldown.destroy("../testDB", function() {
         });
         var db = new DBBusDevice();
+    });
+    it("open an existing database", function() {
+        var db = new DBBusDevice();
     })
-})
+});
 
 describe("putAndGetValues", function () {
     it("handle values and request", function () {
@@ -70,7 +73,7 @@ describe("putAndGetDriver", function () {
                 '"name":"PercentGauge","id":150},{"row":1,"col":8,"size_x":4,"size_y":4,' +
                 '"name":"PercentGauge","id":350}]');
         }, 200);
-    })
+    });
     it("handle driver msg and request", function() {
         var db = new DBBusDevice();
         var simplesub = new SimpleSubscriber();
@@ -82,7 +85,7 @@ describe("putAndGetDriver", function () {
             expect(dam.user).toBe("testa");
             expect(dam.config).toBe("DasIstEinTestString!");
         }, 200);
-    })
+    });
 });
 
 class SimpleSubscriber extends bus.BusDevice {
