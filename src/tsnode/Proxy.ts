@@ -12,6 +12,7 @@ class Proxy extends BusDevice {
     constructor(pSocket) {
         super();
         this.socket = pSocket;
+        this.subscribe(Topic.STEERING);
     }
 
 

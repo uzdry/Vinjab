@@ -1252,10 +1252,8 @@ var Communicator = (function () {
     function Communicator() {
     }
     Communicator.prototype.subscribe = function () {
-        var channelsub = postal.channel("reqsubs");
-        var reqsub = channelsub.publish("request." + "value.steering", "value.steering");
-        //     this.mychannel = postal.channel("values");
-        //     this.mychannel.subscribe("value.steering", this.onMessageReceived);
+        this.mychannel = postal.channel("values");
+        this.mychannel.subscribe("value.steering", this.onMessageReceived);
     };
     Communicator.prototype.onMessageReceived = function (data) {
         var msgdiv = document.getElementById("msgDIV");
