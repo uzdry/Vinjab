@@ -1,5 +1,5 @@
 /**
- * Created by Ray on 14.02.2016.
+ * @author David G.
  */
 
 /// <reference path="./Auxiliary.ts"/>

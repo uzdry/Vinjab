@@ -1,9 +1,6 @@
 /**
- * Created by Ray on 14.02.2016.
+ * @author David G.
  */
-
-
-
 
 /**
  * 1:1 import of the class Value.
