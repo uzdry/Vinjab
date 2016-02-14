@@ -16,6 +16,8 @@ class Terminal {
 
     private channelsub;
 
+    private channelval;
+
     private toServerChannel;
 
 
@@ -27,15 +29,6 @@ class Terminal {
         this.connection = io();
         this.connection.emit('createChannel');
 
-        var channel = postal.channel("values");
-
-        var msg = this.connection.on('message', function(msg) {
-            var message = JSON.parse(msg);
-
-            channel.publish(message.topic.name, message);
-        });
-
-
         this.channelsub = postal.channel("reqsubs");
 
         var subreq = this.channelsub.subscribe("request.#", this.subscribeFromServer.bind(this));
@@ -44,6 +37,17 @@ class Terminal {
         this.toServerChannel = postal.channel("toServer");
         var subToServer = this.toServerChannel.subscribe("#", this.toServer.bind(this));
 
+
+        this.channelval = postal.channel("values");
+
+        this.connection.on('message', this.incomingMsg.bind(this));
+    }
+
+
+    public incomingMsg(msg) {
+        var message = JSON.parse(msg);
+
+        this.channelval.publish(message.topic.name, message);
 
     }
 
@@ -68,8 +72,6 @@ class Terminal {
     public unsubscribeFromServer(data) {
         this.connection.emit('unsubscribe', data);
     }
-
-
 
 }
 
