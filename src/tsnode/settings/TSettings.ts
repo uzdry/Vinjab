@@ -1,10 +1,255 @@
-///<reference path="/Applications/WebStorm.app/Contents/plugins/JavaScriptLanguage/typescriptCompiler/external/lib.es6.d.ts"/>
+///<reference path="S:\Program Files (x86)\JetBrains\WebStorm 11.0.3\plugins/JavaScriptLanguage/typescriptCompiler/external/lib.es6.d.ts"/>
 
 /// <reference path="../../../typings/postal/postal.d.ts"/>
 
 /**
  * @author: David G.
  */
+
+/**
+ * START OF DATABASE COMMUNICATION PART.
+ */
+class ExampleDatabase {
+    public onSettingsMessageReceived(message : SettingsMessage) {
+        if (message.hasBeenHandledByDB() == true) {
+            // Ignore echo.
+            return;
+        }
+
+        var containers = message.getContainers();
+
+        if (containers == null) {
+            // No topics (keys) specified.
+
+            //  Can be used to clean up inconsistent database / XML structure, return every settings entry stored in the DB.
+            var msg = new SettingsMessage(this.getAllSettingsContainersFromDB(), true);
+            this.publishSettingsMessage(msg);
+        }
+
+        // else: a list of topics specified.
+        for (var i = 0; i < containers.length; i++) {
+            var valueInDB = this.readEntry(containers[i].getTopic());
+
+            if (valueInDB != null) {
+                // Value for this key exists in the DB.
+
+                if (containers[i].getDirection() == SettingsIODirection.read) {
+                    // Read operation.
+                    containers[i].setValue(valueInDB);
+                } else {
+                    // Write operation.
+                    //  IMPORTANT : containers[i].getValue() may be NULL.
+                    if (containers[i].getValue() != null) {
+                        // Overwrite an existing value with a new value.
+                        this.writeEntry(containers[i].getTopic(), containers[i].getValue());
+                    } else {
+                        // Overwrite an existing value with null: delete.
+                        this.deleteEntry(containers[i].getTopic());
+                    }
+                }
+            }  else {
+                // Value has not been found for this key in the DB.
+
+                if (containers[i].getDirection() == SettingsIODirection.read) {
+                    // Cannot read from database, entry does not exist.
+                    containers[i].setValue(null);
+                    // Note: you can replace NULL with valueInDB, the latter is also NULL.
+                } else {
+                    // This is a write operation.
+                    //  IMPORTANT : containers[i].getValue() may be NULL.
+                    if (containers[i].getValue() != null) {
+                        // Update database, add new settings entry.
+                        this.createNewEntry(containers[i].getTopic(), containers[i].getValue());
+                    } else {
+                        // Do nothing. Entry does not exist, therefore there is no need to delete it.
+                    }
+                }
+            }
+        }
+        message.setHandledByDBFlag();
+        this.publishSettingsMessage(message);
+    }
+
+    private publishSettingsMessage(message : SettingsMessage) {
+
+    }
+
+    private deleteEntry(key : string) {
+        return;
+    }
+
+    /**
+     * Writes to a database entry (Key/Value store).
+     */
+    private writeEntry(key : string, value : string) {
+        return;
+    }
+
+    /**
+     * Creates a new database entry (Key/Value store).
+     */
+    private createNewEntry(key : string, value : string) {
+        return;
+    }
+
+    /**
+     * Gets all the settings values from the database.
+     * Example: returns all values with the following keys: "settings.*"
+     */
+    private getAllSettingsContainersFromDB() : SettingsContainer[] {
+        var allSettingsContainersStoredInDB : SettingsContainer[] = [];
+        return allSettingsContainersStoredInDB;
+    }
+
+    /*
+     * Key/Value get interface.
+     */
+    private readEntry(key : string) : string {
+        // Instead of returning a new value, return the one from the database.
+        if (true) {
+            // Key exists in DB and the entry stored under key is a Value object.
+            return "0|Name";
+        } else {
+            return null;
+        }
+    }
+}
+
+class SettingsMessage {
+    private handledByDB : boolean;
+    private containers : SettingsContainer[];
+
+    constructor(containers : SettingsContainer[], hasBeenHandledByDB : boolean) {
+        this.containers = containers;
+        this.handledByDB = false;
+    }
+
+    public toString() : string {
+        var buf : string = "SettingsMessage[|";
+        if (this.handledByDB == true) {
+            buf += "true|";
+        } else {
+            buf += "false|";
+        }
+        for (var i = 0; i < this.containers.length; i++) {
+            buf += this.containers[i].toString();
+        }
+        buf += "|]";
+        return buf;
+    }
+
+    public static fromString(stringToParse : string) : SettingsMessage {
+        var splitted = stringToParse.split("|");
+        var containers : SettingsContainer[] = [];
+        if (splitted[0] == "SettingsMessage[") {
+            for (var i = 2; i < splitted.length; i += 5) {
+                var strconc = "";
+                for (var j = 0; j < 5; j++) {
+                    strconc += splitted[i + j];
+                }
+                var sc = SettingsContainer.fromString(strconc);
+                if (sc == null) {
+                    // Error.
+                    return null;
+                }
+                containers.push(sc);
+            }
+        }
+        var alreadyHandled : boolean;
+        if (splitted[1] == "true") {
+            alreadyHandled = true;
+        } else if (splitted[1] == "false") {
+            alreadyHandled = false;
+        } else {
+            return null;
+        }
+        return new SettingsMessage(containers, alreadyHandled);
+    }
+
+    public getContainers() : SettingsContainer[] {
+        return this.containers;
+    }
+
+    public hasBeenHandledByDB() : boolean {
+        return this.handledByDB;
+    }
+
+    public setHandledByDBFlag() {
+        this.handledByDB = true;
+    }
+}
+
+class SettingsContainer {
+    private topic : string;
+    private value : string;
+    private direction : SettingsIODirection;
+
+    constructor(topic : string, value : string, direction : SettingsIODirection) {
+        this.topic = topic;
+        this.value = value;
+        this.direction = direction;
+    }
+
+    public toString() : string {
+        var dir : string = "write";
+        if (this.direction == SettingsIODirection.read) {
+            dir = "read";
+        }
+        return "SettingsContainer[|" + this.topic + "|" + this.value + "|" + dir + "|]";
+    }
+
+    public static fromString(stringToParse : string) : SettingsContainer {
+        if (stringToParse == null) {
+            return null;
+        }
+        var splitted = stringToParse.split("|");
+        if (splitted[0] != "SettingsContainer[") {
+            return null;
+        } else if (splitted.length != 5) {
+            return null;
+        } else {
+            var direction;
+            if (splitted[3] == "read") {
+                direction = SettingsIODirection.read;
+            } else if (splitted[3] == "write") {
+                direction = SettingsIODirection.write;
+            } else {
+                return null;
+            }
+            return new SettingsContainer(splitted[1], splitted[2], direction);
+        }
+    }
+
+    public getTopic() : string {
+        return this.topic;
+    }
+
+    public getValue() : string {
+        return this.value;
+    }
+
+    public setValue(value : string) {
+        this.value = value;
+    }
+
+    public getDirection() : SettingsIODirection {
+        return this.direction;
+    }
+}
+
+enum SettingsIODirection {
+    read, write
+}
+
+/**
+ * END OF DATABASE COMMUNICATION PART.
+ */
+
+
+
+
+
+
 
 /**
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
@@ -39,49 +284,53 @@ class Value {
     }
 }
 
-/**
- * Import of the class Topic.
- * Note: equals() function has been modified, '==' instead of '==='.
- */
+//Topic defines the Topic of a message. BusDevices subscribe to Topics
 class Topic {
 
-    static VALUE_MSG =          new Topic(10, "value.*");
-    static DBREQ_MSG =          new Topic(20, "database request message");
-    static VALUE_ANSWER_MSG =   new Topic(30, "value answer message");
-    static SETTINGS_MSG =       new Topic(40, "settings message");
+    static VALUE_MSG =          new Topic("value.*");
+    static DBREQ_MSG =          new Topic("database request message");
+    static VALUE_ANSWER_MSG =   new Topic("value answer message");
+    static SETTINGS_MSG =       new Topic("settings message");
 
-    static SPEED =              new Topic(140, "value.speed");
-    static MAF =                new Topic(350, "value.mass air flow");
-    static CO0LANT_PRESSURE =   new Topic(110, "value.coolant temperature");
-    static FUEL_PRESSURE =      new Topic(120, "value.fuel pressure");
-    static RPM =                new Topic(130, "value.RPM");
-    static STEERING =           new Topic(150, "value.steering");
-    static INTAKE_TEMP =        new Topic(160, "value.intake air temperature");
-    static ENGINE_RUNTIME =     new Topic(170, "value.engine runtime");
-    static FUEL =               new Topic(180, "value.fuel");
-    static EGR_STATE =          new Topic(190, "value.exhaust gas recirculation state");
-    static INJ_PRESSURE =       new Topic(200, "value.injection pressure State");
-    static FPC_STATE =          new Topic(210, "value.fuel pressure control state");
-    static GPV =                new Topic(220, "value.gas pressure vaporizer");
-    static CAT_TEMP =           new Topic(230, "value.catalyst temperature");
-    static THROTTLE =           new Topic(240, "value.throttle");
-    static ACCELERATOR =        new Topic(250, "value.accelerator pedal position");
-    static TEMP_OUT =           new Topic(260, "value.temperature outside");
-    static TORQUE =             new Topic(270, "value.engine torque");
-    static EGT =                new Topic(280, "value.exhaust gas temperature");
-    static EGP =                new Topic(290, "value.exhaust gas pressure");
-    static ULTRASONIC =         new Topic(300, "value.ultrasonic sensor distance");
+    static SPEED =              new Topic("value.speed");
+    static MAF =                new Topic("value.mass air flow");
+    static COOLANT_PRESSURE =   new Topic("value.coolant temperature");
+    static FUEL_PRESSURE =      new Topic("value.fuel pressure");
+    static RPM =                new Topic("value.RPM");
+    static STEERING =           new Topic("value.steering");
+    static INTAKE_TEMP =        new Topic("value.intake air temperature");
+    static ENGINE_RUNTIME =     new Topic("value.engine runtime");
+    static FUEL =               new Topic("value.fuel");
+    static EGR_STATE =          new Topic("value.exhaust gas recirculation state");
+    static INJ_PRESSURE =       new Topic("value.injection pressure State");
+    static FPC_STATE =          new Topic("value.fuel pressure control state");
+    static GPV =                new Topic("value.gas pressure vaporizer");
+    static CAT_TEMP =           new Topic("value.catalyst temperature");
+    static THROTTLE =           new Topic("value.throttle");
+    static ACCELERATOR =        new Topic("value.accelerator pedal position");
+    static TEMP_OUT =           new Topic("value.temperature outside");
+    static TORQUE =             new Topic("value.engine torque");
+    static EGT =                new Topic("value.exhaust gas temperature");
+    static EGP =                new Topic("value.exhaust gas pressure");
+    static ULTRASONIC =         new Topic("value.ultrasonic sensor distance");
 
 
-    static AVG_FUEL =           new Topic(310, "value.aggregated.average fuel consumption");
-    static FUEL_CONSUMPTION =   new Topic(320, "value.aggregated.fuel consumption.aggregated");
-    static MILEAGE =            new Topic(330, "value.aggregated.mileage");
-    static AVG_SPEED =          new Topic(340, "value.aggregated.average speed");
-    static FUEL_CONSUMPTION_H = new Topic(360, "value.aggregated.fuel per hour")
+    static FUEL_CONSUMPTION =   new Topic("value.aggregated.fuel consumption");
+    static MILEAGE =            new Topic("value.aggregated.mileage");
+    static FUEL_CONSUMPTION_H = new Topic("value.aggregated.fuel per hour");
+
+    static AVG_FUEL =           new Topic("value.avg.aggregated.fuel consumption");
+    static AVG_SPEED =          new Topic("value.avg.speed");
+
+    static DASHBOARD_MSG =      new Topic("dashboard settings");
+    static DASHBOARD_ANS_MSG =  new Topic("dashboard settings from database");
+    static REPLAY_REQ =         new Topic("replay request");
+    static REPLAY_ANS =         new Topic("replay answer");
+    static REPLAY_INFO =        new Topic("replay information");
 
     static VALUES: Topic[] = [     Topic.SPEED,
         Topic.MAF,
-        Topic.CO0LANT_PRESSURE,
+        Topic.COOLANT_PRESSURE,
         Topic.FUEL_PRESSURE,
         Topic.RPM,
         Topic.STEERING,
@@ -106,24 +355,19 @@ class Topic {
         Topic.AVG_SPEED,
         Topic.FUEL_CONSUMPTION_H];
 
-    private id:number;
-    private name:string;
+    name:string;
 
     //instantiates a new Topic with ID and name
-    constructor(pID:number, pName:string) {
-        if (pID < 0) {
-            return null;
-        }
-        this.id = pID;
+    constructor(pName:string) {
         this.name = pName;
     }
 
-    public getID():number {
-        return this.id
+    public getName(): string {
+        return this.name
     }
 
     public equals(topic: Topic): boolean {
-        return this.getID() == topic.getID();
+        return this.name === topic.name;
     }
 }
 
@@ -146,7 +390,7 @@ class Message {
 /**
  * 1:1 import of the class SettingsMessage.
  */
-
+/*
 class SettingsMessage extends Message {
     private configs: Map<Topic, Value>;
 
@@ -158,7 +402,7 @@ class SettingsMessage extends Message {
     public getConfigs(): Map<Topic,Value> {
         return this.configs;
     }
-}
+}*/
 
 /**
  * 1:1 import of the class BusDevice.
@@ -1155,7 +1399,7 @@ class TextDebugger {
                 td.width = "150px";
                 tr.appendChild(td);
                 td = document.createElement('td');
-                td.innerHTML = '' + settingsNodes[i].getTopic().getID();
+                td.innerHTML = '' + settingsNodes[i].getTopic().getName();
                 td.width = "150px";
                 tr.appendChild(td);
                 td = document.createElement('td');
@@ -1332,10 +1576,9 @@ class SCommunicator {
      * @returns {SettingsParameter} The input parameter that is now fully parsed and all the properties are valid based on the XML file.
      */
     private static parseNumericParameter(parameter : any, messageBuffer : MessageBuffer, valueChangeListener : ValueChangeListener, container : Node) {
-        var topicID = SCommunicator.getValue('topicID', parameter);
         var topicName = SCommunicator.getValue('topicName', parameter);
 
-        var topic = new Topic(topicID, topicName);
+        var topic = new Topic(topicName);
 
         var childPar = new SettingsParameter(SCommunicator.getValue("ruid", parameter), SCommunicator.getValue("name", parameter), SCommunicator.getValue("description", parameter),
             SCommunicator.getValue("imageURL", parameter), topic, valueChangeListener, messageBuffer.getValueOf(topic), container);
@@ -1481,9 +1724,9 @@ class DummyDatabase extends BusDevice {
      */
     public handleMessage(m : Message) : void {
         var auxmap = new AuxiliaryMap();
-        var topic1 = new Topic(101, 'topicName_par1');
+        var topic1 = new Topic('topicName_par1');
         auxmap.set(topic1, new Value(111, 'valueName'));
-        var topic2 = new Topic(201, 'topicName_par2');
+        var topic2 = new Topic('topicName_par2');
         auxmap.set(topic2, new Value(222, 'valueName'));
         Broker.get().handleMessage(new AuxiliarySettingsMessage(auxmap));
     }
@@ -1535,11 +1778,13 @@ class Communicator {
 /**
  * Starts the initialization process...
  */
+
 var div1 = document.getElementById("div1");
 var div2 = document.createElement("div");
 div2.style.height = "300px";
 div1.appendChild(div2);
 Startup.initialize(div2);
+
 
 var com : Communicator = new Communicator();
 com.subscribe();

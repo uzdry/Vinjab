@@ -14,9 +14,6 @@ class Communicator {
 
     public onMessageReceived(data) : void {
         var msgdiv = document.getElementById("msgDIV");
-        msgdiv.innerHTML = "Message received: " + data;
+        msgdiv.innerHTML = "Message received - Communicator.js - ERROR: " + data;
     }
 }
-
-var com : Communicator = new Communicator();
-com.subscribe();
