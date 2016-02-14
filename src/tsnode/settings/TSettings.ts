@@ -1,5 +1,3 @@
-///<reference path="S:\Program Files (x86)\JetBrains\WebStorm 11.0.3\plugins/JavaScriptLanguage/typescriptCompiler/external/lib.es6.d.ts"/>
-
 /// <reference path="../../../typings/postal/postal.d.ts"/>
 
 /**
@@ -1519,8 +1517,8 @@ class Communicator {
         var channelsub = postal.channel("reqsubs");
         var reqsub = channelsub.publish("request." + "value.steering", "value.steering");
 
-        //this.mychannel = postal.channel("values");
-        //this.mychannel.subscribe("value.steering", this.onMessageReceived.bind(this));
+   //     this.mychannel = postal.channel("values");
+   //     this.mychannel.subscribe("value.steering", this.onMessageReceived);
     }
 
     public onMessageReceived(data) : void {
