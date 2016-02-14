@@ -34,15 +34,21 @@ class GoogleMapWidget extends Widget {
         this.widgetID = this.typeID + "-" + this.model.id + "-" + GoogleMapWidget.widgetCounter;
         GoogleMapWidget.widgetCounter++;
 
-        //Save the HTMLElements
-        this.htmlElement = "<div id=\"" + this.widgetID + "\" width=\"400\" height=\"400\"></div>";
+        this.htmlElement = '<div id ="' + this.widgetID + '" width="400" height="400"></div>';
     }
 
     initialize(){
 
     }
 
-    private updateLocation(){
+    init() {
+        var opt: google.maps.MapOptions = {
+            center: new google.maps.LatLng(49.012940, 8.424294),
+            zoom: 12,
+            draggable: false
+        };
+        this.map = new google.maps.Map(document.getElementById(this.widgetID), opt);
+        this.infoWind = new google.maps.InfoWindow(this.map);
         if (navigator.geolocation) {
             navigator.geolocation.getCurrentPosition(function(position) {
                 var pos = {
@@ -60,17 +66,6 @@ class GoogleMapWidget extends Widget {
             // Browser doesn't support location
             this.handleLocationError(false, this.infoWind, this.map.getCenter());
         }
-    }
-
-    init() {
-        var opt: google.maps.MapOptions = {
-            center: new google.maps.LatLng(49.012940, 8.424294),
-            zoom: 6,
-            draggable: false
-        };
-        this.map = new google.maps.Map(document.getElementById(this.widgetID), opt);
-        this.infoWind = new google.maps.InfoWindow(this.map);
-        this.updateLocation();
     }
 
     private handleLocationError(locAvailable: Boolean, iw: google.maps.InfoWindow, pos: google.maps.LatLng) {
