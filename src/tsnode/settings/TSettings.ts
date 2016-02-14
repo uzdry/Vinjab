@@ -1514,22 +1514,21 @@ class Startup {
 }
 
 class Communicator {
-    private mychannel;
     public subscribe() : void {
         var channelsub = postal.channel("reqsubs");
-        var reqsub = channelsub.publish("request." + "value.steering", "value.steering");
+        var reqsub = channelsub.publish("request." + "some", "value.steering");
 
-        this.mychannel = postal.channel("values");
-        this.mychannel.subscribe("value.steering", this.onMessageReceived.bind(this));
+      //  var mychannel = postal.channel("values");
+       //mychannel.subscribe("value.steering", this.onMessageReceived);
     }
 
-    public onMessageReceived(data) : void {
+ /*   private onMessageReceived(data) : void {
         var msgdiv = document.getElementById("msgDIV");
         msgdiv.innerHTML = "Message received: " + data.value.value;
         // var swRotation = document.getElementById("swRotation");
         // swRotation.value = data.value.value;
         //  Event: swRotation value changed!
-    }
+    }*/
 }
 
 

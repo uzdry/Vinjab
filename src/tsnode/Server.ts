@@ -5,8 +5,8 @@
 /// <reference path="../../typings/socket.io/socket.io.d.ts"/>
 
 import {ValueAnswerMessage, DBRequestMessage, Message, ValueMessage, Topic} from "./messages";
-import{Proxy} from "./Proxy";
-import{BusDevice} from "./Bus";
+import {Proxy} from "./Proxy";
+import {BusDevice} from "./Bus";
 import {Utils} from "./Utils";
 import {DashboardMessage} from "./messages";
 import {ReplayRequestMessage} from "./messages";
@@ -60,12 +60,11 @@ class Server extends BusDevice{
                 } else if (message.topic.name.startsWith('replay')) {
                     message = new ReplayRequestMessage(message.driverNr, message.callerID, message.startStop);
                 }
-                console.log(message);
                 p.broker.handleMessage(message);
             });
 
             socket.on('subscribe', function(msg) {
-                console.log("msg rcvd");
+
                 p.subscribe(new Topic(msg));
             });
 

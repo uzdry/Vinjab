@@ -71,7 +71,7 @@ class Broker {
     public subscribe(topic:string, sub:BusDevice):void {
         if (this.subscribers.get(topic) == null) {
             this.subscribers.set(topic, new Set<BusDevice>());
-            console.log('Set created: ' + topic + sub.constructor.name);
+            console.log('Set created: ' + topic + " " + sub.constructor.name);
         }
         this.subscribers.get(topic).add(sub);
     }
