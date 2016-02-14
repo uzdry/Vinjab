@@ -73,13 +73,13 @@ class Server extends BusDevice{
             });
 
             socket.on('createChannel', function (){
-                console.log('ch created' + p);
+                console.log('ch created' + p);1
             });
 
         });
 
-        http.listen(3000, function(){
-            console.log('listening on *:3000');
+        http.listen(8000, function(){
+            console.log('listening on *:8000');
         });
 
     }

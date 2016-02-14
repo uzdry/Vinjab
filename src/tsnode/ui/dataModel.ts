@@ -16,8 +16,8 @@ class DataModel extends Backbone.Model{
         var channel = postal.channel("values");;
         this.subscription = channel.subscribe(this.get("tagName"), this.update.bind(this));
 
-      //  var channelsub = postal.channel("reqsubs");
-      //  var reqsub = channelsub.publish("request." + this.get("tagName"), this.get("tagName"));
+        var channelsub = postal.channel("reqsubs");
+        var reqsub = channelsub.publish("request." + this.get("tagName"), this.get("tagName"));
 
 
     }
