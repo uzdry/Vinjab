@@ -3,6 +3,8 @@
  */
 
 /// <reference path="./Auxiliary.ts"/>
+/// <reference path="./CompositeStructure.ts"/>
+/// <reference path="./TSettings.ts"/>
 
 /**
  * The class that provides a debugging console output in the browser.
