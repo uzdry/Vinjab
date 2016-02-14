@@ -1,5 +1,4 @@
-///reference path="./typings/jasmine/jasmine.d.ts"/>
-///reference path="../typings/tsd.d.ts"/>
+///<reference path="./typings/jasmine/jasmine.d.ts"/>
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
@@ -29,9 +28,7 @@ describe("pubsub", function () {
         var value = new messages_1.Value(24, "km/h");
         publisher.publish(value);
         var vm;
-        while (vm == null) {
-            vm = (subscriber.message);
-        }
+        vm = (subscriber.message);
         expect(vm.value.value).toEqual(23);
     });
 });

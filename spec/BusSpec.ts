@@ -1,5 +1,4 @@
-///reference path="./typings/jasmine/jasmine.d.ts"/>
-///reference path="../typings/tsd.d.ts"/>
+///<reference path="./typings/jasmine/jasmine.d.ts"/>
 
 import {BusDevice} from "../src/tsnode/Bus";
 import {Source} from "../src/tsnode/Source";
@@ -27,9 +26,7 @@ describe("pubsub" ,function() {
         var value = new Value(24, "km/h");
         publisher.publish(value);
         var vm;
-        while (vm == null) {
-            vm = <ValueMessage>(subscriber.message);
-        }
+        vm = <ValueMessage>(subscriber.message);
         expect(vm.value.value).toEqual(23);
     });
 

@@ -29,7 +29,7 @@ class Distance extends BusDevice {
     }
 }
 
-class AverageSpeed extends BusDevice {
+/*class AverageSpeed extends BusDevice {
     private avgSpeed: number;
     private numberOfValues: number;
 
@@ -47,7 +47,7 @@ class AverageSpeed extends BusDevice {
             this.broker.handleMessage(new ValueMessage(Topic.AVG_SPEED, new Value(this.avgSpeed, "Km/h")));
         }
     }
-}
+}*/
 
 /*class AvgFuelConsumption extends BusDevice {
     private avgFuelConsumption: number;
@@ -63,9 +63,9 @@ class AverageSpeed extends BusDevice {
 
     public handleMessage(m: Message) {
         if(m instanceof ValueMessage) {
-            if(m.getTopic().getID() == 330 ) { //TODO: DISTANCE.TOPIC
+            if(m.getTopic().getID() == 330 ) {
                 this.currentDistanceInMeters = m.value.numericalValue();
-            } else if(m.getTopic().getID() == 180) { //TODO: TANKCONTENTS.TOPIC
+            } else if(m.getTopic().getID() == 180) {
                 this.currentTankContentsInPercent = m.value.numericalValue();
             }
         }
@@ -96,8 +96,6 @@ class AverageComputation extends BusDevice {
                 this.avg = this.avg * (1-(1/this.numberOfValues)) + m.value.value / this.numberOfValues;
                 var i = m.topic.name.indexOf(".");
                 var l = m.topic.name.length;
-                console.log(m.topic.name.substring(0, i) + ".avg" + m.topic.name.substring(i, l));
-
                 this.broker.handleMessage(new ValueMessage(new Topic(m.topic.name.substring(0, i) + ".avg" + m.topic.name.substring(i, l)), new Value(this.avg, m.value.identifier)));
             }
         }
@@ -142,4 +140,4 @@ class FuelConsumption extends BusDevice {
     }
 }
 
-export {FuelConsumption, AverageComputation};
+export {FuelConsumption, AverageComputation, Distance};
