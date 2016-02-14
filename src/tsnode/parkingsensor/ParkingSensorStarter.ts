@@ -2081,10 +2081,6 @@ module Debug {
         }
     }
 
-    var textNode = document.createElement("div");
-    textNode.id = "msgDIV";
-    textNode.innerHTML = "No messages received yet.";
-    document.getElementById("divPS").appendChild(textNode);
 
     Debug.DebugGUI.drawCommonDebugGUI();
 
