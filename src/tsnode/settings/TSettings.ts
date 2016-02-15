@@ -330,10 +330,6 @@ class DummyDatabase extends BusDevice {
         auxmap.set(topic1, new Value(999, 'valueName'));
         var topic1 = new Topic('fueltankwarning');
         auxmap.set(topic1, new Value(8, 'valueName'));
-        var topic1 = new Topic('topicName_par1');
-        auxmap.set(topic1, new Value(111, 'valueName'));
-        var topic2 = new Topic('topicName_par2');
-        auxmap.set(topic2, new Value(222, 'valueName'));
         Broker.get().handleMessage(new AuxiliarySettingsMessage(auxmap));
     }
 }
@@ -365,11 +361,11 @@ class Startup {
 class Communicator {
     private mychannel;
     public subscribe() : void {
-        var channelsub = postal.channel("reqsubs");
-        var reqsub = channelsub.publish("request." + "value.steering", "value.steering");
+        //var channelsub = postal.channel("reqsubs");
+        //var reqsub = channelsub.publish("request." + "value.steering", "value.steering");
 
-        this.mychannel = postal.channel("values");
-        this.mychannel.subscribe("value.steering", this.onMessageReceived.bind(this));
+        //this.mychannel = postal.channel("values");
+        //this.mychannel.subscribe("value.steering", this.onMessageReceived.bind(this));
     }
 
     public onMessageReceived(data) : void {

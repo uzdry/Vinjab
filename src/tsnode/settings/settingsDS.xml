@@ -51,33 +51,4 @@
             <topicName>dbcapacity</topicName>
         </npar>
     </dir>
-    <dir>
-        <ruid>dir2</ruid>
-        <name>Directory 2</name>
-        <description>Description of Directory 2</description>
-        <imageURL>../../img/settings/directory.png</imageURL>
-        <dir>
-            <ruid>dir3</ruid>
-            <name>Directory 3</name>
-            <description>Description of Directory 3</description>
-            <imageURL>../../img/settings/directory.png</imageURL>
-            <npar>
-                <ruid>par1</ruid>
-                <name>Parameter 1</name>
-                <description>Description of Parameter 1</description>
-                <imageURL>../../img/settings/p1.png</imageURL>
-                <topicID>101</topicID>
-                <topicName>topicName_par1</topicName>
-            </npar>
-            <npar>
-                <ruid>par2</ruid>
-                <name>Parameter 2</name>
-                <description>Description of Parameter 2</description>
-                <imageURL>../../img/settings/p2.png</imageURL>
-                <topicID>201</topicID>
-                <topicName>topicName_par2</topicName>
-            </npar>
-
-        </dir>
-    </dir>
 </root>
