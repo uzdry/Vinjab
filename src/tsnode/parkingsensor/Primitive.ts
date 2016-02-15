@@ -11,16 +11,16 @@ module Primitive {
 
         constructor(segments : Geometry.Vec3[], format : Format.FormatContainer) {
             if (format == null) {
-                // throw new Exception("Format must not be null!");
+                this.format = new Format.FormatContainer(null, null, 0, null);
+            } else {
+                this.format = format;
             }
-            if (segments == null) {
+            if (segments == null || segments.length < 2) {
                 // throw new Exception("Segments must not be null!");
+                this.segments = [new Geometry.Vec3([0, 0, 0]), new Geometry.Vec3([0, 0, 0])];
+            } else {
+                this.segments = segments;
             }
-            if (segments.length < 2) {
-                // throw new Exception("Length of segments must be >2!");
-            }
-            this.format = format;
-            this.segments = segments;
         }
 
         public getSegmentCount() : number {
@@ -28,9 +28,12 @@ module Primitive {
         }
 
         public getSegment(index : number) : Geometry.Vec3 {
-            if (index < 0 || index >= this.getSegmentCount())
+            if (index < 0)
             {
-                // throw new Exception("Index must be in [0, length - 1]!");
+                return this.segments[0];
+            }
+            if (index >= this.getSegmentCount()) {
+                return this.segments[this.segments.length - 1];
             }
             return this.segments[index];
         }
@@ -48,18 +51,6 @@ module Primitive {
         private format : Format.FormatContainer;
 
         constructor(position : Geometry.Vec3, normal : Geometry.Vec3, radius : number, format : Format.FormatContainer) {
-            if (format == null)
-            {
-                // throw new Exception("Format must not be null!");
-            }
-            if (position == null)
-            {
-                // throw new Exception("Position must not be null!");
-            }
-            if (normal == null)
-            {
-                // throw new Exception("Normal must not be null!");
-            }
             this.format = format;
             this.position = position;
             this.normal = normal;
@@ -76,21 +67,36 @@ module Primitive {
             return result;
         }
 
+        public getPosition() : Geometry.Vec3 {
+            return this.position;
+        }
+
+        public getNormal() : Geometry.Vec3 {
+            return this.normal;
+        }
+
         public getFormat() : Format.FormatContainer {
             return this.format;
         }
 
+        public getRadius() : number {
+            return this.radius;
+        }
+
         public toPolygon(n : number) : Polygon {
-            if (n <= 2 || n > 1800)
+            var segmentCount : number = n;
+            if (n <= 2)
             {
-                // throw new Exception("N must be in [3, 1800]!");
+                segmentCount = 2;
+            } else if (n >= 3600) {
+                segmentCount = 3600;
             }
             var array = [];
 
             var parameter : number;
-            for (var i = 0; i < n; i++)
+            for (var i = 0; i < segmentCount; i++)
             {
-                parameter = (i / n) * 2 * Math.PI;
+                parameter = (i / segmentCount) * 2 * Math.PI;
                 var angle = new Geometry.Angle(parameter);
                 array[i] = this.getPoint(angle);
             }

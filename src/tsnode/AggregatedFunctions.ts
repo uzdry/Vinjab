@@ -3,14 +3,23 @@ import {DBRequestMessage, ValueAnswerMessage, ValueMessage, Value, Topic, Messag
 import {BusDevice} from "./Bus";
 import {TlsOptions} from "tls";
 
-class Distance extends BusDevice {
+
+class Aggregation extends BusDevice {
+    protected currentValue: number;
+    constructor() {
+        super();
+        this.currentValue = 0;
+    }
+}
+
+class Distance extends Aggregation {
     private currentDistanceInMeters: number;
     private lastTimeInMS: number;
     private lastSpeedInMpS: number;
 
     constructor() {
         super();
-        this.currentDistanceInMeters = 0;
+        this.currentValue = 0;
         this.lastTimeInMS = 0;
         this.lastSpeedInMpS = 0;
         this.subscribe(Topic.SPEED);
@@ -21,15 +30,15 @@ class Distance extends BusDevice {
             var currentTime = Date.now();
             var currentSpeed = m.value.numericalValue() * 0.2777777778;
             var avgSpeed = 0.5 * this.lastSpeedInMpS + currentSpeed;
-            this.currentDistanceInMeters += (currentTime - this.lastTimeInMS) * 0.001 * avgSpeed;
+            this.currentValue += (currentTime - this.lastTimeInMS) * 0.001 * avgSpeed;
             this.lastTimeInMS = currentTime;
-            this.lastSpeedInMpS = m.value.numericalValue();
-            this.broker.handleMessage(new ValueMessage(Topic.MILEAGE, new Value(this.currentDistanceInMeters, "meters")));
+            this.lastSpeedInMpS = m.value.value;
+            this.broker.handleMessage(new ValueMessage(Topic.MILEAGE, new Value(this.currentValue, "meters")));
         }
     }
 }
 
-class AverageSpeed extends BusDevice {
+/*class AverageSpeed extends BusDevice {
     private avgSpeed: number;
     private numberOfValues: number;
 
@@ -47,7 +56,7 @@ class AverageSpeed extends BusDevice {
             this.broker.handleMessage(new ValueMessage(Topic.AVG_SPEED, new Value(this.avgSpeed, "Km/h")));
         }
     }
-}
+}*/
 
 /*class AvgFuelConsumption extends BusDevice {
     private avgFuelConsumption: number;
@@ -63,9 +72,9 @@ class AverageSpeed extends BusDevice {
 
     public handleMessage(m: Message) {
         if(m instanceof ValueMessage) {
-            if(m.getTopic().getID() == 330 ) { //TODO: DISTANCE.TOPIC
+            if(m.getTopic().getID() == 330 ) {
                 this.currentDistanceInMeters = m.value.numericalValue();
-            } else if(m.getTopic().getID() == 180) { //TODO: TANKCONTENTS.TOPIC
+            } else if(m.getTopic().getID() == 180) {
                 this.currentTankContentsInPercent = m.value.numericalValue();
             }
         }
@@ -75,7 +84,7 @@ class AverageSpeed extends BusDevice {
 /**
  * implements the calculation of the average value of goven topic.
  */
-class AverageComputation extends BusDevice {
+class AverageComputation extends Aggregation {
     avgOf: Topic;
 
     avg: number;
@@ -93,18 +102,17 @@ class AverageComputation extends BusDevice {
         if (m instanceof ValueMessage) {
             if (m.topic.equals(this.avgOf)) {
                 this.numberOfValues++;
-                this.avg = this.avg * (1-(1/this.numberOfValues)) + m.value.value / this.numberOfValues;
+                this.currentValue = this.currentValue * (1-(1/this.numberOfValues)) + m.value.value / this.numberOfValues;
                 var i = m.topic.name.indexOf(".");
                 var l = m.topic.name.length;
-                console.log(m.topic.name.substring(0, i) + ".avg" + m.topic.name.substring(i, l));
-
-                this.broker.handleMessage(new ValueMessage(new Topic(m.topic.name.substring(0, i) + ".avg" + m.topic.name.substring(i, l)), new Value(this.avg, m.value.identifier)));
+                // pushes avg on bus. uses appropriate Topic name
+                this.broker.handleMessage(new ValueMessage(new Topic(m.topic.name.substring(0, i) + ".avg" + m.topic.name.substring(i, l)), new Value(this.currentValue, m.value.identifier)));
             }
         }
     }
 }
 
-class FuelConsumption extends BusDevice {
+class FuelConsumption extends Aggregation {
 
     lph: number;
     speed: number;
@@ -116,6 +124,7 @@ class FuelConsumption extends BusDevice {
         this.lph = 10;
         this.speed = 10;
         this.lphkm = 10;
+        this.init();
     }
 
     public init() {
@@ -142,4 +151,4 @@ class FuelConsumption extends BusDevice {
     }
 }
 
-export {FuelConsumption, AverageComputation};
+export {Aggregation, FuelConsumption, AverageComputation, Distance};

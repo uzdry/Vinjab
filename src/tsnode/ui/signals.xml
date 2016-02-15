@@ -32,7 +32,7 @@
         <name>Drehzahl</name>
         <description>Motordrehzahl in RPM</description>
         <minValue>0</minValue>
-        <maxValue>30000</maxValue>
+        <maxValue>8000</maxValue>
         <unit>RPM</unit>
     </signal>
     <signal category="value.steering">
@@ -148,14 +148,14 @@
         <maxValue>100</maxValue>
         <unit>cm</unit>
     </signal>
-    <signal category="value.aggregated.average fuel consumption">
+    <signal category="value.avg.aggregated.fuel consumption">
         <name>Durchschnittverbrauch</name>
         <description>Durschnittlicher Treibstoffverbrauch</description>
         <minValue>0</minValue>
         <maxValue>20</maxValue>
         <unit>l/100km</unit>
     </signal>
-    <signal category="value.aggregated.fuel consumption.aggregated">
+    <signal category="value.aggregated.fuel consumption">
         <name>Treibstoffverbrauch</name>
         <description>Aktueller Treibstoffverbrauch</description>
         <minValue>0</minValue>
@@ -169,7 +169,7 @@
         <maxValue>10000</maxValue>
         <unit>km</unit>
     </signal>
-    <signal category="value.aggregated.average speed">
+    <signal category="value.avg.speed">
         <name>Durchschnittsgeschwindigkeit</name>
         <description>Durchschnittliche Geschwindigkeit</description>
         <minValue>0</minValue>

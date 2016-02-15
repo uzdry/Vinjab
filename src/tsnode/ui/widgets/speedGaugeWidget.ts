@@ -79,6 +79,16 @@ class SpeedGaugeWidget extends Widget{
 
         this.config.title = this.model.get("name");
 
+        this.config.maxValue = this.model.get("maxValue");
+
+        if (this.config.title == "Drehzahl") {
+            this.config.majorTicks = ['0', '1000', '2000', '3000', '4000', '5000', '6000', '7000', '8000'];
+            this.config.highlights = [
+                {from: 0, to: 5000, color: 'rgba(0,   255, 0, .15)'},
+                {from: 5000, to: 8000, color: 'rgba(255, 0, 0, .15)'},
+            ];
+        }
+
 
     }
 
