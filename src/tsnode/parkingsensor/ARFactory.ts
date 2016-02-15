@@ -14,13 +14,13 @@ module ARFactory {
             return new Visualization.DOMSVG(svg);
         }
 
-        public static drawSimpleCircleAutoClear(image : Visualization.ISVG) : void {
+        public static drawSimpleCircleAutoClear(image : Visualization.ISVG, cameraValuesBuffer : Debug.CameraValuesBuffer) : void {
             image.clear();
-            Drawer.drawSimpleCircle(image);
+            Drawer.drawSimpleCircle(image, cameraValuesBuffer);
             image.refresh();
         }
 
-        public static drawSimpleCircle(image : Visualization.ISVG) : void {
+        public static drawSimpleCircle(image : Visualization.ISVG, cameraValuesBuffer : Debug.CameraValuesBuffer) : void {
 
             // ALL the parameters (all the hard coded numbers) will be replaced by input parameters, they are now only used for debug.
 
@@ -45,7 +45,7 @@ module ARFactory {
             }
             var circleFormat : Format.FormatContainer = new Format.FormatContainer(fillRGB,
                 new Format.RGB(Debug.CircleValuesBuffer.circleStrokeRed, Debug.CircleValuesBuffer.circleStrokeGreen, Debug.CircleValuesBuffer.circleStrokeBlue),
-                Debug.CircleValuesBuffer.circleStrokeWidth);
+                Debug.CircleValuesBuffer.circleStrokeWidth, "circleFormat");
 
             var circlePosition : Geometry.Vec3 = new Geometry.Vec3([vx, vy, vz]);
             var circleNormal : Geometry.Vec3 = new Geometry.Vec3([nx, ny, nz]).normalize();
@@ -57,9 +57,9 @@ module ARFactory {
             var polygon : Primitive.Polygon = circle.toPolygon(polygonSegmentCount);
 
             // The camera rotation values in degrees.
-            var krx : number = Debug.CameraValuesBuffer.cameraRotationX;
-            var kry : number = Debug.CameraValuesBuffer.cameraRotationY;
-            var krz : number = Debug.CameraValuesBuffer.cameraRotationZ;
+            var krx : number = cameraValuesBuffer.cameraRotationX;
+            var kry : number = cameraValuesBuffer.cameraRotationY;
+            var krz : number = cameraValuesBuffer.cameraRotationZ;
 
             var cameraRotation : Geometry.Rot3 = new Geometry.Rot3(new Geometry.Angle(Drawer.deg2rad(krx)),
                 new Geometry.Angle(Drawer.deg2rad(kry)), new Geometry.Angle(Drawer.deg2rad(krz)));
@@ -69,24 +69,24 @@ module ARFactory {
             var rotationMatrixInverse : Geometry.Mat3x3 = rotationMatrix.transpose();
 
             // Camera position.
-            var kpx : number = Debug.CameraValuesBuffer.cameraPositionX;
-            var kpy : number = Debug.CameraValuesBuffer.cameraPositionY;
-            var kpz : number = Debug.CameraValuesBuffer.cameraPositionZ;
+            var kpx : number = cameraValuesBuffer.cameraPositionX;
+            var kpy : number = cameraValuesBuffer.cameraPositionY;
+            var kpz : number = cameraValuesBuffer.cameraPositionZ;
 
             var cameraPosition : Geometry.Vec3 = new Geometry.Vec3([kpx, kpy, kpz]);
             var transformationMatrix : Geometry.Mat4x4 = new Geometry.Mat4x4(rotationMatrixInverse,
                 rotationMatrixInverse.multiplyFromRightByVector(cameraPosition).scale(-1.0));
 
             // Camera Horizontal and Vertical Angle Of View.
-            var khaov : number = Debug.CameraValuesBuffer.cameraHorizontalAOV;
-            var kvaov : number = Debug.CameraValuesBuffer.cameraVerticalAOV;
+            var khaov : number = cameraValuesBuffer.cameraHorizontalAOV;
+            var kvaov : number = cameraValuesBuffer.cameraVerticalAOV;
 
             var cameraHAOV : Geometry.Angle = new Geometry.Angle(Drawer.deg2rad(khaov));
             var cameraVAOV : Geometry.Angle = new Geometry.Angle(Drawer.deg2rad(kvaov));
 
             // Camera horizontal and vertical resolution.
-            var khres : number = Debug.CameraValuesBuffer.cameraResolutionHorizontal;
-            var kvres : number = Debug.CameraValuesBuffer.cameraResolutionVertical;
+            var khres : number = cameraValuesBuffer.cameraResolutionHorizontal;
+            var kvres : number = cameraValuesBuffer.cameraResolutionVertical;
 
             var cameraResolution : Geometry.Vec2 = new Geometry.Vec2(khres, kvres);
             var camera : Visualization.Camera = new Visualization.Camera(cameraRotation, cameraPosition,

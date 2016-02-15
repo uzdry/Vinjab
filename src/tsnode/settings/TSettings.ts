@@ -326,6 +326,10 @@ class DummyDatabase extends BusDevice {
         auxmap.set(topic1, new Value(1300, 'valueName'));
         var topic1 = new Topic('steeringratio');
         auxmap.set(topic1, new Value(20, 'valueName'));
+        var topic1 = new Topic('dbcapacity');
+        auxmap.set(topic1, new Value(999, 'valueName'));
+        var topic1 = new Topic('fueltankwarning');
+        auxmap.set(topic1, new Value(8, 'valueName'));
         var topic1 = new Topic('topicName_par1');
         auxmap.set(topic1, new Value(111, 'valueName'));
         var topic2 = new Topic('topicName_par2');

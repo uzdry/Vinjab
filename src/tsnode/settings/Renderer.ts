@@ -98,7 +98,13 @@ class TableFactory {
 
         innerTR = document.createElement('tr');
         innerTD = document.createElement('td');
-        innerTD.innerHTML = actualRowNode.getFullUid() + '   ← [Debug Only] Resource unique identifier string';
+
+        var ending = "";
+        if (actualRowNode.isDirectory()) {
+            ending = ".*";
+        }
+        innerTD.innerHTML = "Debug | Topic Name → " + actualRowNode.getFullUid() + ending;
+
         innerTR.appendChild(innerTD);
         innerTBody.appendChild(innerTR);
 
