@@ -1,4 +1,4 @@
-///reference path="./typings/jasmine/jasmine.d.ts"/>
+///reference path="../typings/jasmine/jasmine.d.ts"/>
 ///reference path="../typings/tsd.d.ts"/>
 
 import {BusDevice} from "../src/tsnode/Bus";

@@ -50,6 +50,7 @@ class Dashboard{
         var message: DashboardMessage = new DashboardMessage(this.cookie, "", true);
         postal.channel("toServer").publish("", message);
         postal.channel("request").publish("request.#", "dashboard settings from database");
+        postal.channel("value")
 
         $(document).on( "click", ".gridster ul li", function() {
             if(document.getElementById("cDeleteMode").checked) {
