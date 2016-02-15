@@ -1,8 +1,8 @@
 {
   "spec_dir": "../",
   "spec_files": [
-    "**/BusSpec.js"
-
+    "**/BusSpec.js",
+    "**/DBAccessSpec.js"
   ],
   "helpers": [
     "../src/tsnode/**/*.js"

@@ -22,6 +22,8 @@ class GoogleMapWidget extends Widget {
 
     /** Main Element of the Widget */
     map: google.maps.Map;
+    gasStations: google.maps.places.PlacesService;
+
 
     /** String that is being introduced to the grid */
     htmlElement: string;
@@ -34,15 +36,32 @@ class GoogleMapWidget extends Widget {
         this.widgetID = this.typeID + "-" + this.model.id + "-" + GoogleMapWidget.widgetCounter;
         GoogleMapWidget.widgetCounter++;
 
-        //Save the HTMLElements
-        this.htmlElement = "<div id=\"" + this.widgetID + "\" width=\"400\" height=\"400\"></div>";
+        this.htmlElement =  '<li id="' + this.widgetID + '1">' +
+                            '<div id ="' + this.widgetID + '2" height="400" width="400"></div>' +
+                            '</li>';
     }
 
     initialize(){
 
     }
 
-    private updateLocation(){
+    init() {
+        var opt: google.maps.MapOptions = {
+            center: new google.maps.LatLng(49.012940, 8.424294),
+            zoom: 14,
+            draggable: false
+        };
+        this.map = new google.maps.Map(document.getElementById(this.widgetID + '1'), opt);
+        /*
+        var element = document.getElementById(this.widgetID + "_out");
+        element.style.opacity = "0.0";
+        this.map = new google.maps.Map(element.getElementsByTagName('div')[0] , opt);
+        */
+
+        this.gasStations = new google.maps.places.PlacesService(this.map);
+        //to be deleted:
+        this.updateValue(5);
+        this.infoWind = new google.maps.InfoWindow(this.map);
         if (navigator.geolocation) {
             navigator.geolocation.getCurrentPosition(function(position) {
                 var pos = {
@@ -62,17 +81,6 @@ class GoogleMapWidget extends Widget {
         }
     }
 
-    init() {
-        var opt: google.maps.MapOptions = {
-            center: new google.maps.LatLng(49.012940, 8.424294),
-            zoom: 6,
-            draggable: false
-        };
-        this.map = new google.maps.Map(document.getElementById(this.widgetID), opt);
-        this.infoWind = new google.maps.InfoWindow(this.map);
-        this.updateLocation();
-    }
-
     private handleLocationError(locAvailable: Boolean, iw: google.maps.InfoWindow, pos: google.maps.LatLng) {
         iw.setPosition(pos);
         if (locAvailable) {
@@ -87,10 +95,36 @@ class GoogleMapWidget extends Widget {
     }
 
     updateValue(value: number){
-
+        if(value < 10) {
+            if(navigator.geolocation) {
+                var pos;
+                navigator.geolocation.getCurrentPosition(function(position) {
+                    pos = {
+                        lat: position.coords.latitude,
+                        lng: position.coords.longitude
+                    };
+                    this.gasStations.nearbySearch({
+                        location: pos,
+                        radius: 2000,
+                        types: ['gas_station']
+                    }, function(result, status, pagination) {
+                        if (status === google.maps.places.PlacesServiceStatus.OK) {
+                            for (var i = 0; i < result.length; i++) {
+                                var placeLoc = result[i].geometry.location;
+                                var marker = new google.maps.Marker({
+                                    map: this.map,
+                                    position: result[i].geometry.location
+                                });
+                            }
+                        }
+                    }.bind(this))
+                }.bind(this));
+            }
+        }
     }
 
     resize(size_x: number, size_y:number) {
+        google.maps.event.trigger(this.map, "resize");
     }
 
     destroy(){
@@ -98,5 +132,7 @@ class GoogleMapWidget extends Widget {
         delete this;
     }
 }
+
+
 
 export {GoogleMapWidgetConfig}

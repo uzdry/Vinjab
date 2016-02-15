@@ -8,9 +8,9 @@
 module Visualization {
 
     export interface ISVG {
-        setResolution(resolution : Geometry.Vec2) : void;
+        setResolution(resolution:Geometry.Vec2) : void;
 
-        addPolygon(polygon : Primitive.Polygon) : void;
+        addPolygon(polygon:Primitive.Polygon) : void;
 
         refresh() : void;
 
@@ -18,10 +18,11 @@ module Visualization {
     }
 
     export class DOMSVG implements ISVG {
-        private resolution : Geometry.Vec2;
-        private polygons : Primitive.Polygon[] = [];
-        private svg : any;
-        constructor (svg : any) {
+        private resolution:Geometry.Vec2;
+        private polygons:Primitive.Polygon[] = [];
+        private svg:any;
+
+        constructor(svg:any) {
             this.svg = svg;
         }
 
@@ -32,19 +33,18 @@ module Visualization {
             }
         }
 
-        public setResolution(resolution : Geometry.Vec2) : void {
+        public setResolution(resolution:Geometry.Vec2):void {
             this.resolution = resolution;
         }
 
-        public addPolygon(polygon : Primitive.Polygon) : void {
-            if (polygon == null)
-            {
+        public addPolygon(polygon:Primitive.Polygon):void {
+            if (polygon == null) {
                 // throw new Exception("Polygon must not be null!");
             }
             this.polygons.push(polygon);
         }
 
-        public refresh() : void {
+        public refresh():void {
             this.svg.setAttribute('id', "augsvg");
             this.svg.setAttribute('width', "" + this.resolution.getX());
             this.svg.setAttribute('height', "" + this.resolution.getY());
@@ -53,7 +53,7 @@ module Visualization {
             var strbuf;
             for (var i = 0; i < this.polygons.length; i++) {
                 var path = document.createElementNS(svgNS, 'path');
-                var sc : number = this.polygons[i].getSegmentCount();
+                var sc:number = this.polygons[i].getSegmentCount();
                 strbuf = "";
                 for (var j = 0; j < sc; j++) {
                     if (j == 0) {
@@ -80,13 +80,13 @@ module Visualization {
     }
 
     export class CScreen {
-        private resolution : Geometry.Vec2;
-        private width : number;
-        private height : number;
+        private resolution:Geometry.Vec2;
+        private width:number;
+        private height:number;
 
-        private bottomLeft : Geometry.Vec3;
-        private invertX : boolean = false;
-        private invertY : boolean = true;
+        private bottomLeft:Geometry.Vec3;
+        private invertX:boolean = false;
+        private invertY:boolean = true;
 
         // All the calculations are in the camera coordinate system.
         // The screen is in the z == 1 plane.
@@ -94,7 +94,7 @@ module Visualization {
         //  In other words: The camera looks into the z+ direction.
         //  The 'up' vector equals y+.
 
-        constructor(resolution : Geometry.Vec2, width : number, height : number) {
+        constructor(resolution:Geometry.Vec2, width:number, height:number) {
             this.resolution = resolution;
             this.width = width;
             this.height = height;
@@ -103,12 +103,12 @@ module Visualization {
         }
 
 
-        public projectPointToScreen(point : Geometry.Vec3) : Geometry.Vec2 {
-            var screenPoint : Geometry.Vec3 = this.projectPointToScreenPoint(point);
+        public projectPointToScreen(point:Geometry.Vec3):Geometry.Vec2 {
+            var screenPoint:Geometry.Vec3 = this.projectPointToScreenPoint(point);
             if (screenPoint == null) {
                 return null;
             }
-            var pp : Geometry.Vec2 = this.projectScreenPointToPixel(screenPoint);
+            var pp:Geometry.Vec2 = this.projectScreenPointToPixel(screenPoint);
 
             if (pp == null) {
                 return null;
@@ -116,12 +116,12 @@ module Visualization {
             return pp;
         }
 
-        private projectScreenPointToPixel(screenPoint : Geometry.Vec3) : Geometry.Vec2 {
+        private projectScreenPointToPixel(screenPoint:Geometry.Vec3):Geometry.Vec2 {
             //if (!CMMath.Math.NumericEngine.compareEquals(screenPoint.getElement(2), 1.0)) {
             // throw new Exception("Z of the screenPoint must be 1.0!");
             //}
-            var x : number = screenPoint.getElement(0) - this.bottomLeft.getElement(0);
-            var y : number = screenPoint.getElement(1) - this.bottomLeft.getElement(1);
+            var x:number = screenPoint.getElement(0) - this.bottomLeft.getElement(0);
+            var y:number = screenPoint.getElement(1) - this.bottomLeft.getElement(1);
 
             x /= this.width;
             y /= this.height;
@@ -136,13 +136,13 @@ module Visualization {
                 y = this.resolution.getY() - y;
             }
 
-            var pp : Geometry.Vec2 = new Geometry.Vec2(x, y);
+            var pp:Geometry.Vec2 = new Geometry.Vec2(x, y);
 
             return pp;
         }
 
 
-        private projectPointToScreenPoint(point : Geometry.Vec3) : Geometry.Vec3 {
+        private projectPointToScreenPoint(point:Geometry.Vec3):Geometry.Vec3 {
             if (point.getElement(2) < 0) {
                 // Point behind the camera.
                 return null;
@@ -155,25 +155,25 @@ module Visualization {
             // Ray: [0, 0, 0] + t * point.
             // CScreen is in the z == 1 plane.
             // Projected point: [x, y, z] -> [x/z, y/z, 1].
-            var z : number= point.getElement(2);
-            var res : Geometry.Vec3 = new Geometry.Vec3([point.getElement(0) / z,
+            var z:number = point.getElement(2);
+            var res:Geometry.Vec3 = new Geometry.Vec3([point.getElement(0) / z,
                 point.getElement(1) / z, 1.0]);
             return res;
         }
     }
 
     export class Camera {
-        private world : World;
-        private worldToCameraTransformation : Geometry.Mat4x4;
-        private horizontalAOV : Geometry.Angle;
-        private verticalAOV : Geometry.Angle;
-        private resolution : Geometry.Vec2;
+        private world:World;
+        private worldToCameraTransformation:Geometry.Mat4x4;
+        private horizontalAOV:Geometry.Angle;
+        private verticalAOV:Geometry.Angle;
+        private resolution:Geometry.Vec2;
 
-        private cscreen : Visualization.CScreen;
+        private cscreen:Visualization.CScreen;
 
 
-        constructor(rotation : Geometry.Rot3, position : Geometry.Vec3,
-                    horizontalAngleOfView : Geometry.Angle, verticalAngleOfView : Geometry.Angle, resolution : Geometry.Vec2) {
+        constructor(rotation:Geometry.Rot3, position:Geometry.Vec3,
+                    horizontalAngleOfView:Geometry.Angle, verticalAngleOfView:Geometry.Angle, resolution:Geometry.Vec2) {
             if (rotation == null) {
                 // throw new Exception("Rotation must not be null!");
             }
@@ -193,12 +193,12 @@ module Visualization {
                 // throw new System.Exception("Vertical resolution must be >1!");
             }
 
-            var rotationMatrix : Geometry.Mat3x3 = rotation.getRotationMatrix();
+            var rotationMatrix:Geometry.Mat3x3 = rotation.getRotationMatrix();
 
 
-            var rotationMatrixInverse : Geometry.Mat3x3 = rotationMatrix.transpose();
+            var rotationMatrixInverse:Geometry.Mat3x3 = rotationMatrix.transpose();
 
-            var worldToCameraTransformation : Geometry.Mat4x4 =
+            var worldToCameraTransformation:Geometry.Mat4x4 =
                 new Geometry.Mat4x4(rotationMatrixInverse,
                     rotationMatrixInverse.multiplyFromRightByVector(position).scale(-1.0));
 
@@ -212,27 +212,27 @@ module Visualization {
                 Math.tan(this.verticalAOV.getValueRad() / 2.0));
         }
 
-        public setWorld(world : World) : void {
+        public setWorld(world:World):void {
             this.world = world;
         }
 
-        public getPixelPosition(pointInWorldCoordinates : Geometry.Vec3) : Geometry.Vec2 {
-            var pointWorld4 : Geometry.Vec4 = pointInWorldCoordinates.toHomogenousPoint();
-            var pointCamera4 : Geometry.Vec4 = this.worldToCameraTransformation.multiplyFromRightByVector(pointWorld4);
+        public getPixelPosition(pointInWorldCoordinates:Geometry.Vec3):Geometry.Vec2 {
+            var pointWorld4:Geometry.Vec4 = pointInWorldCoordinates.toHomogenousPoint();
+            var pointCamera4:Geometry.Vec4 = this.worldToCameraTransformation.multiplyFromRightByVector(pointWorld4);
 
-            var res : Geometry.Vec2 = this.cscreen.projectPointToScreen(new Geometry.Vec3(
+            var res:Geometry.Vec2 = this.cscreen.projectPointToScreen(new Geometry.Vec3(
                 [pointCamera4.getElement(0), pointCamera4.getElement(1), pointCamera4.getElement(2)]));
 
             return res;
         }
 
 
-        private projectPolygon(polygon : Primitive.Polygon) : Primitive.Polygon {
-            var count : number = polygon.getSegmentCount();
-            var array : Geometry.Vec3[] = [];
+        private projectPolygon(polygon:Primitive.Polygon):Primitive.Polygon {
+            var count:number = polygon.getSegmentCount();
+            var array:Geometry.Vec3[] = [];
 
-            var buf : Geometry.Vec2;
-            var ptr : number = 0;
+            var buf:Geometry.Vec2;
+            var ptr:number = 0;
             for (var i = 0; i < count; i++) {
                 buf = this.getPixelPosition(polygon.getSegment(i));
                 if (buf != null) {
@@ -243,60 +243,55 @@ module Visualization {
             if (ptr < 2) {
                 return null;
             }
-            var array2 : Geometry.Vec3[] = [];
+            var array2:Geometry.Vec3[] = [];
             for (var i = 0; i < ptr; i++) {
                 array2[i] = array[i];
             }
             return new Primitive.Polygon(array2, polygon.getFormat());
         }
 
-        public toImage(image : Visualization.ISVG) : void {
-            if (this.world == null)
-            {
+        public toImage(image:Visualization.ISVG):void {
+            if (this.world == null) {
                 // throw new Exception("World must not be null!");
             }
-            if (image == null)
-            {
+            if (image == null) {
                 // throw new Exception("Image must not be null!");
             }
             image.setResolution(this.resolution);
-            var polygons : Primitive.Polygon[] = this.world.getPolygons();
-            var buf : Primitive.Polygon;
-            for (var i = 0; i < polygons.length; i++)
-            {
+            var polygons:Primitive.Polygon[] = this.world.getPolygons();
+            var buf:Primitive.Polygon;
+            for (var i = 0; i < polygons.length; i++) {
                 buf = this.projectPolygon(polygons[i]);
-                if (buf != null)
-                {
+                if (buf != null) {
                     image.addPolygon(buf);
                 }
             }
         }
 
 
-        public getResolution() : Geometry.Vec2 {
+        public getResolution():Geometry.Vec2 {
             return this.resolution;
         }
     }
 
     export class World {
-        private camera : Camera;
-        private polygons : Primitive.Polygon[] = [];
+        private camera:Camera;
+        private polygons:Primitive.Polygon[] = [];
 
-        constructor(camera : Camera) {
+        constructor(camera:Camera) {
             this.camera = camera;
             camera.setWorld(this);
         }
 
 
-        public addPolygon(polygon : Primitive.Polygon) : void {
-            if (polygon == null)
-            {
+        public addPolygon(polygon:Primitive.Polygon):void {
+            if (polygon == null) {
                 // throw new Exception("Polygon must not be null!");
             }
             this.polygons.push(polygon);
         }
 
-        public getPolygons() : Primitive.Polygon[] {
+        public getPolygons():Primitive.Polygon[] {
             return this.polygons;
         }
     }
