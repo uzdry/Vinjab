@@ -3,6 +3,39 @@
  */
 
 module Geometry {
+    export class ArrayNormalizer {
+        constructor () {
+        }
+
+        static normalize(array : number[], targetLength : number) : number[] {
+            if (array == null) {
+                var res = [];
+                for (var i = 0; i < targetLength; i++) {
+                    res.push(0.0);
+                }
+                return res;
+            } else if (array.length < targetLength) {
+                var res = [];
+                for (var i = 0; i < array.length; i++) {
+                    res.push(array[i]);
+                }
+                while (res.length < targetLength) {
+                    res.push(0.0);
+                }
+                return res;
+            } else if (array.length > targetLength) {
+                var res = [];
+                for (var i = 0; i < targetLength; i++) {
+                    res.push(array[i]);
+                }
+                return res;
+
+            } else {
+                return array;
+            }
+        }
+    }
+
     export class Angle {
         private radValue:number;
 
@@ -21,7 +54,7 @@ module Geometry {
         }
     }
 
-    enum Axis {
+    export enum Axis {
         x, y, z
     }
 
@@ -29,15 +62,8 @@ module Geometry {
         private values:number[];
 
         public constructor(values:number[]) {
-            if (values == null) {
-                // throw new Exception("Values must not be null!");
-            }
-            if (values.length != 4) {
-                // throw new Exception("The length of values must be 4!");
-            }
-            this.values = values;
+            this.values = ArrayNormalizer.normalize(values, 4);
         }
-
 
         public getElement(index:number):number {
             return this.values[index];
@@ -66,7 +92,7 @@ module Geometry {
         private values:number[];
 
         constructor(values:number[]) {
-            this.values = values;
+            this.values = ArrayNormalizer.normalize(values, 3);
         }
 
         public getElement(index:number):number {
@@ -159,45 +185,49 @@ module Geometry {
         private values:number[];
 
         constructor(values:number[]) {
-            this.values = values;
+            this.values = ArrayNormalizer.normalize(values, 9);
         }
 
         public static getSingleAxisRotationMatrix(rotation:Angle, axis:Axis):Mat3x3 {
+            var rotationBuf;
             if (rotation == null) {
-                // throw new Exception("Rotation must not be null!");
+                rotationBuf = new Geometry.Angle(0.0);
+            } else {
+                rotationBuf = rotation;
             }
 
-            var cos = Math.cos(rotation.getValueRad());
-            var sin = Math.sin(rotation.getValueRad());
+            var cos = Math.cos(rotationBuf.getValueRad());
+            var sin = Math.sin(rotationBuf.getValueRad());
 
             var values = [];
             for (var k = 0; k < 9; k++) {
                 values.push(0);
             }
 
-            if (axis == Axis.x) {
-                Mat3x3.setElementOfArray(values, 0, 0, 1);
-                Mat3x3.setElementOfArray(values, 1, 1, cos);
-                Mat3x3.setElementOfArray(values, 2, 2, cos);
-                Mat3x3.setElementOfArray(values, 2, 1, sin);
-                Mat3x3.setElementOfArray(values, 1, 2, -sin);
-            }
-            else if (axis == Axis.y) {
-                Mat3x3.setElementOfArray(values, 1, 1, 1);
-                Mat3x3.setElementOfArray(values, 0, 0, cos);
-                Mat3x3.setElementOfArray(values, 2, 2, cos);
-                Mat3x3.setElementOfArray(values, 0, 2, sin);
-                Mat3x3.setElementOfArray(values, 2, 0, -sin);
-            }
-            else if (axis == Axis.z) {
-                Mat3x3.setElementOfArray(values, 2, 2, 1);
-                Mat3x3.setElementOfArray(values, 0, 0, cos);
-                Mat3x3.setElementOfArray(values, 1, 1, cos);
-                Mat3x3.setElementOfArray(values, 1, 0, sin);
-                Mat3x3.setElementOfArray(values, 0, 1, -sin);
-            }
-            else {
-                // throw new Exception("Axis must be x, y or z!");
+            switch (axis) {
+                case Axis.x:
+                    Mat3x3.setElementOfArray(values, 0, 0, 1);
+                    Mat3x3.setElementOfArray(values, 1, 1, cos);
+                    Mat3x3.setElementOfArray(values, 2, 2, cos);
+                    Mat3x3.setElementOfArray(values, 2, 1, sin);
+                    Mat3x3.setElementOfArray(values, 1, 2, -sin);
+                    break;
+                case Axis.y:
+                    Mat3x3.setElementOfArray(values, 1, 1, 1);
+                    Mat3x3.setElementOfArray(values, 0, 0, cos);
+                    Mat3x3.setElementOfArray(values, 2, 2, cos);
+                    Mat3x3.setElementOfArray(values, 0, 2, sin);
+                    Mat3x3.setElementOfArray(values, 2, 0, -sin);
+                    break;
+                case Axis.z:
+                default:
+                    Mat3x3.setElementOfArray(values, 2, 2, 1);
+                    Mat3x3.setElementOfArray(values, 0, 0, cos);
+                    Mat3x3.setElementOfArray(values, 1, 1, cos);
+                    Mat3x3.setElementOfArray(values, 1, 0, sin);
+                    Mat3x3.setElementOfArray(values, 0, 1, -sin);
+                    break;
+
             }
 
             return new Mat3x3(values);
@@ -311,11 +341,13 @@ module Geometry {
         private values:number[];
 
         constructor(rotation:Mat3x3, translation:Vec3) {
+            var rotm = rotation;
+            var transv = translation;
             if (rotation == null) {
-                // throw new Exception("Rotation must not be null!");
+                rotm = new Mat3x3(null);
             }
             if (translation == null) {
-                // throw new Exception("Translation must not be null!");
+                transv = new Vec3(null);
             }
 
             this.values = [];
@@ -326,13 +358,13 @@ module Geometry {
 
             for (var i = 0; i < 3; i++) {
                 for (var j = 0; j < 3; j++) {
-                    var buf:number = rotation.getElement(i, j);
+                    var buf:number = rotm.getElement(i, j);
                     this.values[4 * i + j] = buf;
                 }
             }
 
             for (var k = 0; k < 3; k++) {
-                this.values[4 * k + 3] = translation.getElement(k);
+                this.values[4 * k + 3] = transv.getElement(k);
             }
 
             this.values[4 * 3 + 3] = 1;
@@ -345,12 +377,18 @@ module Geometry {
 
 
         public multiplyFromRightByVector(vector:Vec4):Vec4 {
+            var vector4;
+            if (vector != null) {
+                vector4 = vector;
+            } else {
+                vector4 = new Geometry.Vec4(null);
+            }
             var buf = [];
 
             for (var i = 0; i < 4; i++) {
                 buf[i] = 0;
                 for (var j = 0; j < 4; j++) {
-                    buf[i] += this.getElement(i, j) * vector.getElement(j);
+                    buf[i] += this.getElement(i, j) * vector4.getElement(j);
                 }
             }
             return new Vec4(buf);

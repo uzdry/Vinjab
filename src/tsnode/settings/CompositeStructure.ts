@@ -118,7 +118,7 @@ class SettingsDirectory implements SettingsNode{
         if (this.parent == this) {
             return this.ruid;
         }
-        return this.parent.getFullUid() + '/' + this.ruid;
+        return this.parent.getFullUid() + '.' + this.ruid;
     }
 
     /**
@@ -270,7 +270,7 @@ class SettingsParameter implements SettingsNode {
      * @returns {string} The unique ID of this parameter.
      */
     getFullUid() {
-        return this.parent.getFullUid() + '/' + this.ruid;
+        return this.parent.getFullUid() + '.' + this.ruid;
     }
 
     /**

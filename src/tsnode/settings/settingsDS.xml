@@ -1,6 +1,6 @@
 <!-- @Author: David G. -->
 <root>
-    <ruid>root</ruid>
+    <ruid>settings</ruid>
     <name>ROOT</name>
     <description>ROOT directory.</description>
     <imageURL>../../img/settings/directory.png</imageURL>
@@ -29,6 +29,26 @@
             <description>Das Verhältnis zwischen der Drehung des Lenkrads (in Grad) und die Drehung der Räder (in Grad).</description>
             <imageURL>../../img/settings/car/steeringratio.png</imageURL>
             <topicName>steeringratio</topicName>
+        </npar>
+        <npar>
+            <ruid>fueltankwarning</ruid>
+            <name>Tankreserve-Warnung</name>
+            <description>Gibt an, wann die Benachrichtigung, dass der Tank leer ist ausgelöst werden soll (in Litern).</description>
+            <imageURL>../../img/settings/car/fueltankwarning.png</imageURL>
+            <topicName>fueltankwarning</topicName>
+        </npar>
+    </dir>
+    <dir>
+        <ruid>database</ruid>
+        <name>Datenbank</name>
+        <description>Datenbankspezifische Einstellungen</description>
+        <imageURL>../../img/settings/database/database.png</imageURL>
+        <npar>
+            <ruid>dbcapacity</ruid>
+            <name>Maximale Datenbankgröße</name>
+            <description>Die maximale Anzahl von Datensätzen, die in der Datenbank gespeichert werden dürfen.</description>
+            <imageURL>../../img/settings/database/dbcapacity.png</imageURL>
+            <topicName>dbcapacity</topicName>
         </npar>
     </dir>
     <dir>
