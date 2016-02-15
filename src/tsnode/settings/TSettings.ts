@@ -383,7 +383,8 @@ class Communicator {
  */
 var div1 = document.getElementById("div1");
 var div2 = document.createElement("div");
-div2.style.height = "300px";
+div2.style.height = "500px";
+div2.style.padding = "20px";
 div1.appendChild(div2);
 Startup.initialize(div2);
 

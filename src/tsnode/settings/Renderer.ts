@@ -75,8 +75,8 @@ class TableFactory {
         td.style.width = "100px";
         var img = document.createElement('img');
         img.src = actualRowNode.getImageURL();
-        img.style.width = "100%";
-        img.style.height = "100%";
+        img.style.width = "100px";
+        img.style.height = "100px";
         td.appendChild(img);
         tr.appendChild(td);
 
