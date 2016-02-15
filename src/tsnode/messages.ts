@@ -10,7 +10,7 @@ class Topic {
 
     static SPEED =              new Topic("value.speed");
     static MAF =                new Topic("value.mass air flow");
-    static COOLANT_PRESSURE =   new Topic("value.coolant temperature");
+    static COOLANT_TEMP =       new Topic("value.coolant temperature");
     static FUEL_PRESSURE =      new Topic("value.fuel pressure");
     static RPM =                new Topic("value.RPM");
     static STEERING =           new Topic("value.steering");
@@ -46,7 +46,7 @@ class Topic {
 
     static VALUES: Topic[] = [     Topic.SPEED,
         Topic.MAF,
-        Topic.COOLANT_PRESSURE,
+        Topic.COOLANT_TEMP,
         Topic.FUEL_PRESSURE,
         Topic.RPM,
         Topic.STEERING,

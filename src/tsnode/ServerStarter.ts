@@ -6,13 +6,14 @@
 import levelup = require("levelup");
 import {Server} from "./Server";
 import {Broker} from "./Bus";
-import {Distance, FuelConsumption, AverageComputation} from "./AggregatedFunctions";
+import {Aggregation, Distance, FuelConsumption, AverageComputation} from "./AggregatedFunctions";
 import {Topic} from "./messages";
+import {BluetoothSim} from "./BluetoothSim";
 
 /**
  * this class is for starting a server
  */
-class SeverStarter {
+class ServerStarter {
 
     private db;
     private server;
@@ -20,7 +21,8 @@ class SeverStarter {
 
     private distance;
     private fuelConsumption;
-    private averageComputations: AverageComputation[];
+    private source;
+    private aggregations: Array<Aggregation>;
 
     /**
      * public constructor
@@ -32,17 +34,24 @@ class SeverStarter {
             this.db = db;
         });
 
+        this.aggregations = new Array<Aggregation>();
+
         this.server = new Server();
-        this.broker = new Broker();
 
         this.distance = new Distance();
         this.fuelConsumption = new FuelConsumption();
 
-        for(var topic in Topic.VALUES) {
-            var averageComputation = new AverageComputation(topic);
-            this.averageComputations.push(averageComputation);
-        }
+        this.source = new BluetoothSim();
+
+        this.aggregations.push(new FuelConsumption());
+        this.aggregations.push(new Distance());
+        this.aggregations.push(new AverageComputation(Topic.SPEED));
+        this.aggregations.push(new AverageComputation(Topic.FUEL_CONSUMPTION));
+
+        this.source.init();
 
     }
 
 }
+
+var serverstarter = new ServerStarter();
