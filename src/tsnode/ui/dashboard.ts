@@ -161,6 +161,7 @@ class Dashboard{
      */
     initTabs(){
         this.grid.gridster.disable();
+        this.grid.gridster.disable_resize();
         $( "#bDashboard" ).click(function() {
             $( "#dDashboard" ).show( "slow" );
             $( "#dSettings").hide("slow");

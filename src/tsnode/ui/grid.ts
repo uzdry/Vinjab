@@ -46,10 +46,12 @@ class Grid {
 
                     dashboard.grid.widgets[name].resize(size_x * dashboard.grid.cube_sizex, size_y * dashboard.grid.cube_sizey);
 
+                    $widget.children().show("fast");
+
                 }.bind(this),
 
                 start: function(e, ui, $widget) {
-                    console.log($widget);
+                    $widget.children().hide("fast");
                 }
             }
         }).data('gridster');
