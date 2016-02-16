@@ -18,24 +18,27 @@ class Distance extends Aggregation {
     private startTime: number;
 
     private lastTimeInMS: number;
-    private avg: number;
 
     constructor() {
         super();
-        this.lastTimeInMS = 0;
-        this.avg = 0;
+        this.currentValue = 0;
         this.startTime = Date.now();
+        this.lastTimeInMS = this.startTime;
         this.subscribe(Topic.SPEED);
     }
 
     public handleMessage(m: Message) {
         if ((m instanceof ValueMessage) && m.topic == Topic.SPEED) {
             var currentTime = Date.now();
-            var currentSpeed = m.value.value * 0.2777777778;
+            var currentSpeed = m.value.value * 0.2777777778; //speed in m/s
 
-            this.avg = (this.lastTimeInMS - this.startTime) * this.avg + (currentTime - this.lastTimeInMS) * currentSpeed;
+            var delta_t = (currentTime - this.lastTimeInMS) / 1000;
+
+            this.currentValue += delta_t * currentSpeed;
 
             this.lastTimeInMS = currentTime;
+
+            this.broker.handleMessage(new ValueMessage(Topic.MILEAGE, new Value(this.currentValue / 1000, "km")));
 
         }
     }
