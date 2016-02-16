@@ -85,7 +85,7 @@ class Grid {
             conf.size_x = parseInt(this.widgetsJQuery[v].attr("data-sizex"));
             conf.size_y = parseInt(this.widgetsJQuery[v].attr("data-sizey"));
             conf.name = this.widgetsJQuery[v][0].innerHTML.match("id=\"(.*?)\"")[1].split("-")[0];
-            conf.id = parseInt(this.widgetsJQuery[v][0].innerHTML.match("id=\"(.*?)\"")[1].split("-")[1]);
+            conf.valueID = this.widgetsJQuery[v][0].innerHTML.match("id=\"(.*?)\"")[1].split("-")[1];
 
             line += JSON.stringify(conf) + ",";
 

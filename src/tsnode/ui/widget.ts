@@ -46,7 +46,10 @@ abstract class Widget extends Backbone.View<DataModel> {
         if(subCounter <= 1){
             postal.channel("reqsubs").publish("stop." + this.model.get("tagName"), this.model.get("tagName"));
             this.model.destroy();
+        }else{
+            this.model.set("subCounter", --subCounter);
         }
+
     }
 
     abstract render();
@@ -80,5 +83,6 @@ class WidgetSerConfig{
     size_y: number;
     col: number;
     row: number;
+    valueID: string;
 
 }
