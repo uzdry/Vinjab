@@ -83,8 +83,8 @@ class PercentGaugeWidget extends Widget{
     }
 
     resize(size_x: number, size_y:number){
-        this.config.height = size_y;
-        this.config.width = size_x;
+        this.config.height = size_y*1.1;
+        this.config.width = size_x*1.1;
         this.gauge.updateConfig(this.config);
     }
 

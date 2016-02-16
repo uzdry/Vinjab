@@ -22,7 +22,7 @@ class LineChartWidget extends Widget{
     static widgetCounter: number = 0;
 
     /** Name of the Widget Type */
-    typeID: string = "LineChart";
+    typeID: string = "LineChartWidget";
 
     /** HTML-String that is pushed into the HTML-File */
     htmlElement: string;

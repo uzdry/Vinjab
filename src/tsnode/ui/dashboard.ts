@@ -61,6 +61,8 @@ class Dashboard{
         });
 
         this.button.onclick = this.addWidget.bind(this);
+
+        this.initTabs();
     }
 
     static getCookie(cname: string): string {
@@ -154,6 +156,41 @@ class Dashboard{
         });
     }
 
+    /**
+     * Initialise changing the dashboard
+     */
+    initTabs(){
+        this.grid.gridster.disable();
+        $( "#bDashboard" ).click(function() {
+            $( "#dDashboard" ).show( "slow" );
+            $( "#dSettings").hide("slow");
+            $( "#dEditMode").hide("slow");
+            $( "#dParkingSensor").hide("slow");
+            this.grid.gridster.disable();
+            this.grid.gridster.disable_resize();
+        }.bind(this));
+        $( "#bSettings" ).click(function() {
+            $( "#dDashboard" ).hide( "slow" );
+            $( "#dSettings").show("slow");
+            $( "#dEditMode").hide("slow");
+            $( "#dParkingSensor").hide("slow");
+        }.bind(this));
+        $( "#bEditMode" ).click(function() {
+            $( "#dDashboard" ).show( "slow" );
+            $( "#dSettings").hide("slow");
+            $( "#dEditMode").show("slow");
+            $( "#dParkingSensor").hide("slow");
+            this.grid.gridster.enable();
+            this.grid.gridster.enable_resize();
+        }.bind(this));
+        $( "#bParkingSensor").click(function() {
+            $( "#dDashboard" ).hide( "slow" );
+            $( "#dSettings").hide("slow");
+            $( "#dEditMode").hide("slow");
+            $( "#dParkingSensor").show("slow");
+        }.bind(this));
+    }
+
 }
 
 class DDSlickOptions{
@@ -171,6 +208,12 @@ dashboard.widgetFactory.addWidget(new TextWidgetConfig());
 dashboard.widgetFactory.addWidget(new PercentGaugeWidgetConfig());
 dashboard.widgetFactory.addWidget(new LineChartWidgetConfig());
 dashboard.widgetFactory.addWidget(new GoogleMapWidgetConfig());
+
+
+setTimeout(function(){
+    dashboard.grid.fromSerialized('[{"row":1,"col":5,"size_x":7,"size_y":7,"name":"SpeedGauge","valueID":"value.speed"},{"row":1,"col":1,"size_x":4,"size_y":4,"name":"PercentGauge","valueID":"value.speed"},{"row":1,"col":12,"size_x":4,"size_y":4,"name":"TextWidget","valueID":"value.mass air flow"}]');
+}, 1000);
+
 
 export {DDSlickOptions, Dashboard}
 //==========================

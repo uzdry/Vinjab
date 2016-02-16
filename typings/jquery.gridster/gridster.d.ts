@@ -299,6 +299,18 @@ interface Gridster {
 	disable(): Gridster;
 
     /**
+     * Enable resizing
+     * @return Returns the instance of the Gridster class.
+     */
+    disable_resize(): Gridster;
+
+    /**
+     * Disable resizing
+     * @return Returns the instance of the Gridster class.
+     */
+    enable_resize(): Gridster;
+
+    /**
     * Returns the options used to initialize the grid
     * @return Returns the options used to initialize the grid
     **/

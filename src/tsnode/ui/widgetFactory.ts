@@ -36,10 +36,10 @@ class WidgetFactory{
     createWidgetFromConfig(conf: WidgetSerConfig):Widget{
 
         //TODO Rebuild serialize-function to value.name something
-        //var model: DataModel = this.dataCollection.getOrCreate(conf.id);
+        var model: DataModel = this.dataCollection.getOrCreate({"tagName": conf.valueID});
+        var widget: Widget = this.createWidgetFromModel(conf.name, model);
 
-        //return this.createWidgetFromModel(conf.name, model);
-        return null;
+        return widget;
 
     }
 

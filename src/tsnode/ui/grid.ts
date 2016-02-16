@@ -46,8 +46,11 @@ class Grid {
 
                     dashboard.grid.widgets[name].resize(size_x * dashboard.grid.cube_sizex, size_y * dashboard.grid.cube_sizey);
 
-                    this.sendDashboardConfig();
-                }.bind(this)
+                }.bind(this),
+
+                start: function(e, ui, $widget) {
+                    console.log($widget);
+                }
             }
         }).data('gridster');
 
@@ -59,9 +62,14 @@ class Grid {
         widget.destroy();
     }
 
-    addWidget(widget: Widget){
+    addWidget(widget: Widget, size_x?:number, size_y?:number, col?:number, row?:number){
 
-        widget.htmlWrapper = this.gridster.add_widget(widget.htmlElement, 4, 4);
+        if (typeof size_x === 'undefined') { size_x = 4; }
+        if (typeof size_y === 'undefined') { size_y = 4; }
+        if (typeof col === 'undefined') { col = 0; }
+        if (typeof row === 'undefined') { row = 0; }
+
+        widget.htmlWrapper = this.gridster.add_widget(widget.htmlElement, size_x, size_y, col, row);
 
         this.widgetsJQuery[widget.widgetID]=widget.htmlWrapper;
 
@@ -101,10 +109,12 @@ class Grid {
 
         for(var w in widgets){
             // Create new Widget
-            var widget: Widget = this.widgetFactory.createWidgetFromConfig(widgets[w]);
+            var widget: Widget = this.widgetFactory.createWidget(widgets[w].name, widgets[w].valueID);
 
             // set
-            widget.htmlWrapper = this.gridster.add_widget(widget.htmlElement, widgets[w].size_x, widgets[w].size_y);
+            this.addWidget(widget, widgets[w].size_x, widgets[w].size_y, widgets[w].col, widgets[w].row);
+
+            widget.resize(this.cube_sizex * widgets[w].size_x, this.cube_sizey * widgets[w].size_y);
 
             this.widgetsJQuery[widget.widgetID]=widget.htmlWrapper;
             this.widgets[widget.widgetID]=widget;
