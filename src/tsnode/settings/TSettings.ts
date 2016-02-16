@@ -1,4 +1,4 @@
-///<reference path="S:\Program Files (x86)\JetBrains\WebStorm 11.0.3\plugins/JavaScriptLanguage/typescriptCompiler/external/lib.es6.d.ts"/>
+///<reference path="C:\Program Files (x86)\JetBrains\WebStorm 11.0.3\plugins/JavaScriptLanguage/typescriptCompiler/external/lib.es6.d.ts"/>
 
 /// <reference path="../../../typings/postal/postal.d.ts"/>
 /// <reference path="./Auxiliary.ts"/>
@@ -67,12 +67,12 @@ class ValueChangeListener {
      * Converts the internal to-be-written-to-the-database list of nodes to a settings message.
      * @returns {AuxiliarySettingsMessage} The settings message that can be sent directly to the database.
      */
-    public getSettingsWriteMessage() : AuxiliarySettingsMessage {
-        var auxiliaryMap = new AuxiliaryMap();
+    public getSettingsWriteMessage() : Auxiliary.AuxiliarySettingsMessage {
+        var auxiliaryMap = new Auxiliary.AuxiliaryMap();
         for (var i = 0; i < this.settingsNodes.length; i++) {
-            auxiliaryMap.set(this.settingsNodes[i].getTopic(), new Value(this.settingsNodes[i].getActualValue(), "ignoreME"));
+            auxiliaryMap.set(this.settingsNodes[i].getTopic(), new Auxiliary.Value(this.settingsNodes[i].getActualValue(), "ignoreME"));
         }
-        var auxiliarySettingsMessage = new AuxiliarySettingsMessage(auxiliaryMap);
+        var auxiliarySettingsMessage = new Auxiliary.AuxiliarySettingsMessage(auxiliaryMap);
         return auxiliarySettingsMessage;
     }
 }
@@ -174,7 +174,7 @@ class SCommunicator {
     private static parseNumericParameter(parameter : any, messageBuffer : MessageBuffer, valueChangeListener : ValueChangeListener, container : Node) {
         var topicName = SCommunicator.getValue('topicName', parameter);
 
-        var topic = new Topic(topicName);
+        var topic = new Auxiliary.Topic(topicName);
 
         var childPar = new SettingsParameter(SCommunicator.getValue("ruid", parameter), SCommunicator.getValue("name", parameter), SCommunicator.getValue("description", parameter),
             SCommunicator.getValue("imageURL", parameter), topic, valueChangeListener, messageBuffer.getValueOf(topic), container);
@@ -222,9 +222,9 @@ class SCommunicator {
 /**
  * A message buffer used to communicate with the server.
  */
-class MessageBuffer extends BusDevice {
+class MessageBuffer extends Auxiliary.BusDevice {
     private answersToReceive = 0;
-    private configs : AuxiliaryMap;
+    private configs : Auxiliary.AuxiliaryMap;
     private valueChangeListener : ValueChangeListener;
     private container : Node;
 
@@ -261,19 +261,19 @@ class MessageBuffer extends BusDevice {
      */
     sendDBRequest() : void {
         this.answersToReceive++;
-        Broker.get().subscribe(Topic.SETTINGS_MSG, this);
-        Broker.get().handleMessage(new DBRequestMessage(new DBSettingsRequest()));
+        Auxiliary.Broker.get().subscribe(Auxiliary.Topic.SETTINGS_MSG, this);
+        Auxiliary.Broker.get().handleMessage(new Auxiliary.DBRequestMessage(new Auxiliary.DBSettingsRequest()));
     }
 
     /**
      * Handles an incoming message from the server.
      * @param m The message that has been send by the server to this settings module.
      */
-    public handleMessage(m : Message) : void {
-        if (m.getTopic().equals(Topic.SETTINGS_MSG)) {
+    public handleMessage(m : Auxiliary.Message) : void {
+        if (m.getTopic().equals(Auxiliary.Topic.SETTINGS_MSG)) {
             if (this.answersToReceive > 0) {
                 this.answersToReceive--;
-                this.configs = (<AuxiliarySettingsMessage>m).getConfigs();
+                this.configs = (<Auxiliary.AuxiliarySettingsMessage>m).getConfigs();
                 this.onReceiveData();
             }
         }
@@ -284,7 +284,7 @@ class MessageBuffer extends BusDevice {
      * @param topic The topic of the specified parameter.
      * @returns {number} The numerical value of the specified parameter.
      */
-    getValueOf(topic : Topic) : number {
+    getValueOf(topic : Auxiliary.Topic) : number {
 
         var val1 = this.configs.get(topic);
         return this.configs.get(topic).numericalValue();
@@ -304,33 +304,33 @@ class MessageBuffer extends BusDevice {
 /**
  * A dummy database used only for test purposes to emulate the real database locally.
  */
-class DummyDatabase extends BusDevice {
+class DummyDatabase extends Auxiliary.BusDevice {
 
     /**
      * Creates a dummy database.
      */
     public constructor() {
         super();
-        this.subscribe(Topic.DBREQ_MSG);
+        this.subscribe(Auxiliary.Topic.DBREQ_MSG);
     }
 
     /**
      * Handles a message that has been sent to the database (this). Only Database request messages are supported.
      * @param m The message that has been sent to the database.
      */
-    public handleMessage(m : Message) : void {
-        var auxmap = new AuxiliaryMap();
-        var topic1 = new Topic('wheelbase');
-        auxmap.set(topic1, new Value(4000, 'valueName'));
-        var topic1 = new Topic('axletrack');
-        auxmap.set(topic1, new Value(1300, 'valueName'));
-        var topic1 = new Topic('steeringratio');
-        auxmap.set(topic1, new Value(20, 'valueName'));
-        var topic1 = new Topic('dbcapacity');
-        auxmap.set(topic1, new Value(999, 'valueName'));
-        var topic1 = new Topic('fueltankwarning');
-        auxmap.set(topic1, new Value(8, 'valueName'));
-        Broker.get().handleMessage(new AuxiliarySettingsMessage(auxmap));
+    public handleMessage(m : Auxiliary.Message) : void {
+        var auxmap = new Auxiliary.AuxiliaryMap();
+        var topic1 = new Auxiliary.Topic('wheelbase');
+        auxmap.set(topic1, new Auxiliary.Value(4000, 'valueName'));
+        var topic1 = new Auxiliary.Topic('axletrack');
+        auxmap.set(topic1, new Auxiliary.Value(1300, 'valueName'));
+        var topic1 = new Auxiliary.Topic('steeringratio');
+        auxmap.set(topic1, new Auxiliary.Value(20, 'valueName'));
+        var topic1 = new Auxiliary.Topic('dbcapacity');
+        auxmap.set(topic1, new Auxiliary.Value(999, 'valueName'));
+        var topic1 = new Auxiliary.Topic('fueltankwarning');
+        auxmap.set(topic1, new Auxiliary.Value(8, 'valueName'));
+        Auxiliary.Broker.get().handleMessage(new Auxiliary.AuxiliarySettingsMessage(auxmap));
     }
 }
 

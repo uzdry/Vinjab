@@ -219,7 +219,7 @@ class TableFactory {
         okbutton.onclick = function () {
             var message = valueChangeListener.getSettingsWriteMessage();
             root.actualValueStored();
-            Broker.get().handleMessage(message);
+            Auxiliary.Broker.get().handleMessage(message);
             TextDebugger.refreshData(null, container);
         };
 
