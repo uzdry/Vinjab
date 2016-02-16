@@ -36,9 +36,10 @@ class Dashboard{
 
 
     constructor(){
+
         this.dataCollection = new DataCollection();
         this.widgetFactory = new WidgetFactory(this.dataCollection, this);
-        this.grid = new Grid(this.widgetFactory, this);
+        this.grid = new Grid(this.widgetFactory);
 
         this.cookie = Dashboard.getCookie("user");
 
@@ -53,7 +54,7 @@ class Dashboard{
         postal.channel("value")
 
         $(document).on( "click", ".gridster ul li", function() {
-            if(document.getElementById("cDeleteMode").checked) {
+            if((<HTMLInputElement>document.getElementById("cDeleteMode")).checked) {
                 $(this).addClass("activ");
                 dashboard.grid.gridster.remove_widget($('.activ'));
                 dashboard.grid.removeWidget(this.children[0].getAttribute("id"));
@@ -65,6 +66,11 @@ class Dashboard{
         this.initTabs();
     }
 
+    /**
+     * Returns a certain cookie
+     * @param cname the cookie to look for
+     * @returns {string} value of the cookie
+     */
     static getCookie(cname: string): string {
         var name = cname + "=";
         var ca = document.cookie.split(';');
@@ -76,6 +82,10 @@ class Dashboard{
         return "";
     }
 
+    /**
+     * Creates a random five digit id
+     * @returns {string} five digit id
+     */
     static makeid()
     {
         var text = "";
@@ -194,10 +204,17 @@ class Dashboard{
 
 }
 
+/**
+ * Class to be used as the options of the ddslick selector
+ */
 class DDSlickOptions{
+    /** the shown text */
     text:string;
+    /** the returned value */
     value:string;
+    /** the shown description */
     description:string;
+    /** the shown picture for each option */
     imageSrc:string;
 }
 

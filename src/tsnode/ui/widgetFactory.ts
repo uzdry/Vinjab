@@ -32,29 +32,15 @@ class WidgetFactory{
         this.getSignalsInit();
     }
 
-    /** Creates widget from the serialized config */
-    createWidgetFromConfig(conf: WidgetSerConfig):Widget{
 
-        //TODO Rebuild serialize-function to value.name something
-        var model: DataModel = this.dataCollection.getOrCreate({"tagName": conf.valueID});
-        var widget: Widget = this.createWidgetFromModel(conf.name, model);
-
-        return widget;
-
-    }
-
-    /** creates Widget from already existing model */
-    createWidgetFromModel(widgetTagName: string, model :DataModel, options?):Widget{
-        var widgetConfig = this.widgetConfigurations[widgetTagName];
-
-        if( widgetConfig != null){
-            var widget: Widget = widgetConfig.newInstance({model: model});
-            return widget;
-        }
-    }
-
-    /** Creates widget by the signalNumber */
-    createWidget(widgetTagName: string, signal: string, options?){
+    /**
+     * Creates and returns a widget
+     * @param widgetTagName The name of the widget-type
+     * @param signal The name of the signal, usually value.something
+     * @param options Further options, for example for the BackboneJS.View class
+     * @returns {Widget} The created Widget
+     */
+    createWidget(widgetTagName: string, signal: string, options?): Widget{
         var widgetConfig = this.widgetConfigurations[widgetTagName];
         var signalConfig = this.signalsDesc[signal];
         var model: Model = this.dataCollection.getOrCreate(signalConfig);
@@ -70,23 +56,36 @@ class WidgetFactory{
         return null;
     }
 
-    /** Adds a widget prototype */
+    /**
+     * Doesn't add a widget perse, but the option of a widget,
+     * to be used by several values
+     * @param widgetConfig The config thats to be used
+     */
     addWidget(widgetConfig: WidgetConfig){
         this.widgetConfigurations[widgetConfig.type_name] = widgetConfig;
         this.dashboard.updateWidgetSelector(this.widgetConfigurations);
     }
 
-    /** Get all available widget options */
+    /**
+     * Return all the available widget options
+     * @returns {{}} A map of the options
+     */
     getOptions():{ [id: string] : WidgetConfig;}{
         return this.widgetConfigurations;
     }
 
+    /**
+     * Returns all the available signal options
+     * @returns {{}} A map of the options
+     */
     getSignals():{[id: string]: SignalDescription;}{
         if(!this.signalsReady) return null;
         return this.signalsDesc;
     }
 
-    /** Decode all possible signals */
+    /**
+     * Is used to initiate the decoding of available Signals
+     */
     private getSignalsInit(){
         var xhttp = new XMLHttpRequest();
 
@@ -101,7 +100,10 @@ class WidgetFactory{
 
     }
 
-    /** Decode all signals */
+    /**
+     * Decodes XML-File
+     * @param xhttp the XHTTP-Request
+     */
     signal(xhttp: XMLHttpRequest){
         var xmlDoc = xhttp.responseXML;
         var elements = xmlDoc.getElementsByTagName("signal");
@@ -123,7 +125,9 @@ class WidgetFactory{
 
 }
 
-/** The description of a Signal */
+/** The description of a Signal
+ * Gets used to keep all available signals in a map
+ */
 class SignalDescription{
 
     tagName: string;

@@ -3,7 +3,9 @@
 
 abstract class Widget extends Backbone.View<DataModel> {
 
-    /** Widget ID */
+    /** Widget ID
+     * The name of the widget
+     * This equals the ID of the HTML-Element*/
     widgetID: string;
 
     /** Name of the Widget Type */
@@ -15,31 +17,63 @@ abstract class Widget extends Backbone.View<DataModel> {
     /** HTML Grid wrapper */
     htmlWrapper: JQuery;
 
-    /** update the shown value */
+    /**
+     * Update the shown value.
+     * This function is mainly called by the assigned model
+     * @param value
+     */
     abstract updateValue(value: number|boolean);
 
     /** initialise the widget */
     abstract init();
 
-    /** constructor */
+    /**
+     * Gets called by backbone shortly after the constructor.
+     * Is supposed to be used for assigning a listenTo function.
+     */
+    abstract initialize();
+
+    /**
+     * Widgets are Elements that are to be shown inside the grid, but may also be used outside of them.
+     * Extends Backbone View
+     * @param options Options according to the BackboneJS specifics
+     */
     constructor(options?){
         super(options);
     }
 
-    /** Resize the widgets
-     * attributes are the size in pixels*/
+    /**
+     * Gets called when the widget is resized inside of the grid.
+     * But may also be used outside of it for resizing the widget.
+     * @param size_x New size in pixels in x direction
+     * @param size_y New size in pixels in y direction
+     */
     abstract resize(size_x: number, size_y: number);
 
+    /**
+     * Overwrites the backbone function
+     * Helps to keep track of the number of the subscribers to a model.
+     * If this is the first subscriber of that value
+     * @param object The Object or model to listen to
+     * @param events The exact event to listen for
+     * @param callback The function that is to be called if event happens
+     */
     listenTo(object: any, events: string, callback: Function): any{
         super.listenTo(object, events, callback);
         var subCounter = this.model.get("subCounter");
-        if(subCounter <= 0){
+        if(subCounter <= 0 || subCounter === undefined){
             postal.channel("reqsubs").publish("request." + this.model.get("tagName"), this.model.get("tagName"))
+            subCounter = 0;
         }
         this.model.set("subCounter", ++subCounter);
     }
 
-    /** Should only be called before destroying the Widget */
+    /**
+     * Overwrites the backbone function
+     * Helps to keep track of the number of the subscribers of a model
+     * If the number of subscribers of that model sinks below 1 it gets destroyed.
+     * @param object the object to stop listening to
+     */
     stopListening(object: any){
         super.stopListening(object);
         var subCounter = this.model.get("subCounter");
@@ -52,30 +86,45 @@ abstract class Widget extends Backbone.View<DataModel> {
 
     }
 
+    /**
+     * Gets called if the value in the model is updated
+     */
     abstract render();
 
+    /**
+     * Is used to destroy the Widget
+     */
     destroy(){
         this.stopListening(this.model);
     }
 
 }
 
+/**
+ * The configuration of a widget that is used to add the Widget to the WidgetFactory options
+ */
 interface WidgetConfig {
-    // Same stuff here as with datasource plugin.
-    "type_name"   : string; // "my_widget_plugin",
-    "display_name"?: string; // "Widget Plugin Example",
-    "description"? : string; // "Some sort of description <strong>with optional html!</strong>",
+    /** The shown name of the WidgetOption */
+    "type_name"   : string;
+    /** Another possible shown name */
+    "display_name"?: string;
+    /** An optional description of the widget */
+    "description"? : string;
 
-    // **external_scripts** : Any external scripts that should be loaded before the plugin instance is created.
-    "external_scripts"?: string[]; // "http://mydomain.com/myscript1.js", "http://mydomain.com/myscript2.js"
-
-    // Possible Image source
+    /** Possible Image as option image */
     "img_src"?: string;
 
-    // Same as with datasource plugin, but there is no updateCallback parameter in this case.
+    /**
+     * Is used to create a new Widget
+     * usually only calls "new ...Widget(config)"
+     * @param config Configuration of that widget
+     */
     newInstance(config): Widget;
 }
 
+/**
+ * Class that is used to build the serializable-feature
+ */
 class WidgetSerConfig{
 
     name: string;

@@ -6,6 +6,7 @@
 
 import {WidgetFactory} from "./widgetFactory";
 import {Dashboard} from "./dashboard";
+
 class Grid {
 
     /** gridster instance */
@@ -15,19 +16,22 @@ class Grid {
     cube_sizex = 50;
     cube_sizey = 50;
 
-    // Widgets in JQuery style
+    /** All the widgets in JQuery Object for possible later use */
     widgetsJQuery: {[id: string]: JQuery; } = {};
 
-    // widgets as Widget Class
+    /** All the widgets as Widget Object for possible later use*/
     widgets: {[id: string]: Widget; } = {};
 
+    /** Used WidgetFactory */
     widgetFactory: WidgetFactory;
-    dashboard: Dashboard;
 
-    constructor(factory: WidgetFactory, dashboard: Dashboard){
+    /**
+     * The grid is used to display all widgets
+     * @param factory The widget factory that is to be used by the grid
+     */
+    constructor(factory: WidgetFactory){
 
         // Save the Objects for later use
-        this.dashboard = dashboard;
         this.widgetFactory = factory;
 
         // Create the gridster instance
@@ -44,13 +48,15 @@ class Grid {
                     var size_y:number = parseInt(outerHTML.match("data-sizey=\"(.*?)\"")[1]);
                     var name:string = outerHTML.match("id=\"(.*?)\"")[1];
 
-                    dashboard.grid.widgets[name].resize(size_x * dashboard.grid.cube_sizex, size_y * dashboard.grid.cube_sizey);
+                    this.widgets[name].resize(size_x * this.cube_sizex, size_y * this.cube_sizey);
 
+                    // Show the children again
                     $widget.children().show("fast");
 
                 }.bind(this),
 
                 start: function(e, ui, $widget) {
+                    // Hide the widget until the resizing stops
                     $widget.children().hide("fast");
                 }
             }
@@ -59,12 +65,26 @@ class Grid {
 
     }
 
+    /**
+     * Remove and destroy a widget from the Grid
+     * @param id the identifier of the to be deleted widget
+     */
     removeWidget(id: string){
         var widget: Widget = this.widgets[id];
+        this.widgets[id].remove();
         widget.destroy();
     }
 
-    addWidget(widget: Widget, size_x?:number, size_y?:number, col?:number, row?:number){
+    /**
+     * Adds a new Widget to the grid
+     * @param widget the widget to add
+     * @param size_x Optional size of the widget in number of cubes in x-direction, default: 4
+     * @param size_y Optional size of the widget in number of cubes in y-direction, default: 4
+     * @param col Optional column number , default: 0
+     * @param row Optional row number, default: 0
+     * @return The added widget to connect function calls
+     */
+    addWidget(widget: Widget, size_x?:number, size_y?:number, col?:number, row?:number): Widget{
 
         if (typeof size_x === 'undefined') { size_x = 4; }
         if (typeof size_y === 'undefined') { size_y = 4; }
@@ -81,8 +101,14 @@ class Grid {
 
         console.log(this.serialize());
 
+        return widget;
+
     }
 
+    /**
+     * Serializes whole grid
+     * @returns {string} A stringified Array of WidgetSerConfig Objects
+     */
     serialize(): string{
 
         var line: string = "[";
@@ -106,6 +132,10 @@ class Grid {
         return line;
     }
 
+    /**
+     * Fills the Grid from a string
+     * @param s A string of WidgetSerConfig objects
+     */
     fromSerialized(s: string){
         var widgets: WidgetSerConfig[] = <WidgetSerConfig[]> JSON.parse(s);
 
