@@ -1,6 +1,5 @@
-///reference path="./typings/jasmine/jasmine.d.ts"/>
-///reference path="../typings/tsd.d.ts"/>
-///reference path="../levelup.d.ts"/>
+///<reference path="./typings/jasmine/jasmine.d.ts"/>
+///<reference path="../levelup.d.ts"/>
 
 import{DBBusDevice} from "../src/tsnode/DBAccess";
 import * as msg from "../src/tsnode/messages";
