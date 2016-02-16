@@ -14,26 +14,29 @@ class Aggregation extends BusDevice {
 
 class Distance extends Aggregation {
     private currentDistanceInMeters: number;
+
+    private startTime: number;
+
     private lastTimeInMS: number;
-    private lastSpeedInMpS: number;
+    private avg: number;
 
     constructor() {
         super();
-        this.currentValue = 0;
         this.lastTimeInMS = 0;
-        this.lastSpeedInMpS = 0;
+        this.avg = 0;
+        this.startTime = Date.now();
         this.subscribe(Topic.SPEED);
     }
 
     public handleMessage(m: Message) {
-        if ((m instanceof ValueMessage) && m.getTopic() == Topic.SPEED) {
+        if ((m instanceof ValueMessage) && m.topic == Topic.SPEED) {
             var currentTime = Date.now();
-            var currentSpeed = m.value.numericalValue() * 0.2777777778;
-            var avgSpeed = 0.5 * this.lastSpeedInMpS + currentSpeed;
-            this.currentValue += (currentTime - this.lastTimeInMS) * 0.001 * avgSpeed;
+            var currentSpeed = m.value.value * 0.2777777778;
+
+            this.avg = (this.lastTimeInMS - this.startTime) * this.avg + (currentTime - this.lastTimeInMS) * currentSpeed;
+
             this.lastTimeInMS = currentTime;
-            this.lastSpeedInMpS = m.value.value;
-            this.broker.handleMessage(new ValueMessage(Topic.MILEAGE, new Value(this.currentValue, "meters")));
+
         }
     }
 }
@@ -87,26 +90,39 @@ class Distance extends Aggregation {
 class AverageComputation extends Aggregation {
     avgOf: Topic;
 
-    avg: number;
-    numberOfValues: number;
+    private startTime: number;
+
+    private lastTimeInMS: number;
+    private avg: number;
+
 
     constructor(t: Topic) {
         super();
         this.avgOf = t;
         this.avg = 0;
-        this.numberOfValues = 0;
+        this.startTime = Date.now();
+        this.lastTimeInMS = this.startTime;
         this.subscribe(t);
     }
 
     public handleMessage(m: Message): void {
         if (m instanceof ValueMessage) {
             if (m.topic.equals(this.avgOf)) {
-                this.numberOfValues++;
-                this.currentValue = this.currentValue * (1-(1/this.numberOfValues)) + m.value.value / this.numberOfValues;
+                var currentTime = Date.now();
+                var currentValue = m.value.value;
+
+                var denom = (currentTime - this.startTime);
+
+                this.avg = ((this.lastTimeInMS - this.startTime) * this.avg + (currentTime - this.lastTimeInMS) * currentValue) / denom;
+
+                this.lastTimeInMS = currentTime;
+
+
                 var i = m.topic.name.indexOf(".");
                 var l = m.topic.name.length;
                 // pushes avg on bus. uses appropriate Topic name
-                this.broker.handleMessage(new ValueMessage(new Topic(m.topic.name.substring(0, i) + ".avg" + m.topic.name.substring(i, l)), new Value(this.currentValue, m.value.identifier)));
+              //  console.log(m.topic.name.substring(0, i) + ".avg" + m.topic.name.substring(i, l) + this.avg);
+                this.broker.handleMessage(new ValueMessage(new Topic(m.topic.name.substring(0, i) + ".avg" + m.topic.name.substring(i, l)), new Value(this.avg, m.value.identifier)));
             }
         }
     }
@@ -136,13 +152,14 @@ class FuelConsumption extends Aggregation {
         if (m instanceof ValueMessage) {
             // Mass Air Flow in gramms per second
             if (m.topic.equals(Topic.MAF)) {
-                var maf = m.value.numericalValue();
+                var maf = m.value.value;
                 this.lph = (maf / 14.7 / 750) * 3600; //liter
             }
             // vehicle speed
             else {
                 if (m.topic.equals(Topic.SPEED)) {
-                    this.lphkm = this.lph / this.speed;
+                    this.speed = m.value.value;
+                    this.lphkm = (this.lph / this.speed) * 100;
                 }
             }
         }
