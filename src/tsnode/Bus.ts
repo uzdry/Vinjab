@@ -1,11 +1,10 @@
-///<reference path="/Applications/WebStorm.app/Contents/plugins/JavaScriptLanguage/typescriptCompiler/external/lib.es6.d.ts"/>
 
 ///<reference path="../../typings/node/node.d.ts"/>
 
 import * as Msg from "./messages"
 
 
-//A BusDevice has acces to the Bus
+//A BusDevice has access to the Bus
 class BusDevice {
     broker:Broker;
     id:number;
@@ -50,10 +49,13 @@ class Broker {
 
 
     private static instance:Broker;
-    private subscribers: Map<string, Set<BusDevice>>;
+  //  private subs: Map<string, Set<BusDevice>>;
+    private subscribers: { [path:string]:Array<BusDevice>; };
 
     constructor() {
-        this.subscribers = new Map<string, Set<BusDevice>>();
+     //   this.subs = new Map<string, Set<BusDevice>>();
+        this.subscribers = {};
+
     }
 
     public static get():Broker {
@@ -69,21 +71,30 @@ class Broker {
 
 
     public subscribe(topic:string, sub:BusDevice):void {
-        if (this.subscribers.get(topic) == null) {
-            this.subscribers.set(topic, new Set<BusDevice>());
+        if (!this.subscribers[topic]) {
+            this.subscribers[topic] = new Array<BusDevice>();
             console.log('Set created: ' + topic + " " + sub.constructor.name);
         }
-        this.subscribers.get(topic).add(sub);
+        this.subscribers[topic].push(sub);
     }
 
     public unsubscribe(topic:string, sub:BusDevice):void {
 
-        this.subscribers.get(topic).delete(sub);
+    //    this.subscribers.get(topic).delete(sub);
+
+        var subsOfTopic = this.subscribers[topic];
+
+        if(!this.subscribers[topic]) {
+            return;
+        }
+
+        var i = this.subscribers[topic].indexOf(sub);
+        this.subscribers[topic].splice(i,1);
 
     }
 
     private distribute(m:Msg.Message) {
-        if (this.subscribers.get(m.topic.name) == null) {
+       /* if (this.subscribers.get(m.topic.name) == null) {
             return;
         }
 
@@ -92,10 +103,17 @@ class Broker {
         var x;
         while((x = iter.next().value) != null) {
             x[0].handleMessage(m);
+        }*/
+
+        if (!this.subscribers[m.topic.name]) {
+            return;
+        }
+
+        for (var i = 0; i < this.subscribers[m.topic.name].length; i++) {
+            this.subscribers[m.topic.name][i].handleMessage(m);
         }
 
     }
 }
-
 
 export {BusDevice, Broker};

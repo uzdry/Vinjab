@@ -3,6 +3,7 @@
  */
 
 ///<reference path="./../../src/tsnode/parkingsensor/Geometry.ts"/>
+///<reference path="../typings/jasmine/jasmine.d.ts"/>
 
 describe("Geometry", function () {
     it("ArrayNormalizer - Tests the Array Normalizer constructor", function () {

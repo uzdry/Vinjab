@@ -227,13 +227,14 @@ class LevelDBAccess {
       * @param k: The key of the entry to be deleted.
      */
     protected deleteFromKey(k: any) {
-        this.db.get(k, function(value, err) {
+        this.db.get(k, function(err, value) {
             if(err && !err.notFound) {
                 console.log(err);
+            } else if(err && err.notFound) {
             } else {
                 this.db.del(k);
             }
-        });
+        }.bind(this));
     }
 
     /**
@@ -274,12 +275,12 @@ class LevelDBAccess {
     public getEntries(topicID: string, drivenr: number, beginDate: number, endDate: number, callback) {
         var listOfKeys: ValueEntryKey[] = [];
         var listOfEntries: SensorValueEntry[] = [];
-        if(drivenr >= 0) { //TODO: test for string comparison in utf8
+        if(drivenr >= 0) {
             var lte = JSON.stringify(new ValueEntryKey(drivenr, new Date(endDate)));
             var gte = JSON.stringify(new ValueEntryKey(drivenr, new Date(beginDate)));
-        } else {
+        } else if(drivenr == -1) {
             var lte = JSON.stringify(new ValueEntryKey(this.DBInfo.currentDrive, new Date(endDate)));
-            var gte = JSON.stringify(new ValueEntryKey(-1, new Date(beginDate)));
+            var gte = JSON.stringify(new ValueEntryKey(this.DBInfo.currentDrive, new Date(beginDate)));
         }
         this.db.createReadStream({gte: gte, lte: lte}).on('data', function (data) {
             var parsed = JSON.parse(data.key);
@@ -290,9 +291,9 @@ class LevelDBAccess {
                     listOfEntries[listOfEntries.length] = sve;
                 }
             }
-        }).on('end', function () {
+        }.bind(this)).on('end', function () {
                 callback(listOfEntries, listOfKeys);
-            });
+            }.bind(this));
     }
 
     /**
@@ -302,23 +303,25 @@ class LevelDBAccess {
      * @param callback: The callback function, to which the UserInfoEntry is returned.
      */
     public getDriverEntry(userID: string, callback) {
-        this.db.get(userID, function(value, err) {
-            if(err.notFound) {
-                var standardConfig: string = '[{"row":1,"col":1,"size_x":4,"size_y":4,"name":' +
-                    '"SpeedGauge","id":140},{"row":1,"col":5,"size_x":3,"size_y":3,' +
-                    '"name":"PercentGauge","id":150},{"row":1,"col":8,"size_x":4,"size_y":4,' +
-                    '"name":"PercentGauge","id":350}]';
-                this.dbAccess.putUserInfo(userID, standardConfig, function(err) {
+        this.db.get(userID, function(err, value) {
+            if(err) {
+                if(err.notFound) {
+                    var standardConfig: string = '[{"row":1,"col":5,"size_x":7,"size_y":7,"name":"SpeedGauge",' +
+                        '"valueID":"value.speed"},{"row":1,"col":1,"size_x":4,"size_y":4,"name":"PercentGauge",' +
+                        '"valueID":"value.speed"},{"row":1,"col":12,"size_x":4,"size_y":4,"name":"TextWidget",' +
+                        '"valueID":"value.mass air flow"}]';
+                    this.putUserInfo(userID, standardConfig, function(err) {
+                        if(err) console.log(err);
+                    });
+                    callback(new UserInfoEntry(standardConfig));
+                } else {
                     console.log(err);
-                });
-                callback(new UserInfoEntry(standardConfig));
-            } else if (err) {
-                console.log(err);
+                }
             } else {
                 var dr = new UserInfoEntry(JSON.parse(value).dashboardConfig);
                 callback(dr);
             }
-        })
+        }.bind(this));
     }
 }
 
@@ -348,9 +351,10 @@ class DBBusDevice extends BusDevice {
      * drive begin) to the Bus.
      * @param content: The array of SensorValueEntries to be sent
      * @param times: The array of corresponding timestamps to be sent
+     * @param topic: The Topic of the contained values
      */
-    private sendValueMessage(content: SensorValueEntry[], times: number[]) {
-        this.broker.handleMessage(new ValueAnswerMessage(times, content));
+    private sendValueMessage(topic: Topic, content: SensorValueEntry[], times: number[]) {
+        this.broker.handleMessage(new ValueAnswerMessage(topic, times, content));
     }
 
     /**
@@ -373,7 +377,7 @@ class DBBusDevice extends BusDevice {
             //handling of a Value Request: Values are fetched from the DB and a value response is sent
             var dbValueReq = <DBRequestMessage> m;
             this.dbAccess.getEntries(dbValueReq.reqTopic.getName(), dbValueReq.driveNr, dbValueReq.beginDate.getDate(), dbValueReq.endDate.getDate(), function(res, tim){
-                this.sendValueMessage(res, tim);
+                this.sendValueMessage(dbValueReq.reqTopic, res, tim);
             }.bind(this));
         }
 
@@ -387,7 +391,7 @@ class DBBusDevice extends BusDevice {
             var dbm = <DashboardMessage> m;
             if(dbm.request) {
                 this.dbAccess.getDriverEntry(dbm.user, function(value) {
-                    this.sendDashboardRspMessage(value.dashboardConfig);
+                    this.sendDashboardRspMessage(dbm.user, value.dashboardConfig);
                 }.bind(this));
                 this.broker.handleMessage(new ReplayInfoMessage(this.dbAccess.replayInfo.finishTime));
             } else {

@@ -9,6 +9,7 @@ import {Broker} from "./Bus";
 import {Aggregation, Distance, FuelConsumption, AverageComputation} from "./AggregatedFunctions";
 import {Topic} from "./messages";
 import {BluetoothSim} from "./BluetoothSim";
+import {DBBusDevice} from "./DBAccess";
 
 /**
  * this class is for starting a server
@@ -29,10 +30,7 @@ class ServerStarter {
      */
     constructor() {
 
-        this.db = levelup('./testDB', function(err, db) {
-            if (err) console.log("Error in opening the Database: " + err);
-            this.db = db;
-        });
+        this.db = new DBBusDevice();
 
         this.aggregations = new Array<Aggregation>();
 
