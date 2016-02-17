@@ -14,7 +14,7 @@ import {Terminal} from "../Terminal"
 import {DashboardMessage} from "../messages";
 import {WidgetFactory, SignalDescription} from "./widgetFactory";
 import {Grid} from "./grid";
-//import {GoogleMapWidgetConfig} from "./Map";
+import {GoogleMapWidgetConfig} from "./Map";
 
 class Dashboard{
     /** MVC Stuff */
@@ -228,7 +228,7 @@ dashboard.widgetFactory.addWidget(new SpeedGaugeWidgetConfig());
 dashboard.widgetFactory.addWidget(new TextWidgetConfig());
 dashboard.widgetFactory.addWidget(new PercentGaugeWidgetConfig());
 dashboard.widgetFactory.addWidget(new LineChartWidgetConfig());
-//dashboard.widgetFactory.addWidget(new GoogleMapWidgetConfig());
+dashboard.widgetFactory.addWidget(new GoogleMapWidgetConfig());
 
 
 //setTimeout(function(){

@@ -234,7 +234,7 @@ class LevelDBAccess {
             } else {
                 this.db.del(k);
             }
-        });
+        }.bind(this));
     }
 
     /**
