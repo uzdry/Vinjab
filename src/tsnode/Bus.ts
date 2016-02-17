@@ -1,11 +1,10 @@
-/// <reference path ="C:\Program Files (x86)\JetBrains\WebStorm 11.0.3\plugins\JavaScriptLanguage\typescriptCompiler\external\lib.es6.d.ts"/>
 
 ///<reference path="../../typings/node/node.d.ts"/>
 
 import * as Msg from "./messages"
 
 
-//A BusDevice has acces to the Bus
+//A BusDevice has access to the Bus
 class BusDevice {
     broker:Broker;
     id:number;

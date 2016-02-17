@@ -64,7 +64,8 @@ class TextWidget extends Widget{
     render():TextWidget{
         this.value = this.model.get("value");
 
-        this.htmlText.innerHTML = '<li><span>x</span><br ><br ><br ><br ><br >'+ this.model.get("name") + '<br >' + this.value + '</li>';
+        this.htmlText.innerHTML = '<li><span>x</span><br ><br ><br ><br ><br >'+ this.model.get("name") +
+            '<br >' + this.value + '</li>';
 
         return this;
     }

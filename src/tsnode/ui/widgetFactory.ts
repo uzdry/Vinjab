@@ -46,7 +46,7 @@ class WidgetFactory{
         var model: Model = this.dataCollection.getOrCreate(signalConfig);
 
         model.set({name: signalConfig.name, description: signalConfig.description,
-            maxValue: signalConfig.maxValue, minValue: signalConfig.minValue});
+            maxValue: signalConfig.maxValue, minValue: signalConfig.minValue, ticks:signalConfig.ticks});
 
         if(widgetConfig != null){
             var widget: Widget = widgetConfig.newInstance({model: model});
@@ -117,7 +117,24 @@ class WidgetFactory{
             var maxValue: number = parseInt(elements[i].getElementsByTagName("maxValue")[0].textContent);
             var minValue: number = parseInt(elements[i].getElementsByTagName("minValue")[0].textContent);
             var desc: string = elements[i].getElementsByTagName("description")[0].textContent;
-            this.signalsDesc[tagName] = new SignalDescription(name, tagName, maxValue, minValue, desc);
+            var tickse = elements[i].getElementsByTagName("ticks");
+            var ticksv;
+            var ticks = new Array<string>();
+
+
+            if (!tickse[0]) {
+
+            } else {
+                ticksv = tickse[0].getElementsByTagName("tick");
+                if (ticksv) {
+                    for (var i = 0; i < ticksv.length; i++) {
+                        ticks.push(ticksv[i].innerHTML);
+                    }
+                }
+
+                console.log(ticksv);
+            }
+            this.signalsDesc[tagName] = new SignalDescription(name, tagName, maxValue, minValue, desc, ticks);
         }
         this.dashboard.updateSignalSelector(this.signalsDesc);
     }
@@ -135,14 +152,17 @@ class SignalDescription{
     maxValue: number;
     minValue: number;
     description: string;
+    ticks: string[];
+    highlight;
 
 
-    constructor(name:string, tagName: string, maxValue:number, minValue:number, description:string) {
+    constructor(name:string, tagName: string, maxValue:number, minValue:number, description:string, ticks:string[]) {
         this.tagName = tagName;
         this.name = name;
         this.maxValue = maxValue;
         this.minValue = minValue;
         this.description = description;
+        this.ticks = ticks;
     }
 }
 

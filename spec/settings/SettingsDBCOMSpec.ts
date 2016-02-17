@@ -4,6 +4,7 @@ import LowLevelDatabaseEmulator = SettingsDBCOM.LowLevelDatabaseEmulator;
  */
 
 ///<reference path="./../../src/tsnode/settings/SettingsDBCOM.ts"/>
+///<reference path="../typings/jasmine/jasmine.d.ts"/>
 
 describe("SettingsDBCOM", function () {
     it("SettingsValue - Tests the SettingsValue constructor", function () {

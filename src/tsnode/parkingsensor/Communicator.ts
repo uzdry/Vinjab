@@ -8,7 +8,6 @@ class Communicator {
     private mychannel;
     public subscribe() : void {
         this.mychannel = postal.channel("values");
-
         this.mychannel.subscribe("value.steering", this.onMessageReceived.bind(this));
     }
 

@@ -42,7 +42,7 @@ class SpeedGaugeWidget extends Widget{
         title: false,
         minValue: 0,
         maxValue: 220,
-        majorTicks: ['0', '20', '40', '60', '80', '100', '120', '140', '160', '180', '200', '220'],
+        majorTicks: [],
         minorTicks: 2,
         strokeTicks: false,
         highlights: [
@@ -81,13 +81,23 @@ class SpeedGaugeWidget extends Widget{
 
         this.config.maxValue = this.model.get("maxValue");
 
-        if (this.config.title == "Drehzahl") {
+        if (this.model.get("ticks")) {
+            this.config.majorTicks = this.model.get("ticks");
+        }
+       // console.log(this.model.get("ticks"));
+
+        var step = Math.round(this.config.maxValue / 10);
+
+
+
+
+        /*if (this.config.title == "Drehzahl") {
             this.config.majorTicks = ['0', '1000', '2000', '3000', '4000', '5000', '6000', '7000', '8000'];
             this.config.highlights = [
                 {from: 0, to: 5000, color: 'rgba(0,   255, 0, .15)'},
                 {from: 5000, to: 8000, color: 'rgba(255, 0, 0, .15)'},
             ];
-        }
+        }*/
 
 
     }

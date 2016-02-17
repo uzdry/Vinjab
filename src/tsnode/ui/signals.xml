@@ -5,13 +5,29 @@
         <description>Geschwindigkeit des Autos</description>
         <minValue>0</minValue>
         <maxValue>220</maxValue>
+
+        <ticks>
+            <tick>0</tick>
+            <tick>20</tick>
+            <tick>40</tick>
+            <tick>60</tick>
+            <tick>80</tick>
+            <tick>100</tick>
+            <tick>120</tick>
+            <tick>140</tick>
+            <tick>160</tick>
+            <tick>180</tick>
+            <tick>200</tick>
+            <tick>220</tick>
+        </ticks>
+
         <unit>km/h</unit>
     </signal>
     <signal category="value.mass air flow">
         <name>MAF</name>
         <description>Luftmassenstrom</description>
-        <minValue>0</minValue>
-        <maxValue>100</maxValue>
+        <minValue></minValue>
+        <maxValue></maxValue>
         <unit>SI</unit>
     </signal>
     <signal category="value.coolant temperature">
@@ -33,6 +49,20 @@
         <description>Motordrehzahl in RPM</description>
         <minValue>0</minValue>
         <maxValue>8000</maxValue>
+        <ticks>
+            <tick>0</tick>
+            <tick>1000</tick>
+            <tick>2000</tick>
+            <tick>3000</tick>
+            <tick>4000</tick>
+            <tick>5000</tick>
+            <tick>6000</tick>
+            <tick>7000</tick>
+            <tick>8000</tick>
+        </ticks>
+        <highlights>
+            <highlight>5000</highlight>
+        </highlights>
         <unit>RPM</unit>
     </signal>
     <signal category="value.steering">
@@ -96,12 +126,12 @@
         <name>KatalysatorTemperatur</name>
         <description>Temperatur des Katalysators</description>
         <minValue>0</minValue>
-        <maxValue>100</maxValue>
+        <maxValue>800</maxValue>
         <unit>°C</unit>
     </signal>
     <signal category="value.throttle">
-        <name>Beschleunigung</name>
-        <description>Beschleunigungs des Autos</description>
+        <name>Drosselklappe</name>
+        <description>Drosselklappenstellung des Autos</description>
         <minValue>0</minValue>
         <maxValue>100</maxValue>
         <unit>%</unit>
@@ -109,8 +139,8 @@
     <signal category="value.accelerator pedal position">
         <name>GaspedalPos</name>
         <description>Position des Gaspedals</description>
-        <minValue></minValue>
-        <maxValue></maxValue>
+        <minValue>0</minValue>
+        <maxValue>100</maxValue>
         <unit>%</unit>
     </signal>
     <signal category="value.temperature outside">

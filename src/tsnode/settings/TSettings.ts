@@ -359,8 +359,8 @@ class Startup {
 class Communicator {
     private mychannel;
     public subscribe() : void {
-        //var channelsub = postal.channel("reqsubs");
-        //var reqsub = channelsub.publish("request." + "value.steering", "value.steering");
+        var channelsub = postal.channel("reqsubs");
+        var reqsub = channelsub.publish("request." + "value.steering", "value.steering");
 
         this.mychannel = postal.channel("values");
         this.mychannel.subscribe("value.steering", this.onMessageReceived.bind(this));
