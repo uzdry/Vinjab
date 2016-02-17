@@ -53,11 +53,11 @@ class Server extends BusDevice{
 
             socket.on('message', function(msg){
                 var message = JSON.parse(msg);
-                if (message.topic.name.startsWith('value.')) {
+                if (Utils.startsWith(message.topic.name, 'value.')) {
                     message = new ValueMessage(new Topic(message.topic.name), message.value);
-                } else if (message.topic.name.startsWith('dashboard')) {
+                } else if (Utils.startsWith(message.topic.name, 'dashboard')) {
                     message = new DashboardMessage(message.user, message.config, message.request);
-                } else if (message.topic.name.startsWith('replay')) {
+                } else if (Utils.startsWith(message.topic.name, 'replay')) {
                     message = new ReplayRequestMessage(message.driverNr, message.callerID, message.startStop);
                 }
                 p.broker.handleMessage(message);
