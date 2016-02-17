@@ -230,10 +230,10 @@ class TableFactory {
     createTable(actualSettingsNode : SettingsNode) {
         while (true) {
             var oldTable = document.getElementById('settings_table');
-            if (oldTable == null) {
+            if (oldTable == undefined || oldTable == null) {
                 break;
             }
-            container.removeChild(oldTable);
+            this.container.removeChild(oldTable);
         }
         this.table = document.createElement('table');
         this.table.id = 'settings_table';

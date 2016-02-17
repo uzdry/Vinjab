@@ -64,7 +64,6 @@ module Drawer {
             tr.appendChild(td);
             tbody.appendChild(tr);
 
-            this.dbgui.drawDebugGUIAppendCamera(tbody);
             table.appendChild(tbody);
             document.getElementById("divPS").appendChild(table);
 

@@ -366,7 +366,7 @@ class DummyDatabase {
         var topic5 = new SettingsMessageClient.STopic('settings.fueltankwarning');
         var value5 = new SettingsMessageClient.SettingsValue(8, 'valueName');
 
-        SettingsDBCOM.LowLevelDatabaseEmulator.clearDB();
+        //SettingsDBCOM.LowLevelDatabaseEmulator.clearDB();
         SettingsDBCOM.LowLevelDatabaseEmulator.createNewEntry(topic1.getName(),
             SettingsMessageCommon.SettingsValue.stringifyValue(value1));
         SettingsDBCOM.LowLevelDatabaseEmulator.createNewEntry(topic2.getName(),

@@ -45,6 +45,7 @@ module Visualization {
         }
 
         public refresh():void {
+            this.svg.setAttribute('z-index', 200);
             this.svg.setAttribute('id', "augsvg");
             this.svg.setAttribute('width', "" + this.resolution.getX());
             this.svg.setAttribute('height', "" + this.resolution.getY());
