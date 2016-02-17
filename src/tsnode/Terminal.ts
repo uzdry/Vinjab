@@ -47,8 +47,8 @@ class Terminal {
     public incomingMsg(msg) {
         var message = JSON.parse(msg);
 
-      //  setTimeout()
-        this.channelval.publish(message.topic.name, message);
+        setTimeout(this.channelval.publish, 0, message.topic.name, message);
+        //this.channelval.publish(message.topic.name, message);
 
     }
 
