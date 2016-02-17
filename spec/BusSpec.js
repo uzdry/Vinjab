@@ -42,3 +42,4 @@ var SimpleSubscriber = (function (_super) {
     };
     return SimpleSubscriber;
 })(Bus_1.BusDevice);
+//# sourceMappingURL=BusSpec.js.map

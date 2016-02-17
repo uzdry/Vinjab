@@ -274,12 +274,12 @@ class LevelDBAccess {
     public getEntries(topicID: string, drivenr: number, beginDate: number, endDate: number, callback) {
         var listOfKeys: ValueEntryKey[] = [];
         var listOfEntries: SensorValueEntry[] = [];
-        if(drivenr >= 0) { //TODO: test for string comparison in utf8
+        if(drivenr >= 0) {
             var lte = JSON.stringify(new ValueEntryKey(drivenr, new Date(endDate)));
             var gte = JSON.stringify(new ValueEntryKey(drivenr, new Date(beginDate)));
-        } else {
+        } else if(drivenr == -1) {
             var lte = JSON.stringify(new ValueEntryKey(this.DBInfo.currentDrive, new Date(endDate)));
-            var gte = JSON.stringify(new ValueEntryKey(-1, new Date(beginDate)));
+            var gte = JSON.stringify(new ValueEntryKey(this.DBInfo.currentDrive, new Date(beginDate)));
         }
         this.db.createReadStream({gte: gte, lte: lte}).on('data', function (data) {
             var parsed = JSON.parse(data.key);
@@ -303,17 +303,19 @@ class LevelDBAccess {
      */
     public getDriverEntry(userID: string, callback) {
         this.db.get(userID, function(value, err) {
-            if(err.notFound) {
-                var standardConfig: string = '[{"row":1,"col":1,"size_x":4,"size_y":4,"name":' +
-                    '"SpeedGauge","id":140},{"row":1,"col":5,"size_x":3,"size_y":3,' +
-                    '"name":"PercentGauge","id":150},{"row":1,"col":8,"size_x":4,"size_y":4,' +
-                    '"name":"PercentGauge","id":350}]';
-                this.dbAccess.putUserInfo(userID, standardConfig, function(err) {
+            if(err) {
+                if(err.notFound) {
+                    var standardConfig: string = '[{"row":1,"col":1,"size_x":4,"size_y":4,"name":' +
+                        '"SpeedGauge","id":140},{"row":1,"col":5,"size_x":3,"size_y":3,' +
+                        '"name":"PercentGauge","id":150},{"row":1,"col":8,"size_x":4,"size_y":4,' +
+                        '"name":"PercentGauge","id":350}]';
+                    this.dbAccess.putUserInfo(userID, standardConfig, function(err) {
+                        console.log(err);
+                    });
+                    callback(new UserInfoEntry(standardConfig));
+                } else {
                     console.log(err);
-                });
-                callback(new UserInfoEntry(standardConfig));
-            } else if (err) {
-                console.log(err);
+                }
             } else {
                 var dr = new UserInfoEntry(JSON.parse(value).dashboardConfig);
                 callback(dr);
@@ -348,9 +350,10 @@ class DBBusDevice extends BusDevice {
      * drive begin) to the Bus.
      * @param content: The array of SensorValueEntries to be sent
      * @param times: The array of corresponding timestamps to be sent
+     * @param topic: The Topic of the contained values
      */
-    private sendValueMessage(content: SensorValueEntry[], times: number[]) {
-        this.broker.handleMessage(new ValueAnswerMessage(times, content));
+    private sendValueMessage(topic: Topic, content: SensorValueEntry[], times: number[]) {
+        this.broker.handleMessage(new ValueAnswerMessage(topic, times, content));
     }
 
     /**
@@ -373,7 +376,7 @@ class DBBusDevice extends BusDevice {
             //handling of a Value Request: Values are fetched from the DB and a value response is sent
             var dbValueReq = <DBRequestMessage> m;
             this.dbAccess.getEntries(dbValueReq.reqTopic.getName(), dbValueReq.driveNr, dbValueReq.beginDate.getDate(), dbValueReq.endDate.getDate(), function(res, tim){
-                this.sendValueMessage(res, tim);
+                this.sendValueMessage(dbValueReq.reqTopic, res, tim);
             }.bind(this));
         }
 
@@ -387,7 +390,7 @@ class DBBusDevice extends BusDevice {
             var dbm = <DashboardMessage> m;
             if(dbm.request) {
                 this.dbAccess.getDriverEntry(dbm.user, function(value) {
-                    this.sendDashboardRspMessage(value.dashboardConfig);
+                    this.sendDashboardRspMessage(dbm.user, value.dashboardConfig);
                 }.bind(this));
                 this.broker.handleMessage(new ReplayInfoMessage(this.dbAccess.replayInfo.finishTime));
             } else {
