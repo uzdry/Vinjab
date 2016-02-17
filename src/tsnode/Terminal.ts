@@ -20,6 +20,8 @@ class Terminal {
 
     private toServerChannel;
 
+    private messageFromServer;
+
 
     /**
      * public constructor
@@ -54,6 +56,7 @@ class Terminal {
 
     public synchronousPublish(message) {
         this.channelval.publish(message.topic.name, message);
+
 
     }
     /**
