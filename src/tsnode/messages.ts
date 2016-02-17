@@ -103,10 +103,12 @@ class Message {
 class ValueAnswerMessage extends Message {
     private times: number[];
     private values: any[];
-    constructor(times: number[], values: any[]) {
+    private ansTopic: Topic;
+    constructor(top: Topic, times: number[], values: any[]) {
         super(Topic.VALUE_ANSWER_MSG);
         this.times = times;
         this.values = values;
+        this.ansTopic = top;
     }
 
     public getTimes(): number[] {
@@ -114,6 +116,9 @@ class ValueAnswerMessage extends Message {
     }
     public getValues(): any[] {
         return this.values;
+    }
+    public getAnsTopic(): Topic {
+        return this.ansTopic;
     }
 }
 

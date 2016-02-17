@@ -1,6 +1,8 @@
 /// <reference path ="./google.maps.d.ts"/>
 /// <reference path ="./widget.ts"/>
+/// <reference path ="C:\Program Files (x86)\JetBrains\WebStorm 11.0.3\plugins\JavaScriptLanguage\typescriptCompiler\external\lib.es6.d.ts"/>
 
+import LatLng = google.maps.LatLng;
 class GoogleMapWidgetConfig implements WidgetConfig{
 
     "type_name" = "SurroundingsMap";
@@ -23,7 +25,7 @@ class GoogleMapWidget extends Widget {
     /** Main Element of the Widget */
     map: google.maps.Map;
     gasStations: google.maps.places.PlacesService;
-
+    minTankContents: number;
 
     /** String that is being introduced to the grid */
     htmlElement: string;
@@ -37,8 +39,9 @@ class GoogleMapWidget extends Widget {
         GoogleMapWidget.widgetCounter++;
 
         this.htmlElement =  '<li id="' + this.widgetID + '1">' +
-                            '<div id ="' + this.widgetID + '2" height="400" width="400"></div>' +
+                            '<div id ="' + this.widgetID + '2"></div>' +
                             '</li>';
+        this.minTankContents = 10;
     }
 
     initialize(){
@@ -47,7 +50,7 @@ class GoogleMapWidget extends Widget {
 
     init() {
         var opt: google.maps.MapOptions = {
-            center: new google.maps.LatLng(49.012940, 8.424294),
+            center: new google.maps.LatLng(59.012940, 8.424294),
             zoom: 14,
             draggable: false
         };
@@ -59,8 +62,6 @@ class GoogleMapWidget extends Widget {
         */
 
         this.gasStations = new google.maps.places.PlacesService(this.map);
-        //to be deleted:
-        this.updateValue(5);
         this.infoWind = new google.maps.InfoWindow(this.map);
         if (navigator.geolocation) {
             navigator.geolocation.getCurrentPosition(function(position) {
@@ -68,8 +69,10 @@ class GoogleMapWidget extends Widget {
                     lat: position.coords.latitude,
                     lng: position.coords.longitude
                 };
-
-                this.infoWind.setPosition(pos);
+                var marker = new google.maps.Marker({
+                    map: this.map,
+                    position: new LatLng(pos.lat, pos.lng)
+                });
                 this.infoWind.setContent('You are here');
                 this.map.setCenter(pos);
             }.bind(this), function() {
@@ -84,9 +87,9 @@ class GoogleMapWidget extends Widget {
     private handleLocationError(locAvailable: Boolean, iw: google.maps.InfoWindow, pos: google.maps.LatLng) {
         iw.setPosition(pos);
         if (locAvailable) {
-            iw.setContent("Unfortunately, your location is not available");
+            console.log("Unfortunately, your location is not available");
         } else {
-            iw.setContent("Unfortunately, your browser does not support location");
+            console.log("Unfortunately, your browser does not support location");
         }
     }
 

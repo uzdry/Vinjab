@@ -227,9 +227,10 @@ class LevelDBAccess {
       * @param k: The key of the entry to be deleted.
      */
     protected deleteFromKey(k: any) {
-        this.db.get(k, function(value, err) {
+        this.db.get(k, function(err, value) {
             if(err && !err.notFound) {
                 console.log(err);
+            } else if(err && err.notFound) {
             } else {
                 this.db.del(k);
             }
@@ -290,9 +291,9 @@ class LevelDBAccess {
                     listOfEntries[listOfEntries.length] = sve;
                 }
             }
-        }).on('end', function () {
+        }.bind(this)).on('end', function () {
                 callback(listOfEntries, listOfKeys);
-            });
+            }.bind(this));
     }
 
     /**
@@ -302,7 +303,7 @@ class LevelDBAccess {
      * @param callback: The callback function, to which the UserInfoEntry is returned.
      */
     public getDriverEntry(userID: string, callback) {
-        this.db.get(userID, function(value, err) {
+        this.db.get(userID, function(err, value) {
             if(err) {
                 if(err.notFound) {
                     var standardConfig: string = '[{"row":1,"col":1,"size_x":4,"size_y":4,"name":' +
@@ -310,7 +311,7 @@ class LevelDBAccess {
                         '"name":"PercentGauge","id":150},{"row":1,"col":8,"size_x":4,"size_y":4,' +
                         '"name":"PercentGauge","id":350}]';
                     this.dbAccess.putUserInfo(userID, standardConfig, function(err) {
-                        console.log(err);
+                        if(err) console.log(err);
                     });
                     callback(new UserInfoEntry(standardConfig));
                 } else {
@@ -320,7 +321,7 @@ class LevelDBAccess {
                 var dr = new UserInfoEntry(JSON.parse(value).dashboardConfig);
                 callback(dr);
             }
-        })
+        });
     }
 }
 
