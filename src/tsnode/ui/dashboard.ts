@@ -51,7 +51,9 @@ class Dashboard{
         var message: DashboardMessage = new DashboardMessage(this.cookie, "", true);
         postal.channel("toServer").publish("", message);
         postal.channel("request").publish("request.#", "dashboard settings from database");
-        postal.channel("value")
+        postal.channel("values").subscribe("dashboard settings from database", function(data:string, envelope){
+            this.grid.fromSerialized(JSON.parse(data).config);
+        }.bind(this));
 
         $(document).on( "click", ".gridster ul li", function() {
             if((<HTMLInputElement>document.getElementById("cDeleteMode")).checked) {
@@ -228,9 +230,9 @@ dashboard.widgetFactory.addWidget(new LineChartWidgetConfig());
 dashboard.widgetFactory.addWidget(new GoogleMapWidgetConfig());
 
 
-setTimeout(function(){
-    dashboard.grid.fromSerialized('[{"row":1,"col":5,"size_x":7,"size_y":7,"name":"SpeedGauge","valueID":"value.speed"},{"row":1,"col":1,"size_x":4,"size_y":4,"name":"PercentGauge","valueID":"value.speed"},{"row":1,"col":12,"size_x":4,"size_y":4,"name":"TextWidget","valueID":"value.mass air flow"}]');
-}, 1000);
+//setTimeout(function(){
+//    dashboard.grid.fromSerialized('[{"row":1,"col":5,"size_x":7,"size_y":7,"name":"SpeedGauge","valueID":"value.speed"},{"row":1,"col":1,"size_x":4,"size_y":4,"name":"PercentGauge","valueID":"value.speed"},{"row":1,"col":12,"size_x":4,"size_y":4,"name":"TextWidget","valueID":"value.mass air flow"}]');
+//}, 1000);
 
 
 export {DDSlickOptions, Dashboard}
