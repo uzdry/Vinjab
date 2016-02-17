@@ -47,10 +47,15 @@ class Terminal {
     public incomingMsg(msg) {
         var message = JSON.parse(msg);
 
+        //setTimeout(this.synchronousPublish.bind(this), 0, message);
         this.channelval.publish(message.topic.name, message);
 
     }
 
+    public synchronousPublish(message) {
+        this.channelval.publish(message.topic.name, message);
+
+    }
     /**
      * send a message to the server that is to be put on the bus
      * @param data the data that is to be send
