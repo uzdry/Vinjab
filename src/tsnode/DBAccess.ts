@@ -303,17 +303,19 @@ class LevelDBAccess {
      */
     public getDriverEntry(userID: string, callback) {
         this.db.get(userID, function(value, err) {
-            if(err.notFound) {
-                var standardConfig: string = '[{"row":1,"col":1,"size_x":4,"size_y":4,"name":' +
-                    '"SpeedGauge","id":140},{"row":1,"col":5,"size_x":3,"size_y":3,' +
-                    '"name":"PercentGauge","id":150},{"row":1,"col":8,"size_x":4,"size_y":4,' +
-                    '"name":"PercentGauge","id":350}]';
-                this.dbAccess.putUserInfo(userID, standardConfig, function(err) {
+            if(err) {
+                if(err.notFound) {
+                    var standardConfig: string = '[{"row":1,"col":1,"size_x":4,"size_y":4,"name":' +
+                        '"SpeedGauge","id":140},{"row":1,"col":5,"size_x":3,"size_y":3,' +
+                        '"name":"PercentGauge","id":150},{"row":1,"col":8,"size_x":4,"size_y":4,' +
+                        '"name":"PercentGauge","id":350}]';
+                    this.dbAccess.putUserInfo(userID, standardConfig, function(err) {
+                        console.log(err);
+                    });
+                    callback(new UserInfoEntry(standardConfig));
+                } else {
                     console.log(err);
-                });
-                callback(new UserInfoEntry(standardConfig));
-            } else if (err) {
-                console.log(err);
+                }
             } else {
                 var dr = new UserInfoEntry(JSON.parse(value).dashboardConfig);
                 callback(dr);
@@ -348,6 +350,7 @@ class DBBusDevice extends BusDevice {
      * drive begin) to the Bus.
      * @param content: The array of SensorValueEntries to be sent
      * @param times: The array of corresponding timestamps to be sent
+     * @param topic: The Topic of the contained values
      */
     private sendValueMessage(topic: Topic, content: SensorValueEntry[], times: number[]) {
         this.broker.handleMessage(new ValueAnswerMessage(topic, times, content));
