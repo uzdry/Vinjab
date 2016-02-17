@@ -52,6 +52,7 @@ class Server extends BusDevice{
             });
 
             socket.on('message', function(msg){
+                console.log(msg);
                 var message = JSON.parse(msg);
                 if (Utils.startsWith(message.topic.name, 'value.')) {
                     message = new ValueMessage(new Topic(message.topic.name), message.value);
