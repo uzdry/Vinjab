@@ -1,4 +1,4 @@
-///<reference path="S:\Program Files (x86)\JetBrains\WebStorm 11.0.3\plugins/JavaScriptLanguage/typescriptCompiler/external/lib.es6.d.ts"/>
+///<reference path="C:\Program Files (x86)\JetBrains\WebStorm 11.0.3\plugins/JavaScriptLanguage/typescriptCompiler/external/lib.es6.d.ts"/>
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
@@ -63,11 +63,11 @@ var ValueChangeListener = (function () {
      * @returns {AuxiliarySettingsMessage} The settings message that can be sent directly to the database.
      */
     ValueChangeListener.prototype.getSettingsWriteMessage = function () {
-        var auxiliaryMap = new AuxiliaryMap();
+        var auxiliaryMap = new Auxiliary.AuxiliaryMap();
         for (var i = 0; i < this.settingsNodes.length; i++) {
-            auxiliaryMap.set(this.settingsNodes[i].getTopic(), new Value(this.settingsNodes[i].getActualValue(), "ignoreME"));
+            auxiliaryMap.set(this.settingsNodes[i].getTopic(), new Auxiliary.Value(this.settingsNodes[i].getActualValue(), "ignoreME"));
         }
-        var auxiliarySettingsMessage = new AuxiliarySettingsMessage(auxiliaryMap);
+        var auxiliarySettingsMessage = new Auxiliary.AuxiliarySettingsMessage(auxiliaryMap);
         return auxiliarySettingsMessage;
     };
     return ValueChangeListener;
@@ -162,7 +162,7 @@ var SCommunicator = (function () {
      */
     SCommunicator.parseNumericParameter = function (parameter, messageBuffer, valueChangeListener, container) {
         var topicName = SCommunicator.getValue('topicName', parameter);
-        var topic = new Topic(topicName);
+        var topic = new Auxiliary.Topic(topicName);
         var childPar = new SettingsParameter(SCommunicator.getValue("ruid", parameter), SCommunicator.getValue("name", parameter), SCommunicator.getValue("description", parameter), SCommunicator.getValue("imageURL", parameter), topic, valueChangeListener, messageBuffer.getValueOf(topic), container);
         return childPar;
     };
@@ -237,15 +237,15 @@ var MessageBuffer = (function (_super) {
      */
     MessageBuffer.prototype.sendDBRequest = function () {
         this.answersToReceive++;
-        Broker.get().subscribe(Topic.SETTINGS_MSG, this);
-        Broker.get().handleMessage(new DBRequestMessage(new DBSettingsRequest()));
+        Auxiliary.Broker.get().subscribe(Auxiliary.Topic.SETTINGS_MSG, this);
+        Auxiliary.Broker.get().handleMessage(new Auxiliary.DBRequestMessage(new Auxiliary.DBSettingsRequest()));
     };
     /**
      * Handles an incoming message from the server.
      * @param m The message that has been send by the server to this settings module.
      */
     MessageBuffer.prototype.handleMessage = function (m) {
-        if (m.getTopic().equals(Topic.SETTINGS_MSG)) {
+        if (m.getTopic().equals(Auxiliary.Topic.SETTINGS_MSG)) {
             if (this.answersToReceive > 0) {
                 this.answersToReceive--;
                 this.configs = m.getConfigs();
@@ -271,7 +271,7 @@ var MessageBuffer = (function (_super) {
         SCommunicator.openXMLfromURL("/src/tsnode/settings/settingsDS.xml", this, this.valueChangeListener, this.container);
     };
     return MessageBuffer;
-})(BusDevice);
+})(Auxiliary.BusDevice);
 /**
  * A dummy database used only for test purposes to emulate the real database locally.
  */
@@ -282,28 +282,28 @@ var DummyDatabase = (function (_super) {
      */
     function DummyDatabase() {
         _super.call(this);
-        this.subscribe(Topic.DBREQ_MSG);
+        this.subscribe(Auxiliary.Topic.DBREQ_MSG);
     }
     /**
      * Handles a message that has been sent to the database (this). Only Database request messages are supported.
      * @param m The message that has been sent to the database.
      */
     DummyDatabase.prototype.handleMessage = function (m) {
-        var auxmap = new AuxiliaryMap();
-        var topic1 = new Topic('wheelbase');
-        auxmap.set(topic1, new Value(4000, 'valueName'));
-        var topic1 = new Topic('axletrack');
-        auxmap.set(topic1, new Value(1300, 'valueName'));
-        var topic1 = new Topic('steeringratio');
-        auxmap.set(topic1, new Value(20, 'valueName'));
-        var topic1 = new Topic('dbcapacity');
-        auxmap.set(topic1, new Value(999, 'valueName'));
-        var topic1 = new Topic('fueltankwarning');
-        auxmap.set(topic1, new Value(8, 'valueName'));
-        Broker.get().handleMessage(new AuxiliarySettingsMessage(auxmap));
+        var auxmap = new Auxiliary.AuxiliaryMap();
+        var topic1 = new Auxiliary.Topic('wheelbase');
+        auxmap.set(topic1, new Auxiliary.Value(4000, 'valueName'));
+        var topic1 = new Auxiliary.Topic('axletrack');
+        auxmap.set(topic1, new Auxiliary.Value(1300, 'valueName'));
+        var topic1 = new Auxiliary.Topic('steeringratio');
+        auxmap.set(topic1, new Auxiliary.Value(20, 'valueName'));
+        var topic1 = new Auxiliary.Topic('dbcapacity');
+        auxmap.set(topic1, new Auxiliary.Value(999, 'valueName'));
+        var topic1 = new Auxiliary.Topic('fueltankwarning');
+        auxmap.set(topic1, new Auxiliary.Value(8, 'valueName'));
+        Auxiliary.Broker.get().handleMessage(new Auxiliary.AuxiliarySettingsMessage(auxmap));
     };
     return DummyDatabase;
-})(BusDevice);
+})(Auxiliary.BusDevice);
 /**
  * The static class that can be used to initialize this module.
  */
@@ -350,7 +350,8 @@ var Communicator = (function () {
  */
 var div1 = document.getElementById("div1");
 var div2 = document.createElement("div");
-div2.style.height = "300px";
+div2.style.height = "500px";
+div2.style.padding = "20px";
 div1.appendChild(div2);
 Startup.initialize(div2);
 //var com : Communicator = new Communicator();
