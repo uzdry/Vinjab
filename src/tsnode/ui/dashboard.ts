@@ -14,7 +14,7 @@ import {Terminal} from "../Terminal"
 import {DashboardMessage} from "../messages";
 import {WidgetFactory, SignalDescription} from "./widgetFactory";
 import {Grid} from "./grid";
-import {GoogleMapWidgetConfig} from "./Map";
+//import {GoogleMapWidgetConfig} from "./Map";
 
 class Dashboard{
     /** MVC Stuff */
@@ -49,11 +49,12 @@ class Dashboard{
         }
 
         var message: DashboardMessage = new DashboardMessage(this.cookie, "", true);
-        postal.channel("toServer").publish("", message);
-        postal.channel("request").publish("request.#", "dashboard settings from database");
-        postal.channel("values").subscribe("dashboard settings from database", function(data:string, envelope){
-            this.grid.fromSerialized(JSON.parse(data).config);
+        postal.channel("reqsubs").publish("request.dashboard settings from database", "dashboard settings from database");
+        postal.channel("values").subscribe("dashboard settings from database", function(data, envelope){
+            console.log(data);
+            this.grid.fromSerialized(data.config);
         }.bind(this));
+        postal.channel("toServer").publish("", message);
 
         $(document).on( "click", ".gridster ul li", function() {
             if((<HTMLInputElement>document.getElementById("cDeleteMode")).checked) {
@@ -227,7 +228,7 @@ dashboard.widgetFactory.addWidget(new SpeedGaugeWidgetConfig());
 dashboard.widgetFactory.addWidget(new TextWidgetConfig());
 dashboard.widgetFactory.addWidget(new PercentGaugeWidgetConfig());
 dashboard.widgetFactory.addWidget(new LineChartWidgetConfig());
-dashboard.widgetFactory.addWidget(new GoogleMapWidgetConfig());
+//dashboard.widgetFactory.addWidget(new GoogleMapWidgetConfig());
 
 
 //setTimeout(function(){

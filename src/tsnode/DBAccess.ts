@@ -306,11 +306,11 @@ class LevelDBAccess {
         this.db.get(userID, function(err, value) {
             if(err) {
                 if(err.notFound) {
-                    var standardConfig: string = '[{"row":1,"col":1,"size_x":4,"size_y":4,"name":' +
-                        '"SpeedGauge","id":140},{"row":1,"col":5,"size_x":3,"size_y":3,' +
-                        '"name":"PercentGauge","id":150},{"row":1,"col":8,"size_x":4,"size_y":4,' +
-                        '"name":"PercentGauge","id":350}]';
-                    this.dbAccess.putUserInfo(userID, standardConfig, function(err) {
+                    var standardConfig: string = '[{"row":1,"col":5,"size_x":7,"size_y":7,"name":"SpeedGauge",' +
+                        '"valueID":"value.speed"},{"row":1,"col":1,"size_x":4,"size_y":4,"name":"PercentGauge",' +
+                        '"valueID":"value.speed"},{"row":1,"col":12,"size_x":4,"size_y":4,"name":"TextWidget",' +
+                        '"valueID":"value.mass air flow"}]';
+                    this.putUserInfo(userID, standardConfig, function(err) {
                         if(err) console.log(err);
                     });
                     callback(new UserInfoEntry(standardConfig));
@@ -321,7 +321,7 @@ class LevelDBAccess {
                 var dr = new UserInfoEntry(JSON.parse(value).dashboardConfig);
                 callback(dr);
             }
-        });
+        }.bind(this));
     }
 }
 
