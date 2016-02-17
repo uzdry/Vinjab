@@ -37,7 +37,6 @@ module SettingsDBCOM {
                     // ... handle any other message type and then put the results to the bus...
                     return;
             }
-
         }
     }
 
