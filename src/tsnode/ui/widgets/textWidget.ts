@@ -25,7 +25,7 @@ class TextWidget extends Widget{
     htmlElement: string;
 
     /** the current value of the widget*/
-    value: number|boolean;
+    value: number;
 
     /** Id of the document */
     id: string;
@@ -33,7 +33,7 @@ class TextWidget extends Widget{
     /** HTML Text */
     htmlText: HTMLParagraphElement;
 
-    updateValue(value:number|boolean) {
+    updateValue(value:number) {
         this.value = value;
         this.init();
     }
@@ -41,7 +41,7 @@ class TextWidget extends Widget{
 
     init() {
         this.htmlText = <HTMLParagraphElement>document.getElementById(this.widgetID);
-        this.htmlText.innerHTML = "<br ><br ><br ><br ><br >"+ this.model.get("name") + "<br >" + this.value;
+        this.htmlText.innerHTML = this.model.get("name") + "<br >" + this.value;
     }
 
     constructor(options?){
@@ -50,7 +50,8 @@ class TextWidget extends Widget{
         this.widgetID = this.typeID + "-" + this.model.get("tagName") + "-" + TextWidget.widgetCounter;
         TextWidget.widgetCounter++;
 
-        this.htmlElement = "<li><p align=\"center\" id=\"" + this.widgetID  + "\"> </p></li>";
+        this.htmlElement = "<li><div style='text-align: center; vertical-align: middle; height: 220px; width: 220px; " +
+            "display:table-cell;' id=\"" + this.widgetID  + "\"> </div></li>";
         this.value = options.value;
         this.id = options.id;
     }
@@ -64,14 +65,17 @@ class TextWidget extends Widget{
     render():TextWidget{
         this.value = this.model.get("value");
 
-        this.htmlText.innerHTML = '<li><span>x</span><br ><br ><br ><br ><br >'+ this.model.get("name") +
-            '<br >' + this.value + '</li>';
+        this.htmlText.innerHTML = "<span style='font-size: 200%'>" + this.model.get("name") + "</span><br >" +
+            "<br ><span style='font-size: 200%;'>" + this.value.toFixed(2) + "</span>";
 
         return this;
     }
 
     resize(size_x: number, size_y:number){
-
+        this.htmlText.innerHTML = "<span style='font-size: " + size_x + "%'>" + this.model.get("name") + "</span><br >" +
+        "<br ><span style='font-size: 200%;'>" + this.value.toFixed(2) + "</span>"
+        this.htmlText.style.setProperty("width", (size_x * 1.1) + "px");
+        this.htmlText.style.setProperty("height", (size_y * 1.1) + "px");
     }
 
     destroy(){

@@ -2,7 +2,6 @@
 /// <reference path ="./widget.ts"/>
 /// <reference path ="C:\Program Files (x86)\JetBrains\WebStorm 11.0.3\plugins\JavaScriptLanguage\typescriptCompiler\external\lib.es6.d.ts"/>
 
-import LatLng = google.maps.LatLng;
 class GoogleMapWidgetConfig implements WidgetConfig{
 
     "type_name" = "SurroundingsMap";
@@ -17,75 +16,39 @@ class GoogleMapWidgetConfig implements WidgetConfig{
 
 class GoogleMapWidget extends Widget {
 
-    static widgetCounter: number = 0;
+    static widgetCounter:number = 0;
 
     /** Tag name */
-    typeID: string = "SurroundingsMap";
+    typeID:string = "SurroundingsMap";
 
     /** Main Element of the Widget */
-    map: google.maps.Map;
-    gasStations: google.maps.places.PlacesService;
-    minTankContents: number;
+    map:google.maps.Map;
+    currentLoc: google.maps.LatLng;
 
     /** String that is being introduced to the grid */
-    htmlElement: string;
-
-    infoWind: google.maps.InfoWindow;
+    htmlElement:string;
 
     constructor(options?) {
         super(options);
 
-        this.widgetID = this.typeID + "-" + this.model.id + "-" + GoogleMapWidget.widgetCounter;
+        this.widgetID = this.typeID + "-" + this.model.get("tagName") + "-" + GoogleMapWidget.widgetCounter;
         GoogleMapWidget.widgetCounter++;
 
-        this.htmlElement =  '<li id="' + this.widgetID + '1">' +
-                            '<div id ="' + this.widgetID + '2"></div>' +
-                            '</li>';
-        this.minTankContents = 10;
+        this.htmlElement = '<li id="' + this.widgetID + '">' +
+            '<div></div>' +
+            '</li>';
     }
 
-    initialize(){
+    initialize() {
 
     }
 
     init() {
-        var opt: google.maps.MapOptions = {
-            center: new google.maps.LatLng(59.012940, 8.424294),
-            zoom: 14,
-            draggable: false
-        };
-        this.map = new google.maps.Map(document.getElementById(this.widgetID + '1'), opt);
-        /*
-        var element = document.getElementById(this.widgetID + "_out");
-        element.style.opacity = "0.0";
-        this.map = new google.maps.Map(element.getElementsByTagName('div')[0] , opt);
-        */
-
-        this.gasStations = new google.maps.places.PlacesService(this.map);
-        this.infoWind = new google.maps.InfoWindow(this.map);
-        if (navigator.geolocation) {
-            navigator.geolocation.getCurrentPosition(function(position) {
-                var pos = {
-                    lat: position.coords.latitude,
-                    lng: position.coords.longitude
-                };
-                var marker = new google.maps.Marker({
-                    map: this.map,
-                    position: new LatLng(pos.lat, pos.lng)
-                });
-                this.infoWind.setContent('You are here');
-                this.map.setCenter(pos);
-            }.bind(this), function() {
-                this.handleLocationError(true, this.infoWind, this.map.getCenter());
-            }.bind(this));
-        } else {
-            // Browser doesn't support location
-            this.handleLocationError(false, this.infoWind, this.map.getCenter());
-        }
+        this.initMap();
+        this.listenTo(this.model, 'change:data', this.updateValue);
     }
 
-    private handleLocationError(locAvailable: Boolean, iw: google.maps.InfoWindow, pos: google.maps.LatLng) {
-        iw.setPosition(pos);
+    private handleLocationError(locAvailable:Boolean, pos:google.maps.LatLng) {
         if (locAvailable) {
             console.log("Unfortunately, your location is not available");
         } else {
@@ -97,45 +60,80 @@ class GoogleMapWidget extends Widget {
 
     }
 
-    updateValue(value: number){
+    updateValue() {
+        var value = this.model.get("value");
         if(value < 10) {
-            if(navigator.geolocation) {
-                var pos;
-                navigator.geolocation.getCurrentPosition(function(position) {
-                    pos = {
-                        lat: position.coords.latitude,
-                        lng: position.coords.longitude
-                    };
-                    this.gasStations.nearbySearch({
-                        location: pos,
-                        radius: 2000,
-                        types: ['gas_station']
-                    }, function(result, status, pagination) {
-                        if (status === google.maps.places.PlacesServiceStatus.OK) {
-                            for (var i = 0; i < result.length; i++) {
-                                var placeLoc = result[i].geometry.location;
-                                var marker = new google.maps.Marker({
-                                    map: this.map,
-                                    position: result[i].geometry.location
-                                });
-                            }
-                        }
-                    }.bind(this))
-                }.bind(this));
-            }
+            this.findGasStations();
         }
     }
 
-    resize(size_x: number, size_y:number) {
+    resize(size_x:number, size_y:number) {
         google.maps.event.trigger(this.map, "resize");
     }
 
-    destroy(){
+    destroy() {
         super.destroy();
         delete this;
     }
+
+    initMap() {
+        this.map = new google.maps.Map(document.getElementById(this.widgetID), {
+            center: new google.maps.LatLng(49.013655, 8.4043383),
+            zoom: 14,
+            draggable: false
+        });
+
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(function (position) {
+                this.currentLoc = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
+
+                var marker = new google.maps.Marker({
+                    position: this.currentLoc,
+                    map: this.map,
+                    title: 'current location'
+                });
+
+                this.map.setCenter(this.currentLoc);
+            }.bind(this), function () {
+                this.handleLocationError(true, this.map.getCenter());
+            }.bind(this));
+        } else {
+            // Browser doesn't support Geolocation
+            this.handleLocationError(false, this.map.getCenter());
+        }
+    }
+
+    findGasStations() {
+        console.log("WOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO");
+        var service = new google.maps.places.PlacesService(this.map);
+        service.nearbySearch({
+            location: this.currentLoc,
+            radius: 10000,
+            types: ['gas_station']
+        }, function (results, status) {
+            if (status === google.maps.places.PlacesServiceStatus.OK) {
+                for (var i = 0; i < results.length; i++) {
+                    this.createMarker(results[i]);
+                }
+            }
+        }.bind(this));
+    }
+
+
+    createMarker(place) {
+        var placeLoc = place.geometry.location;
+        var marker = new google.maps.Marker({
+            map: this.map,
+            position: placeLoc
+        });
+
+        var infowindow = new google.maps.InfoWindow();
+
+        google.maps.event.addListener(marker, 'click', function () {
+            infowindow.setContent(place.name);
+            infowindow.open(this.map, this);
+        });
+    }
 }
-
-
 
 export {GoogleMapWidgetConfig}

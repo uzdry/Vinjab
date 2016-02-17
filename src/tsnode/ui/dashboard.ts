@@ -14,7 +14,7 @@ import {Terminal} from "../Terminal"
 import {DashboardMessage} from "../messages";
 import {WidgetFactory, SignalDescription} from "./widgetFactory";
 import {Grid} from "./grid";
-//import {GoogleMapWidgetConfig} from "./Map";
+import {GoogleMapWidgetConfig} from "./Map";
 
 class Dashboard{
     /** MVC Stuff */
@@ -32,7 +32,7 @@ class Dashboard{
     options:string[];
 
     /** Cookie Stuff */
-    cookie: string;
+    user: string;
 
 
     constructor(){
@@ -41,19 +41,23 @@ class Dashboard{
         this.widgetFactory = new WidgetFactory(this.dataCollection, this);
         this.grid = new Grid(this.widgetFactory);
 
-        this.cookie = Dashboard.getCookie("user");
+        this.user = Dashboard.getCookie("user");
 
-        if(this.cookie === ""){
-            this.cookie = Dashboard.makeid();
-            document.cookie = "user=" + this.cookie;
+        if(this.user === ""){
+            this.user = Dashboard.makeid();
+            document.cookie = "user=" + this.user;
         }
 
-        var message: DashboardMessage = new DashboardMessage(this.cookie, "", true);
+        var message: DashboardMessage = new DashboardMessage(this.user, "", true);
         postal.channel("reqsubs").publish("request.dashboard settings from database", "dashboard settings from database");
+
         postal.channel("values").subscribe("dashboard settings from database", function(data, envelope){
-            console.log(data);
+            console.log("Input: " + JSON.stringify(data));
+            if(data.user !== this.user) return;
             this.grid.fromSerialized(data.config);
+            postal.channel("reqsubs").publish("stop.dashboard settings from database", "dashboard settings from database");
         }.bind(this));
+
         postal.channel("toServer").publish("", message);
 
         $(document).on( "click", ".gridster ul li", function() {
@@ -176,6 +180,10 @@ class Dashboard{
         this.grid.gridster.disable();
         this.grid.gridster.disable_resize();
         $( "#bDashboard" ).click(function() {
+            if($("#dEditMode").is(":visible")){
+                console.log("Saving DashboardConfig");
+                postal.channel("toServer").publish("" ,new DashboardMessage(this.user, this.grid.serialize(), false));
+            }
             $( "#dDashboard" ).show( "slow" );
             $( "#dSettings").hide("slow");
             $( "#dEditMode").hide("slow");
@@ -228,12 +236,8 @@ dashboard.widgetFactory.addWidget(new SpeedGaugeWidgetConfig());
 dashboard.widgetFactory.addWidget(new TextWidgetConfig());
 dashboard.widgetFactory.addWidget(new PercentGaugeWidgetConfig());
 dashboard.widgetFactory.addWidget(new LineChartWidgetConfig());
-//dashboard.widgetFactory.addWidget(new GoogleMapWidgetConfig());
+dashboard.widgetFactory.addWidget(new GoogleMapWidgetConfig());
 
-
-//setTimeout(function(){
-//    dashboard.grid.fromSerialized('[{"row":1,"col":5,"size_x":7,"size_y":7,"name":"SpeedGauge","valueID":"value.speed"},{"row":1,"col":1,"size_x":4,"size_y":4,"name":"PercentGauge","valueID":"value.speed"},{"row":1,"col":12,"size_x":4,"size_y":4,"name":"TextWidget","valueID":"value.mass air flow"}]');
-//}, 1000);
 
 
 export {DDSlickOptions, Dashboard}
