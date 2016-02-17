@@ -4,6 +4,54 @@
 
 /// <reference path="./TextDebugger.ts"/>
 /// <reference path="./TSettings.ts"/>
+
+class StyleConstants {
+    // Table
+    public tableRowHeight : string = "100px";
+    public tableWidth : string = "100%";
+    public tableHeight : string = "auto";
+
+    // Back button
+    public backButtonId : string = "settings_backButton";
+    public backButtonWidth : string = "50px";
+    public backButtonEnabledColor : string = "GreenYellow";
+    public backButtonDisabledColor : string = "Gray";
+    public backButtonImgSrc : string = "../../img/settings/leftarrow.png";
+    public backButtonImgHeight : string = "50px";
+    public backButtonImgWidth : string = "50px";
+
+    // Image column
+    public imageColumnWidth : string = "50px";
+    public imageWidth : string = "100px";
+    public imageHeight : string = "100px";
+
+    // Folders
+    public nonEmptyFolderTextColumnBgColor : string = "LightSkyBlue";
+    public emptyFolderTextColumnBgColor : string = "PaleVioletRed";
+
+    public nonEmptyFolderInputColumnBgColor : string = "DeepSkyBlue";
+    public emptyFolderInputColumnBgColor : string = "MediumVioletRed";
+
+    // Values
+    public valueTextColumnBgColor : string = "LightGray";
+    public valueInputColumnBgColor : string = "Gray";
+    public valueInputColumnWidth : string = "320px";
+
+    public valueNumericUpDownHeight : string = "80px";
+    public valueNumericUpDownFontSize : string = "50px";
+    public valueNumericUpDownWidth : string = "300px";
+
+    // OK button
+    public OKButtonPosition : string = "relative";
+    public OKButtonWidth : string = "60%";
+    public OKButtonMarginLeft = '20%';
+    public OKButtonHeight = '60%';
+    public OKButtonFontSize = '18px';
+    public OKButtonRowHeight = '60px';
+    public OKButtonCellAlign = 'center';
+    public OKButtonCellBgColor = 'Orange';
+}
+
 /**
  * Creates the main HTML table for the settings GUI.
  */
@@ -17,6 +65,7 @@ class TableFactory {
     private actualSettingsNode : SettingsNode;
 
     private backButton : HTMLTableCellElement;
+    private styleConstants : StyleConstants = new StyleConstants;
 
     /**
      * Creates a new TableFactory.
@@ -41,15 +90,16 @@ class TableFactory {
         var actualDir = this.actualSettingsNode;
 
         var tr = document.createElement('tr');
-        tr.style.height = "100px";
+        tr.style.height = this.styleConstants.tableRowHeight;
 
         var valueChangeListener = this.valueChangeListener;
 
         if (rowId == 0) {
             this.backButton = document.createElement('td');
-            this.backButton.style.width = "50px";
+            this.backButton.id = this.styleConstants.backButtonId;
+            this.backButton.style.width = this.styleConstants.backButtonWidth;
             if (actualDir.getParent() != actualDir) {
-                this.backButton.style.backgroundColor = "GreenYellow";
+                this.backButton.style.backgroundColor = this.styleConstants.backButtonEnabledColor;
                 var container = this.container;
                 this.backButton.onclick = function () {
                     var table = document.getElementById('settings_table');
@@ -58,12 +108,12 @@ class TableFactory {
                     t.createTable(actualDir.getParent());
                 };
             } else {
-                this.backButton.style.backgroundColor = "Gray";
+                this.backButton.style.backgroundColor = this.styleConstants.backButtonDisabledColor;
             }
             var img = document.createElement('img');
-            img.src = "../../img/settings/leftarrow.png";
-            img.style.width = "50px";
-            img.style.height = "50px";
+            img.src = this.styleConstants.backButtonImgSrc;
+            img.style.width = this.styleConstants.backButtonImgWidth;
+            img.style.height = this.styleConstants.backButtonImgHeight;
             this.backButton.appendChild(img);
             tr.appendChild(this.backButton);
         } else {
@@ -71,11 +121,11 @@ class TableFactory {
         }
 
         var td = document.createElement('td');
-        td.style.width = "100px";
+        td.style.width = this.styleConstants.imageColumnWidth;
         var img = document.createElement('img');
         img.src = actualRowNode.getImageURL();
-        img.style.width = "100px";
-        img.style.height = "100px";
+        img.style.width = this.styleConstants.imageWidth;
+        img.style.height = this.styleConstants.imageHeight;
         td.appendChild(img);
         tr.appendChild(td);
 
@@ -102,7 +152,7 @@ class TableFactory {
         if (actualRowNode.isDirectory()) {
             ending = ".*";
         }
-        innerTD.innerHTML = "Debug | Topic Name → " + actualRowNode.getFullUid() + ending;
+        //innerTD.innerHTML = "Debug | Topic Name → " + actualRowNode.getFullUid() + ending;
 
         innerTR.appendChild(innerTD);
         innerTBody.appendChild(innerTR);
@@ -113,7 +163,7 @@ class TableFactory {
 
         if (actualRowNode.isDirectory()) {
             if (actualRowNode.getElements().length > 0) {
-                td.style.backgroundColor = "LightSkyBlue";
+                td.style.backgroundColor = this.styleConstants.nonEmptyFolderTextColumnBgColor;
                 var container = this.container;
                 td.onclick = function () {
                     var table = document.getElementById('settings_table');
@@ -123,11 +173,11 @@ class TableFactory {
                 };
 
             } else {
-                td.style.backgroundColor = "PaleVioletRed";
+                td.style.backgroundColor = this.styleConstants.emptyFolderTextColumnBgColor;
             }
         }
         else {
-            td.style.backgroundColor = "LightGray";
+            td.style.backgroundColor = this.styleConstants.valueTextColumnBgColor;
         }
 
         tr.appendChild(td);
@@ -138,7 +188,7 @@ class TableFactory {
 
         if (actualRowNode.isDirectory()) {
             if (actualRowNode.getElements().length > 0) {
-                td.style.backgroundColor = "DeepSkyBlue";
+                td.style.backgroundColor = this.styleConstants.nonEmptyFolderInputColumnBgColor;
                 var container = this.container;
                 td.onclick = function () {
                     var table = document.getElementById('settings_table');
@@ -147,18 +197,18 @@ class TableFactory {
                     t.createTable(actualRowNode);
                 };
             } else {
-                td.style.backgroundColor = "MediumVioletRed";
+                td.style.backgroundColor = this.styleConstants.emptyFolderInputColumnBgColor;
             }
 
         }
         else {
-            td.style.backgroundColor = "Gray";
+            td.style.backgroundColor = this.styleConstants.valueInputColumnBgColor;
             var form = document.createElement('form');
             var input = document.createElement('input');
             input.type = 'number';
-            input.style.height = "80px";
-            input.style.fontSize = "50px";
-            input.style.width = "300px";
+            input.style.height = this.styleConstants.valueNumericUpDownHeight;
+            input.style.fontSize = this.styleConstants.valueNumericUpDownFontSize;
+            input.style.width = this.styleConstants.valueNumericUpDownWidth;
             input.value = '' + actualRowNode.getActualValue();
             input.onchange = function() {
                 actualRowNode.setActualValue(this.value);
@@ -167,7 +217,7 @@ class TableFactory {
             form.appendChild(input);
             td.appendChild(form);
         }
-        td.style.width = "320px";
+        td.style.width = this.styleConstants.valueInputColumnWidth;
         tr.appendChild(td);
 
         this.tableBody.appendChild(tr);
@@ -178,10 +228,17 @@ class TableFactory {
      * @param actualSettingsNode The parent node, all of its children should be displayed in the table.
      */
     createTable(actualSettingsNode : SettingsNode) {
+        while (true) {
+            var oldTable = document.getElementById('settings_table');
+            if (oldTable == null) {
+                break;
+            }
+            container.removeChild(oldTable);
+        }
         this.table = document.createElement('table');
         this.table.id = 'settings_table';
-        this.table.style.width = '100%';
-        this.table.style.height = '100%';
+        this.table.style.width = this.styleConstants.tableWidth;
+        this.table.style.height = this.styleConstants.tableHeight;
         this.table.setAttribute('border', '1');
 
         this.tableBody = document.createElement('tbody');
@@ -197,11 +254,11 @@ class TableFactory {
         // Add ok button //
         var okbutton : HTMLButtonElement;
         okbutton = document.createElement('button');
-        okbutton.style.position = 'relative';
-        okbutton.style.width = '60%';
-        okbutton.style.marginLeft = '20%';
-        okbutton.style.height = '60%';
-        okbutton.style.fontSize = '18px';
+        okbutton.style.position = this.styleConstants.OKButtonPosition;
+        okbutton.style.width = this.styleConstants.OKButtonWidth;
+        okbutton.style.marginLeft = this.styleConstants.OKButtonMarginLeft;
+        okbutton.style.height = this.styleConstants.OKButtonHeight;
+        okbutton.style.fontSize = this.styleConstants.OKButtonFontSize;
         okbutton.appendChild(document.createTextNode('Save configuration!'));
 
         var root = actualSettingsNode;
@@ -226,16 +283,15 @@ class TableFactory {
         var tr = document.createElement('tr');
         var td = document.createElement('td');
         td.colSpan = 4;
-        td.height = '60px';
+        td.height = this.styleConstants.OKButtonRowHeight;
         td.appendChild(okbutton);
         tr.appendChild(td);
-        td.style.alignItems = 'center';
-        td.style.backgroundColor = 'Orange';
+        td.style.alignItems = this.styleConstants.OKButtonCellAlign;
+        td.style.backgroundColor = this.styleConstants.OKButtonCellBgColor;
         this.tableBody.appendChild(tr);
 
 
         this.table.appendChild(this.tableBody);
-        this.table.style.height = "auto";
         this.table.style.paddingBottom = "0px";
         this.container.appendChild(this.table);
     }
