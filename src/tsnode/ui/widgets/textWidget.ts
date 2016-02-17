@@ -50,8 +50,8 @@ class TextWidget extends Widget{
         this.widgetID = this.typeID + "-" + this.model.get("tagName") + "-" + TextWidget.widgetCounter;
         TextWidget.widgetCounter++;
 
-        this.htmlElement = "<li><div style='text-align: center; vertical-align: middle; height: 220px; width: 220px; display:table-cell;' " +
-            "id=\"" + this.widgetID  + "\"> </div></li>";
+        this.htmlElement = "<li><div style='text-align: center; vertical-align: middle; height: 220px; width: 220px; " +
+            "display:table-cell;' id=\"" + this.widgetID  + "\"> </div></li>";
         this.value = options.value;
         this.id = options.id;
     }
@@ -65,12 +65,15 @@ class TextWidget extends Widget{
     render():TextWidget{
         this.value = this.model.get("value");
 
-        this.htmlText.innerHTML = this.model.get("name") + "<br >" + this.value.toFixed(2);
+        this.htmlText.innerHTML = "<span style='font-size: 200%'>" + this.model.get("name") + "</span><br >" +
+            "<br ><span style='font-size: 200%;'>" + this.value.toFixed(2) + "</span>";
 
         return this;
     }
 
     resize(size_x: number, size_y:number){
+        this.htmlText.innerHTML = "<span style='font-size: " + size_x + "%'>" + this.model.get("name") + "</span><br >" +
+        "<br ><span style='font-size: 200%;'>" + this.value.toFixed(2) + "</span>"
         this.htmlText.style.setProperty("width", (size_x * 1.1) + "px");
         this.htmlText.style.setProperty("height", (size_y * 1.1) + "px");
     }
