@@ -2,8 +2,9 @@
  * @author David G.
  */
 
-/// <reference path="./Auxiliary.ts"/>
 /// <reference path="./TSettings.ts"/>
+/// <reference path="./../messages.ts"/>
+
 /**
  * A settings directory that can contain parameters or other directories.
  */
@@ -58,7 +59,7 @@ class SettingsDirectory implements SettingsNode{
      * Gets the topic of this directory. Directories do not have a topic, so null is returned.
      * @returns {null} Null, directories do not have a topic.
      */
-    getTopic() : Auxiliary.Topic {
+    getTopic() : SettingsMessageClient.STopic {
         return null;
     }
 
@@ -191,7 +192,7 @@ class SettingsParameter implements SettingsNode {
     private imageURL : string;
     private value : number;
     private actualValue : number;
-    private topic : Auxiliary.Topic;
+    private topic : SettingsMessageClient.STopic;
     private valueChangeListener : ValueChangeListener;
     private container : Node;
 
@@ -204,7 +205,7 @@ class SettingsParameter implements SettingsNode {
      * @param imageURL The URL of the image to be displayed in the GUI as this folder.
      * @param value The original value of this settings parameter.
      */
-    public constructor(ruid : string, name : string, description : string, imageURL : string, topic : Auxiliary.Topic, valueChangeListener : ValueChangeListener, value : number,
+    public constructor(ruid : string, name : string, description : string, imageURL : string, topic : SettingsMessageClient.STopic, valueChangeListener : ValueChangeListener, value : number,
                        container : Node) {
         this.name = name;
         this.description = description;
@@ -262,7 +263,7 @@ class SettingsParameter implements SettingsNode {
         return this.imageURL;
     }
 
-    getTopic() : Auxiliary.Topic {
+    getTopic() : SettingsMessageClient.STopic {
         return this.topic;
     }
 
@@ -397,7 +398,7 @@ interface SettingsNode {
      */
     getParent() : SettingsNode;
 
-    getTopic() : Auxiliary.Topic;
+    getTopic() : SettingsMessageClient.STopic;
 
     /**
      * Gets the relatively unique ID of this node.

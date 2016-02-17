@@ -15,7 +15,7 @@ describe("SettingsDBCOM", function () {
         expect(sv.getIdentifier()).toEqual(name);
     });
 
-    it("SettingsValue - Tests the SettingsValue toString function", function () {
+    it("SettingsValue - Tests the SettingsValue string2 function", function () {
         var value : number = 41.73;
         var name : string = "myNameOfThisSettingsValue";
         var sv : SettingsDBCOM.SettingsValue = new SettingsDBCOM.SettingsValue(value, name);
@@ -115,7 +115,7 @@ describe("SettingsDBCOM", function () {
         expect(sc.getValue().numericalValue()).toEqual(newNumValue);
     });
 
-    it("SettingsContainer - Tests the SettingsContainer toString method", function () {
+    it("SettingsContainer - Tests the SettingsContainer string2 method", function () {
         var topic : string = "setting.myTest";
         var numValue : number = -0.7;
         var valName : string = "testName";
@@ -242,7 +242,7 @@ describe("SettingsDBCOM", function () {
         expect(sm.hasBeenHandledByDB()).toEqual(true);
     });
 
-    it("SettingsMessage - Tests the SettingsMessage toString function", function() {
+    it("SettingsMessage - Tests the SettingsMessage string2 function", function() {
         var sv1 : SettingsDBCOM.SettingsValue = new SettingsDBCOM.SettingsValue(1, "name1");
 
         var sc1 : SettingsDBCOM.SettingsContainer = new SettingsDBCOM.SettingsContainer(
@@ -253,7 +253,7 @@ describe("SettingsDBCOM", function () {
         expect(sm.toString()).toEqual("SettingsMessage[|false|" + sc1.toString() + "|]");
     });
 
-    it("SettingsMessage - Tests the SettingsMessage toString function", function() {
+    it("SettingsMessage - Tests the SettingsMessage string2 function", function() {
         var sv1 : SettingsDBCOM.SettingsValue = new SettingsDBCOM.SettingsValue(1, "myName1");
         var sv2 : SettingsDBCOM.SettingsValue = new SettingsDBCOM.SettingsValue(2, "myName2");
 
@@ -267,7 +267,7 @@ describe("SettingsDBCOM", function () {
         expect(sm.toString()).toEqual("SettingsMessage[|false|" + sc1.toString() + "|" + sc2.toString() + "|]");
     });
 
-    it("SettingsMessage - Tests the SettingsMessage toString function", function() {
+    it("SettingsMessage - Tests the SettingsMessage string2 function", function() {
         var sm : SettingsDBCOM.SettingsMessage = new SettingsDBCOM.SettingsMessage(null, true);
 
         expect(sm.toString()).toEqual("SettingsMessage[|true|null|]");

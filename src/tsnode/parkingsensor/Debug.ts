@@ -4,6 +4,7 @@
 
 
 ///<reference path="ARFactory.ts"/>
+///<reference path="Communicator.ts"/>
 ///<reference path="Geometry.ts"/>
 ///<reference path="XMLParser.ts"/>
 ///<reference path="./drawer/PolygonDrawer.ts"/>
@@ -69,21 +70,26 @@ module Debug {
     export enum DebugGUIMode {
         simpleCircle, tracks, kitLogo
     }
-    export class DebugGUI {
+    export class DebugGUI implements Communicator.PComListener {
 
-        private static cameraValuesBuffer : Debug.CameraValuesBuffer = new Debug.CameraValuesBuffer();
-        private static mode : DebugGUIMode;
-        private static polygonDrawer : Drawer.PolygonDrawer = new Drawer.PolygonDrawer(mydomsvg, myisvg);
+        private cameraValuesBuffer : Debug.CameraValuesBuffer = new Debug.CameraValuesBuffer();
+        private mode : DebugGUIMode;
+        private polygonDrawer : Drawer.PolygonDrawer = new Drawer.PolygonDrawer(mydomsvg, myisvg, this);
 
-        public static getCameraValuesBuffer() {
-            return DebugGUI.cameraValuesBuffer;
+        public onMessageReceived(data) {
+            CarParameters.steeringWheelAngle = data.value.value;
+            this.redrawTracks();
         }
 
-        public static setMode(mode : DebugGUIMode) {
+        public getCameraValuesBuffer() {
+            return this.cameraValuesBuffer;
+        }
+
+        public setMode(mode : DebugGUIMode) {
             this.mode = mode;
         }
 
-        public static drawCommonDebugGUI() {
+        public drawCommonDebugGUI() {
             var table = document.createElement('table');
             var tbody = document.createElement('tbody');
             var tr = document.createElement('tr');
@@ -103,8 +109,9 @@ module Debug {
             input.style.height = "30px";
 
             input.id = 'button_dbg_drawSimpleCircle';
+            var dbgui = this;
             input.onclick = function() {
-                DebugGUI.drawDebugGUISimpleCircle();
+                dbgui.drawDebugGUISimpleCircle();
             };
 
             form.appendChild(document.createTextNode('Simple Circle in 3D: '));
@@ -126,7 +133,7 @@ module Debug {
 
             input.id = 'button_dbg_drawSimpleCircle';
             input.onclick = function() {
-                DebugGUI.drawDebugGUISteeringWheel();
+                dbgui.drawDebugGUISteeringWheel();
             };
 
             form.appendChild(document.createTextNode('Tracks of rear wheels: '));
@@ -151,7 +158,7 @@ module Debug {
 
             input.id = 'button_dbg_drawKITlogo';
             input.onclick = function() {
-                DebugGUI.polygonDrawer.drawDebugGUIlogoKIT();
+                dbgui.polygonDrawer.drawDebugGUIlogoKIT();
             };
 
             form.appendChild(document.createTextNode('KIT logo: '));
@@ -165,7 +172,7 @@ module Debug {
             document.getElementById("divPS").appendChild(table);
         }
 
-        public static drawDebugGUIAppendCamera(tbody : HTMLElement) {
+        public drawDebugGUIAppendCamera(tbody : HTMLElement) {
             var tr;
             var td;
             var form;
@@ -185,11 +192,12 @@ module Debug {
             input.style.height = "16px";
             input.style.fontSize = "12px";
             input.style.width = "60px";
-            input.value = DebugGUI.cameraValuesBuffer.cameraPositionX;
+            input.value = this.cameraValuesBuffer.cameraPositionX;
             input.id = 'kpx';
+            var dbgui = this;
             input.onchange = function() {
-                DebugGUI.cameraValuesBuffer.cameraPositionX = parseFloat(this.value);
-                DebugGUI.redrawDebugGUICommon();
+                dbgui.cameraValuesBuffer.cameraPositionX = parseFloat(this.value);
+                dbgui.redrawDebugGUICommon();
             };
 
             form.appendChild(document.createTextNode('x: '));
@@ -205,10 +213,11 @@ module Debug {
             input.style.height = "16px";
             input.style.fontSize = "12px";
             input.style.width = "60px";
-            input.value = DebugGUI.cameraValuesBuffer.cameraPositionY;
+            input.value = this.cameraValuesBuffer.cameraPositionY;
+
             input.onchange = function() {
-                DebugGUI.cameraValuesBuffer.cameraPositionY = parseFloat(this.value);
-                DebugGUI.redrawDebugGUICommon();
+                dbgui.cameraValuesBuffer.cameraPositionY = parseFloat(this.value);
+                dbgui.redrawDebugGUICommon();
             };
 
             form.appendChild(document.createTextNode('y: '));
@@ -226,10 +235,10 @@ module Debug {
             input.style.height = "16px";
             input.style.fontSize = "12px";
             input.style.width = "60px";
-            input.value = DebugGUI.cameraValuesBuffer.cameraPositionZ;
+            input.value = this.cameraValuesBuffer.cameraPositionZ;
             input.onchange = function() {
-                DebugGUI.cameraValuesBuffer.cameraPositionZ = parseFloat(this.value);
-                DebugGUI.redrawDebugGUICommon();
+                dbgui.cameraValuesBuffer.cameraPositionZ = parseFloat(this.value);
+                dbgui.redrawDebugGUICommon();
             };
 
             form.appendChild(document.createTextNode('z: '));
@@ -255,10 +264,10 @@ module Debug {
             input.style.height = "16px";
             input.style.fontSize = "12px";
             input.style.width = "60px";
-            input.value = DebugGUI.cameraValuesBuffer.cameraRotationX;
+            input.value = this.cameraValuesBuffer.cameraRotationX;
             input.onchange = function() {
-                DebugGUI.cameraValuesBuffer.cameraRotationX = parseFloat(this.value);
-                DebugGUI.redrawDebugGUICommon();
+                dbgui.cameraValuesBuffer.cameraRotationX = parseFloat(this.value);
+                dbgui.redrawDebugGUICommon();
             };
 
             form.appendChild(document.createTextNode('x: '));
@@ -274,10 +283,10 @@ module Debug {
             input.style.height = "16px";
             input.style.fontSize = "12px";
             input.style.width = "60px";
-            input.value = DebugGUI.cameraValuesBuffer.cameraRotationY;
+            input.value = this.cameraValuesBuffer.cameraRotationY;
             input.onchange = function() {
-                DebugGUI.cameraValuesBuffer.cameraRotationY = parseFloat(this.value);
-                DebugGUI.redrawDebugGUICommon();
+                dbgui.cameraValuesBuffer.cameraRotationY = parseFloat(this.value);
+                dbgui.redrawDebugGUICommon();
             };
 
             form.appendChild(document.createTextNode('y: '));
@@ -295,10 +304,10 @@ module Debug {
             input.style.height = "16px";
             input.style.fontSize = "12px";
             input.style.width = "60px";
-            input.value = DebugGUI.cameraValuesBuffer.cameraRotationZ;
+            input.value = this.cameraValuesBuffer.cameraRotationZ;
             input.onchange = function() {
-                DebugGUI.cameraValuesBuffer.cameraRotationZ = parseFloat(this.value);
-                DebugGUI.redrawDebugGUICommon();
+                dbgui.cameraValuesBuffer.cameraRotationZ = parseFloat(this.value);
+                dbgui.redrawDebugGUICommon();
             };
 
             form.appendChild(document.createTextNode('z: '));
@@ -325,12 +334,12 @@ module Debug {
             input.style.height = "16px";
             input.style.fontSize = "12px";
             input.style.width = "60px";
-            input.value = DebugGUI.cameraValuesBuffer.cameraResolutionHorizontal;
+            input.value = this.cameraValuesBuffer.cameraResolutionHorizontal;
             input.min = '1';
             input.id = 'kresh';
             input.onchange = function() {
-                DebugGUI.cameraValuesBuffer.cameraResolutionHorizontal = parseFloat(this.value);
-                DebugGUI.redrawDebugGUICommon();
+                dbgui.cameraValuesBuffer.cameraResolutionHorizontal = parseFloat(this.value);
+                dbgui.redrawDebugGUICommon();
             };
 
             form.appendChild(document.createTextNode('Hor.: '));
@@ -346,12 +355,12 @@ module Debug {
             input.style.height = "16px";
             input.style.fontSize = "12px";
             input.style.width = "60px";
-            input.value = DebugGUI.cameraValuesBuffer.cameraResolutionVertical;
+            input.value = this.cameraValuesBuffer.cameraResolutionVertical;
             input.min = '1';
             input.id = 'kresv';
             input.onchange = function() {
-                DebugGUI.cameraValuesBuffer.cameraResolutionVertical = parseFloat(this.value);
-                DebugGUI.redrawDebugGUICommon();
+                dbgui.cameraValuesBuffer.cameraResolutionVertical = parseFloat(this.value);
+                dbgui.redrawDebugGUICommon();
             };
 
             form.appendChild(document.createTextNode('Ver.: '));
@@ -378,13 +387,13 @@ module Debug {
             input.style.height = "16px";
             input.style.fontSize = "12px";
             input.style.width = "60px";
-            input.value = DebugGUI.cameraValuesBuffer.cameraHorizontalAOV;
+            input.value = this.cameraValuesBuffer.cameraHorizontalAOV;
             input.min = '1';
             input.max = '160';
             input.id = 'khaov';
             input.onchange = function() {
-                DebugGUI.cameraValuesBuffer.cameraHorizontalAOV = parseFloat(this.value);
-                DebugGUI.redrawDebugGUICommon();
+                dbgui.cameraValuesBuffer.cameraHorizontalAOV = parseFloat(this.value);
+                dbgui.redrawDebugGUICommon();
             };
 
             form.appendChild(document.createTextNode('Hor.: '));
@@ -400,13 +409,13 @@ module Debug {
             input.style.height = "16px";
             input.style.fontSize = "12px";
             input.style.width = "60px";
-            input.value = DebugGUI.cameraValuesBuffer.cameraVerticalAOV;
+            input.value = this.cameraValuesBuffer.cameraVerticalAOV;
             input.min = '1';
             input.max = '160';
             input.id = 'kvaov';
             input.onchange = function() {
-                DebugGUI.cameraValuesBuffer.cameraVerticalAOV = parseFloat(this.value);
-                DebugGUI.redrawDebugGUICommon();
+                dbgui.cameraValuesBuffer.cameraVerticalAOV = parseFloat(this.value);
+                dbgui.redrawDebugGUICommon();
             };
 
             form.appendChild(document.createTextNode('Ver.: '));
@@ -417,33 +426,33 @@ module Debug {
             tbody.appendChild(tr);
         }
 
-        public static redrawDebugGUICommon() {
-            if (DebugGUI.mode == DebugGUIMode.simpleCircle) {
-                ARFactory.Drawer.drawSimpleCircleAutoClear(myisvg, DebugGUI.cameraValuesBuffer);
-            } else if (DebugGUI.mode == DebugGUIMode.tracks) {
-                DebugGUI.redrawTracks();
-            } else if (DebugGUI.mode == DebugGUIMode.kitLogo) {
-                DebugGUI.polygonDrawer.redrawKITlogo();
+        public redrawDebugGUICommon() {
+            if (this.mode == DebugGUIMode.simpleCircle) {
+                ARFactory.Drawer.drawSimpleCircleAutoClear(myisvg, this.cameraValuesBuffer);
+            } else if (this.mode == DebugGUIMode.tracks) {
+                this.redrawTracks();
+            } else if (this.mode == DebugGUIMode.kitLogo) {
+                this.polygonDrawer.redrawKITlogo();
             }
         }
 
-        public static drawDebugGUISimpleCircle() {
+        public drawDebugGUISimpleCircle() {
 
-            DebugGUI.cameraValuesBuffer.cameraPositionX = 0;
-            DebugGUI.cameraValuesBuffer.cameraPositionY = 16;
-            DebugGUI.cameraValuesBuffer.cameraPositionZ = 0;
+            this.cameraValuesBuffer.cameraPositionX = 0;
+            this.cameraValuesBuffer.cameraPositionY = 16;
+            this.cameraValuesBuffer.cameraPositionZ = 0;
 
-            DebugGUI.cameraValuesBuffer.cameraRotationX = 90;
-            DebugGUI.cameraValuesBuffer.cameraRotationY = 0;
-            DebugGUI.cameraValuesBuffer.cameraRotationZ = 0;
+            this.cameraValuesBuffer.cameraRotationX = 90;
+            this.cameraValuesBuffer.cameraRotationY = 0;
+            this.cameraValuesBuffer.cameraRotationZ = 0;
 
-            DebugGUI.cameraValuesBuffer.cameraResolutionHorizontal = 640;
-            DebugGUI.cameraValuesBuffer.cameraResolutionVertical = 480;
+            this.cameraValuesBuffer.cameraResolutionHorizontal = 640;
+            this.cameraValuesBuffer.cameraResolutionVertical = 480;
 
-            DebugGUI.cameraValuesBuffer.cameraHorizontalAOV = 106;
-            DebugGUI.cameraValuesBuffer.cameraVerticalAOV = 90;
+            this.cameraValuesBuffer.cameraHorizontalAOV = 106;
+            this.cameraValuesBuffer.cameraVerticalAOV = 90;
 
-            DebugGUI.mode = DebugGUIMode.simpleCircle;
+            this.mode = DebugGUIMode.simpleCircle;
             var oldTable = document.getElementById("table_dbg_gui");
             while (oldTable != null) {
                 document.getElementById("divPS").removeChild(oldTable);
@@ -484,7 +493,7 @@ module Debug {
             input.id = 'cx';
             input.onchange = function() {
                 CircleValuesBuffer.cx = parseFloat(this.value);
-                ARFactory.Drawer.drawSimpleCircleAutoClear(myisvg, DebugGUI.cameraValuesBuffer);
+                ARFactory.Drawer.drawSimpleCircleAutoClear(myisvg, this.cameraValuesBuffer);
             };
 
             form.appendChild(document.createTextNode('x: '));
@@ -504,7 +513,7 @@ module Debug {
             input.id = 'cy';
             input.onchange = function() {
                 CircleValuesBuffer.cy = parseFloat(this.value);
-                ARFactory.Drawer.drawSimpleCircleAutoClear(myisvg, DebugGUI.cameraValuesBuffer);
+                ARFactory.Drawer.drawSimpleCircleAutoClear(myisvg, this.cameraValuesBuffer);
             };
 
             form.appendChild(document.createTextNode('y: '));
@@ -526,7 +535,7 @@ module Debug {
             input.id = 'cz';
             input.onchange = function() {
                 CircleValuesBuffer.cz = parseFloat(this.value);
-                ARFactory.Drawer.drawSimpleCircleAutoClear(myisvg, DebugGUI.cameraValuesBuffer);
+                ARFactory.Drawer.drawSimpleCircleAutoClear(myisvg, this.cameraValuesBuffer);
             };
 
             form.appendChild(document.createTextNode('z: '));
@@ -555,7 +564,7 @@ module Debug {
             input.id = 'cnx';
             input.onchange = function() {
                 CircleValuesBuffer.cnx = parseFloat(this.value);
-                ARFactory.Drawer.drawSimpleCircleAutoClear(myisvg, DebugGUI.cameraValuesBuffer);
+                ARFactory.Drawer.drawSimpleCircleAutoClear(myisvg, this.cameraValuesBuffer);
             };
 
             form.appendChild(document.createTextNode('x: '));
@@ -575,7 +584,7 @@ module Debug {
             input.id = 'cny';
             input.onchange = function() {
                 CircleValuesBuffer.cny = parseFloat(this.value);
-                ARFactory.Drawer.drawSimpleCircleAutoClear(myisvg, DebugGUI.cameraValuesBuffer);
+                ARFactory.Drawer.drawSimpleCircleAutoClear(myisvg, this.cameraValuesBuffer);
             };
 
             form.appendChild(document.createTextNode('y: '));
@@ -597,7 +606,7 @@ module Debug {
             input.id = 'cnz';
             input.onchange = function() {
                 CircleValuesBuffer.cnz = parseFloat(this.value);
-                ARFactory.Drawer.drawSimpleCircleAutoClear(myisvg, DebugGUI.cameraValuesBuffer);
+                ARFactory.Drawer.drawSimpleCircleAutoClear(myisvg, this.cameraValuesBuffer);
             };
 
             form.appendChild(document.createTextNode('z: '));
@@ -628,7 +637,7 @@ module Debug {
             input.id = 'cr';
             input.onchange = function() {
                 CircleValuesBuffer.radius = parseFloat(this.value);
-                ARFactory.Drawer.drawSimpleCircleAutoClear(myisvg, DebugGUI.cameraValuesBuffer);
+                ARFactory.Drawer.drawSimpleCircleAutoClear(myisvg, this.cameraValuesBuffer);
             };
 
             form.appendChild(document.createTextNode('r: '));
@@ -656,7 +665,7 @@ module Debug {
             input.id = 'psc';
             input.onchange = function() {
                 CircleValuesBuffer.polygonSegmentCount = parseFloat(this.value);
-                ARFactory.Drawer.drawSimpleCircleAutoClear(myisvg, DebugGUI.cameraValuesBuffer);
+                ARFactory.Drawer.drawSimpleCircleAutoClear(myisvg, this.cameraValuesBuffer);
             };
 
             form.appendChild(document.createTextNode('#: '));
@@ -686,7 +695,7 @@ module Debug {
             input.id = 'csw';
             input.onchange = function() {
                 CircleValuesBuffer.circleStrokeWidth = parseFloat(this.value);
-                ARFactory.Drawer.drawSimpleCircleAutoClear(myisvg, DebugGUI.cameraValuesBuffer);
+                ARFactory.Drawer.drawSimpleCircleAutoClear(myisvg, this.cameraValuesBuffer);
             };
 
             form.appendChild(document.createTextNode('w: '));
@@ -721,7 +730,7 @@ module Debug {
             input.id = 'ccr';
             input.onchange = function() {
                 CircleValuesBuffer.circleStrokeRed = parseFloat(this.value);
-                ARFactory.Drawer.drawSimpleCircleAutoClear(myisvg, DebugGUI.cameraValuesBuffer);
+                ARFactory.Drawer.drawSimpleCircleAutoClear(myisvg, this.cameraValuesBuffer);
             };
 
             form.appendChild(document.createTextNode('r: '));
@@ -743,7 +752,7 @@ module Debug {
             input.id = 'ccg';
             input.onchange = function() {
                 CircleValuesBuffer.circleStrokeGreen = parseFloat(this.value);
-                ARFactory.Drawer.drawSimpleCircleAutoClear(myisvg, DebugGUI.cameraValuesBuffer);
+                ARFactory.Drawer.drawSimpleCircleAutoClear(myisvg, this.cameraValuesBuffer);
             };
 
             form.appendChild(document.createTextNode('g: '));
@@ -766,7 +775,7 @@ module Debug {
             input.max = 255;
             input.onchange = function() {
                 CircleValuesBuffer.circleStrokeBlue = parseFloat(this.value);
-                ARFactory.Drawer.drawSimpleCircleAutoClear(myisvg, DebugGUI.cameraValuesBuffer);
+                ARFactory.Drawer.drawSimpleCircleAutoClear(myisvg, this.cameraValuesBuffer);
             };
 
             form.appendChild(document.createTextNode('b: '));
@@ -801,7 +810,7 @@ module Debug {
             input.id = 'cfr';
             input.onchange = function() {
                 CircleValuesBuffer.circleFillRed = parseFloat(this.value);
-                ARFactory.Drawer.drawSimpleCircleAutoClear(myisvg, DebugGUI.cameraValuesBuffer);
+                ARFactory.Drawer.drawSimpleCircleAutoClear(myisvg, this.cameraValuesBuffer);
             };
 
             form.appendChild(document.createTextNode('r: '));
@@ -823,7 +832,7 @@ module Debug {
             input.id = 'cfg';
             input.onchange = function() {
                 CircleValuesBuffer.circleFillGreen = parseFloat(this.value);
-                ARFactory.Drawer.drawSimpleCircleAutoClear(myisvg, DebugGUI.cameraValuesBuffer);
+                ARFactory.Drawer.drawSimpleCircleAutoClear(myisvg, this.cameraValuesBuffer);
             };
 
             form.appendChild(document.createTextNode('g: '));
@@ -847,7 +856,7 @@ module Debug {
             input.id = 'cfb';
             input.onchange = function() {
                 CircleValuesBuffer.circleFillBlue = parseFloat(this.value);
-                ARFactory.Drawer.drawSimpleCircleAutoClear(myisvg, DebugGUI.cameraValuesBuffer);
+                ARFactory.Drawer.drawSimpleCircleAutoClear(myisvg, this.cameraValuesBuffer);
             };
 
             form.appendChild(document.createTextNode('b: '));
@@ -857,28 +866,28 @@ module Debug {
 
             tbody.appendChild(tr);
 
-            DebugGUI.drawDebugGUIAppendCamera(tbody);
+            this.drawDebugGUIAppendCamera(tbody);
 
             table.appendChild(tbody);
             document.getElementById("divPS").appendChild(table);
 
-            ARFactory.Drawer.drawSimpleCircleAutoClear(myisvg, DebugGUI.cameraValuesBuffer);
+            ARFactory.Drawer.drawSimpleCircleAutoClear(myisvg, this.cameraValuesBuffer);
         }
 
-        public static redrawTracks() {
+        public redrawTracks() {
 
-            var cameraRotation : Geometry.Rot3 = new Geometry.Rot3(new Geometry.Angle(DebugGUI.cameraValuesBuffer.cameraRotationX / 180 * Math.PI),
-                new Geometry.Angle(DebugGUI.cameraValuesBuffer.cameraRotationY / 180 * Math.PI), new Geometry.Angle(DebugGUI.cameraValuesBuffer.cameraRotationZ / 180 * Math.PI));
+            var cameraRotation : Geometry.Rot3 = new Geometry.Rot3(new Geometry.Angle(this.cameraValuesBuffer.cameraRotationX / 180 * Math.PI),
+                new Geometry.Angle(this.cameraValuesBuffer.cameraRotationY / 180 * Math.PI), new Geometry.Angle(this.cameraValuesBuffer.cameraRotationZ / 180 * Math.PI));
 
-            var cameraPosition : Geometry.Vec3 = new Geometry.Vec3([DebugGUI.cameraValuesBuffer.cameraPositionX,
-                DebugGUI.cameraValuesBuffer.cameraPositionY, DebugGUI.cameraValuesBuffer.cameraPositionZ]);
+            var cameraPosition : Geometry.Vec3 = new Geometry.Vec3([this.cameraValuesBuffer.cameraPositionX,
+                this.cameraValuesBuffer.cameraPositionY, this.cameraValuesBuffer.cameraPositionZ]);
 
             // Camera Horizontal and Vertical Angle Of View.
-            var cameraHAOV : Geometry.Angle = new Geometry.Angle(DebugGUI.cameraValuesBuffer.cameraHorizontalAOV / 180 * Math.PI);
-            var cameraVAOV : Geometry.Angle = new Geometry.Angle(DebugGUI.cameraValuesBuffer.cameraVerticalAOV / 180 * Math.PI);
+            var cameraHAOV : Geometry.Angle = new Geometry.Angle(this.cameraValuesBuffer.cameraHorizontalAOV / 180 * Math.PI);
+            var cameraVAOV : Geometry.Angle = new Geometry.Angle(this.cameraValuesBuffer.cameraVerticalAOV / 180 * Math.PI);
 
             // Camera horizontal and vertical resolution.
-            var cameraResolution : Geometry.Vec2 = new Geometry.Vec2(DebugGUI.cameraValuesBuffer.cameraResolutionHorizontal, DebugGUI.cameraValuesBuffer.cameraResolutionVertical);
+            var cameraResolution : Geometry.Vec2 = new Geometry.Vec2(this.cameraValuesBuffer.cameraResolutionHorizontal, this.cameraValuesBuffer.cameraResolutionVertical);
 
             var camera : Visualization.Camera = new Visualization.Camera(cameraRotation, cameraPosition,
                 cameraHAOV, cameraVAOV, cameraResolution);
@@ -922,22 +931,22 @@ module Debug {
             myisvg.refresh();
         }
 
-        public static drawDebugGUISteeringWheel() {
-            DebugGUI.cameraValuesBuffer.cameraPositionX = 0;
-            DebugGUI.cameraValuesBuffer.cameraPositionY = 800;
-            DebugGUI.cameraValuesBuffer.cameraPositionZ = 0;
+        public drawDebugGUISteeringWheel() {
+            this.cameraValuesBuffer.cameraPositionX = 0;
+            this.cameraValuesBuffer.cameraPositionY = 800;
+            this.cameraValuesBuffer.cameraPositionZ = 0;
 
-            DebugGUI.cameraValuesBuffer.cameraRotationX = 20;
-            DebugGUI.cameraValuesBuffer.cameraRotationY = 0;
-            DebugGUI.cameraValuesBuffer.cameraRotationZ = 0;
+            this.cameraValuesBuffer.cameraRotationX = 20;
+            this.cameraValuesBuffer.cameraRotationY = 0;
+            this.cameraValuesBuffer.cameraRotationZ = 0;
 
-            DebugGUI.cameraValuesBuffer.cameraResolutionHorizontal = 640;
-            DebugGUI.cameraValuesBuffer.cameraResolutionVertical = 480;
+            this.cameraValuesBuffer.cameraResolutionHorizontal = 640;
+            this.cameraValuesBuffer.cameraResolutionVertical = 480;
 
-            DebugGUI.cameraValuesBuffer.cameraHorizontalAOV = 106;
-            DebugGUI.cameraValuesBuffer.cameraVerticalAOV = 90;
+            this.cameraValuesBuffer.cameraHorizontalAOV = 106;
+            this.cameraValuesBuffer.cameraVerticalAOV = 90;
 
-            DebugGUI.mode = DebugGUIMode.tracks;
+            this.mode = DebugGUIMode.tracks;
 
             var oldTable = document.getElementById("table_dbg_gui");
             while (oldTable != null) {
@@ -981,7 +990,7 @@ module Debug {
             input.max = +540;
             input.onchange = function() {
                 CarParameters.steeringWheelAngle = this.value;
-                DebugGUI.redrawTracks();
+                this.redrawTracks();
             };
 
             form.appendChild(document.createTextNode('rot.: '));
@@ -991,19 +1000,28 @@ module Debug {
 
             tbody.appendChild(tr);
 
-            DebugGUI.drawDebugGUIAppendCamera(tbody);
+            this.drawDebugGUIAppendCamera(tbody);
 
             table.appendChild(tbody);
             document.getElementById("divPS").appendChild(table);
 
-            DebugGUI.redrawTracks();
+            this.redrawTracks();
         }
     }
 
     export class Starter {
         static start() {
-            Debug.DebugGUI.drawCommonDebugGUI();
-            ARFactory.Drawer.drawSimpleCircleAutoClear(myisvg, DebugGUI.getCameraValuesBuffer());
+            var div = document.createElement("div");
+            div.id = "ps_msgDIV";
+            div.innerHTML = "No messages received yet.";
+            document.getElementById("divPS").appendChild(div);
+            var dbgui = new Debug.DebugGUI();
+            dbgui.drawCommonDebugGUI();
+            ARFactory.Drawer.drawSimpleCircleAutoClear(myisvg, dbgui.getCameraValuesBuffer());
+
+            var pcom : Communicator.PCommunicator = new Communicator.PCommunicator("ps_msgDIV", dbgui);
+            pcom.subscribe();
+
             myisvg.refresh();
         }
     }

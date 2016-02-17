@@ -2,7 +2,6 @@
  * @author David G.
  */
 
-/// <reference path="./Auxiliary.ts"/>
 /// <reference path="./TextDebugger.ts"/>
 /// <reference path="./TSettings.ts"/>
 /**
@@ -217,9 +216,10 @@ class TableFactory {
 
         var container = this.container;
         okbutton.onclick = function () {
-            var message = valueChangeListener.getSettingsWriteMessage();
+            var postal_message = valueChangeListener.postal_getSettingsWriteMessage();
             root.actualValueStored();
-            Auxiliary.Broker.get().handleMessage(message);
+            var pch = postal.channel(TSConstants.st2dbChannel);
+            pch.publish(TSConstants.st2dbTopic, postal_message);
             TextDebugger.refreshData(null, container);
         };
 

@@ -81,7 +81,7 @@ describe("Format", function () {
         expect(rgbERR.toHEXString()).toEqual(rgbOK.toHEXString());
     });
 
-    it("Tests the toString function of RGB", function () {
+    it("Tests the string2 function of RGB", function () {
         var rgb = new Format.RGB(128, 194, 1);
         expect(rgb.toString()).toEqual("rgb(128, 194, 1)");
     });
@@ -110,14 +110,14 @@ describe("Format", function () {
         expect(format.getFill().toHEXString()).toEqual(rgb2.toHEXString());
     });
 
-    it("Tests the toString function of FormatContainer with a specified fill container", function () {
+    it("Tests the string2 function of FormatContainer with a specified fill container", function () {
         var fill = new Format.RGB(1, 2, 3);
         var stroke = new Format.RGB(4, 5, 6);
         var format = new Format.FormatContainer(fill, stroke, 7, "FormatName");
         expect(format.toString()).toEqual("fill=\"" + fill.toString() + "\" stroke=\"" + stroke.toString() + "\" stroke-width=\"" + 7 + "\"");
     });
 
-    it("Tests the toString function of FormatContainer with an unspecified fill container (none)", function () {
+    it("Tests the string2 function of FormatContainer with an unspecified fill container (none)", function () {
         var fill = null;
         var stroke = new Format.RGB(1, 2, 3);
         var format = new Format.FormatContainer(fill, stroke, 7, "FormatName");

@@ -2,7 +2,6 @@
  * @author David G.
  */
 
-/// <reference path="./Auxiliary.ts"/>
 /// <reference path="./CompositeStructure.ts"/>
 /// <reference path="./TSettings.ts"/>
 
@@ -59,11 +58,11 @@ class TextDebugger {
             td.width = "150px";
             tr.appendChild(td);
             td = document.createElement('td');
-            td.innerHTML = "Topic ID";
+            td.innerHTML = "STopic ID";
             td.width = "150px";
             tr.appendChild(td);
             td = document.createElement('td');
-            td.innerHTML = "Value to be stored";
+            td.innerHTML = "SValue to be stored";
             td.width = "150px";
             tr.appendChild(td);
             tr.style.border = '1px solid black';

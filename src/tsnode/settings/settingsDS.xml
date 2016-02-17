@@ -10,32 +10,32 @@
         <description>Fahrzeugspezifische Einstellungen</description>
         <imageURL>../../img/settings/car/car.png</imageURL>
         <npar>
-            <ruid>wheelbase</ruid>
+            <ruid>settings.wheelbase</ruid>
             <name>Radstand</name>
             <description>Abstand zwischen den Achsen des Fahrzeuges (gemessen in Millimetern).</description>
             <imageURL>../../img/settings/car/wheelbase.png</imageURL>
-            <topicName>wheelbase</topicName>
+            <topicName>settings.wheelbase</topicName>
         </npar>
         <npar>
-            <ruid>axletrack</ruid>
+            <ruid>settings.axletrack</ruid>
             <name>Spurweite</name>
             <description>Abstand zwischen den beiden Radaufstandspunkten der hinteren Achse in der Ansicht von hinten (gemessen in Millimetern).</description>
             <imageURL>../../img/settings/car/axletrack.png</imageURL>
-            <topicName>axletrack</topicName>
+            <topicName>settings.axletrack</topicName>
         </npar>
         <npar>
-            <ruid>steeringratio</ruid>
+            <ruid>settings.steeringratio</ruid>
             <name>Lenkverhältnis</name>
             <description>Das Verhältnis zwischen der Drehung des Lenkrads (in Grad) und die Drehung der Räder (in Grad).</description>
             <imageURL>../../img/settings/car/steeringratio.png</imageURL>
-            <topicName>steeringratio</topicName>
+            <topicName>settings.steeringratio</topicName>
         </npar>
         <npar>
-            <ruid>fueltankwarning</ruid>
+            <ruid>settings.fueltankwarning</ruid>
             <name>Tankreserve-Warnung</name>
             <description>Gibt an, wann die Benachrichtigung, dass der Tank leer ist ausgelöst werden soll (in Litern).</description>
             <imageURL>../../img/settings/car/fueltankwarning.png</imageURL>
-            <topicName>fueltankwarning</topicName>
+            <topicName>settings.fueltankwarning</topicName>
         </npar>
     </dir>
     <dir>
@@ -44,11 +44,11 @@
         <description>Datenbankspezifische Einstellungen</description>
         <imageURL>../../img/settings/database/database.png</imageURL>
         <npar>
-            <ruid>dbcapacity</ruid>
+            <ruid>settings.dbcapacity</ruid>
             <name>Maximale Datenbankgröße</name>
             <description>Die maximale Anzahl von Datensätzen, die in der Datenbank gespeichert werden dürfen.</description>
             <imageURL>../../img/settings/database/dbcapacity.png</imageURL>
-            <topicName>dbcapacity</topicName>
+            <topicName>settings.dbcapacity</topicName>
         </npar>
     </dir>
 </root>

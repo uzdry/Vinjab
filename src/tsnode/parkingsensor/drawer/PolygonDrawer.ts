@@ -11,15 +11,17 @@ module Drawer {
     export class PolygonDrawer implements XMLParser.XMLParserCallBack {
         private mydomsvg;
         private myisvg;
+        private dbgui : Debug.DebugGUI;
 
-        constructor(mydomsvg, myisvg) {
+        constructor(mydomsvg, myisvg, dbgui : Debug.DebugGUI) {
             this.mydomsvg = mydomsvg;
             this.myisvg = myisvg;
+            this.dbgui = dbgui;
         }
 
         public onPolygonsFound(polygons:Primitive.Polygon[]) {
 
-            var cameraValuesBuffer = Debug.DebugGUI.getCameraValuesBuffer();
+            var cameraValuesBuffer = this.dbgui.getCameraValuesBuffer();
             var cameraRotation:Geometry.Rot3 = new Geometry.Rot3(new Geometry.Angle(cameraValuesBuffer.cameraRotationX / 180 * Math.PI),
                 new Geometry.Angle(cameraValuesBuffer.cameraRotationY / 180 * Math.PI), new Geometry.Angle(cameraValuesBuffer.cameraRotationZ / 180 * Math.PI));
 
@@ -62,7 +64,7 @@ module Drawer {
             tr.appendChild(td);
             tbody.appendChild(tr);
 
-            Debug.DebugGUI.drawDebugGUIAppendCamera(tbody);
+            this.dbgui.drawDebugGUIAppendCamera(tbody);
             table.appendChild(tbody);
             document.getElementById("divPS").appendChild(table);
 
@@ -77,7 +79,7 @@ module Drawer {
         }
 
         public drawDebugGUIlogoKIT() {
-            var cameraValuesBuffer = Debug.DebugGUI.getCameraValuesBuffer();
+            var cameraValuesBuffer = this.dbgui.getCameraValuesBuffer();
 
             cameraValuesBuffer.cameraPositionX = 50;
             cameraValuesBuffer.cameraPositionY = 0;
@@ -93,7 +95,7 @@ module Drawer {
             cameraValuesBuffer.cameraHorizontalAOV = 106;
             cameraValuesBuffer.cameraVerticalAOV = 90;
 
-            Debug.DebugGUI.setMode(Debug.DebugGUIMode.kitLogo);
+            this.dbgui.setMode(Debug.DebugGUIMode.kitLogo);
 
             this.redrawKITlogo();
         }

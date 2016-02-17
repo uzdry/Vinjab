@@ -1,9 +1,12 @@
 ///<reference path="C:\Program Files (x86)\JetBrains\WebStorm 11.0.3\plugins/JavaScriptLanguage/typescriptCompiler/external/lib.es6.d.ts"/>
 
 /// <reference path="../../../typings/postal/postal.d.ts"/>
-/// <reference path="./Auxiliary.ts"/>
 /// <reference path="./TextDebugger.ts"/>
 /// <reference path="./Renderer.ts"/>
+/// <reference path="./SettingsDBCOM.ts"/>
+/// <reference path="./../parkingsensor/Communicator.ts"/>
+/// <reference path="./SettingsMessageClient.ts"/>
+/// <reference path="./SettingsMessageCommon.ts"/>
 
 /**
  * @author: David G.
@@ -63,17 +66,21 @@ class ValueChangeListener {
         TextDebugger.refreshData(this.settingsNodes, container);
     }
 
-    /**
-     * Converts the internal to-be-written-to-the-database list of nodes to a settings message.
-     * @returns {AuxiliarySettingsMessage} The settings message that can be sent directly to the database.
-     */
-    public getSettingsWriteMessage() : Auxiliary.AuxiliarySettingsMessage {
-        var auxiliaryMap = new Auxiliary.AuxiliaryMap();
+
+
+    public postal_getSettingsWriteMessage() : SettingsMessageClient.SettingsMessage {
+        var sc : SettingsMessageCommon.SettingsContainer;
+        var scArray : SettingsMessageCommon.SettingsContainer[];
+
         for (var i = 0; i < this.settingsNodes.length; i++) {
-            auxiliaryMap.set(this.settingsNodes[i].getTopic(), new Auxiliary.Value(this.settingsNodes[i].getActualValue(), "ignoreME"));
+            var sv : SettingsMessageClient.SettingsValue =
+                new SettingsMessageClient.SettingsValue(this.settingsNodes[i].getActualValue(), "dontforgettochangeme");
+            sc = new SettingsMessageCommon.SettingsContainer(this.settingsNodes[i].getTopic().getName(),
+                sv, SettingsMessageCommon.SettingsIODirection.write);
+            scArray.push(sc);
         }
-        var auxiliarySettingsMessage = new Auxiliary.AuxiliarySettingsMessage(auxiliaryMap);
-        return auxiliarySettingsMessage;
+        var sm : SettingsMessageClient.SettingsMessage = new SettingsMessageClient.SettingsMessage(scArray, false);
+        return sm;
     }
 }
 
@@ -174,7 +181,7 @@ class SCommunicator {
     private static parseNumericParameter(parameter : any, messageBuffer : MessageBuffer, valueChangeListener : ValueChangeListener, container : Node) {
         var topicName = SCommunicator.getValue('topicName', parameter);
 
-        var topic = new Auxiliary.Topic(topicName);
+        var topic = new SettingsMessageClient.STopic(topicName);
 
         var childPar = new SettingsParameter(SCommunicator.getValue("ruid", parameter), SCommunicator.getValue("name", parameter), SCommunicator.getValue("description", parameter),
             SCommunicator.getValue("imageURL", parameter), topic, valueChangeListener, messageBuffer.getValueOf(topic), container);
@@ -218,13 +225,49 @@ class SCommunicator {
     }
 }
 
+class MBMap {
+    topics:SettingsMessageClient.STopic[];
+    values:SettingsMessageInterface.ISettingsValue[];
+
+    public constructor() {
+        this.topics = [];
+        this.values = [];
+    }
+
+    public set(topic:SettingsMessageClient.STopic, value:SettingsMessageInterface.ISettingsValue):void {
+        var index = this.getIndexOf(topic);
+        if (index != -1) {
+            this.values[index] = value;
+        } else {
+            this.topics.push(topic);
+            this.values.push(value);
+        }
+    }
+
+    public get(topic:SettingsMessageClient.STopic):SettingsMessageInterface.ISettingsValue {
+        var index = this.getIndexOf(topic);
+        if (index != -1) {
+            return this.values[index];
+        }
+        return null;
+    }
+
+    private getIndexOf(topic:SettingsMessageClient.STopic) {
+        for (var i = 0; i < this.topics.length; i++) {
+            if (topic.equals(this.topics[i])) {
+                return i;
+            }
+        }
+        return -1;
+    }
+}
 
 /**
  * A message buffer used to communicate with the server.
  */
-class MessageBuffer extends Auxiliary.BusDevice {
+class MessageBuffer {
     private answersToReceive = 0;
-    private configs : Auxiliary.AuxiliaryMap;
+    private configs : MBMap;
     private valueChangeListener : ValueChangeListener;
     private container : Node;
 
@@ -233,7 +276,6 @@ class MessageBuffer extends Auxiliary.BusDevice {
      * @param valueChangeListener The value change listener to be notified if the value of any parameter changes.
      */
     public constructor(valueChangeListener : ValueChangeListener, container : Node) {
-        super();
         this.valueChangeListener = valueChangeListener;
         this.container = container;
     }
@@ -242,7 +284,7 @@ class MessageBuffer extends Auxiliary.BusDevice {
      * Initializes the module, sends a request to the database to send all the settings values.
      */
     public initialize() : void {
-        this.sendDBRequest();
+        this.postal_sendDBRequest();
     }
 
     /**
@@ -256,24 +298,22 @@ class MessageBuffer extends Auxiliary.BusDevice {
         return true;
     }
 
-    /**
-     * Sends a database settings request message to the database. No parameters needed, only one possible database settings request message exists.
-     */
-    sendDBRequest() : void {
-        this.answersToReceive++;
-        Auxiliary.Broker.get().subscribe(Auxiliary.Topic.SETTINGS_MSG, this);
-        Auxiliary.Broker.get().handleMessage(new Auxiliary.DBRequestMessage(new Auxiliary.DBSettingsRequest()));
+    public postal_sendDBRequest() : void {
+        var pch_db2st = postal.channel(TSConstants.db2stChannel);
+        pch_db2st.subscribe(TSConstants.db2stTopic, this.postal_handleMessage.bind(this));
+        var pch_st2db = postal.channel(TSConstants.st2dbChannel);
+        pch_st2db.publish(TSConstants.st2dbTopic, new SettingsMessageClient.SettingsMessage(null, false));
     }
 
-    /**
-     * Handles an incoming message from the server.
-     * @param m The message that has been send by the server to this settings module.
-     */
-    public handleMessage(m : Auxiliary.Message) : void {
-        if (m.getTopic().equals(Auxiliary.Topic.SETTINGS_MSG)) {
-            if (this.answersToReceive > 0) {
-                this.answersToReceive--;
-                this.configs = (<Auxiliary.AuxiliarySettingsMessage>m).getConfigs();
+    public postal_handleMessage(data) {
+        var message = <SettingsMessageInterface.ISettingsMessage>data;
+        if (message.getTopic().equals(SettingsMessageClient.STopic.SETTINGS_MSG)) {
+            var auxmap = new MBMap();
+            if (message.getContainers() != null) {
+                for (var i = 0; i < message.getContainers().length; i++) {
+                    auxmap.set(new SettingsMessageClient.STopic(message.getContainers()[i].getTopic()), message.getContainers()[i].getValue());
+                }
+                this.configs = auxmap;
                 this.onReceiveData();
             }
         }
@@ -284,7 +324,7 @@ class MessageBuffer extends Auxiliary.BusDevice {
      * @param topic The topic of the specified parameter.
      * @returns {number} The numerical value of the specified parameter.
      */
-    getValueOf(topic : Auxiliary.Topic) : number {
+    getValueOf(topic : SettingsMessageClient.STopic) : number {
 
         var val1 = this.configs.get(topic);
         return this.configs.get(topic).numericalValue();
@@ -304,34 +344,83 @@ class MessageBuffer extends Auxiliary.BusDevice {
 /**
  * A dummy database used only for test purposes to emulate the real database locally.
  */
-class DummyDatabase extends Auxiliary.BusDevice {
+class DummyDatabase {
 
-    /**
-     * Creates a dummy database.
-     */
+    private dbinf : SettingsDBCOM.ExampleDatabaseInterface;
+
+
     public constructor() {
-        super();
-        this.subscribe(Auxiliary.Topic.DBREQ_MSG);
+
+        var topic1 = new SettingsMessageClient.STopic("settings.wheelbase");
+        var value1 = new SettingsMessageClient.SettingsValue(4000, 'valueName');
+
+        var topic2 = new SettingsMessageClient.STopic("settings.axletrack");
+        var value2 = new SettingsMessageClient.SettingsValue(1300, 'valueName');
+
+        var topic3 = new SettingsMessageClient.STopic('settings.steeringratio');
+        var value3 = new SettingsMessageClient.SettingsValue(20, 'valueName');
+
+        var topic4 = new SettingsMessageClient.STopic('settings.dbcapacity');
+        var value4 = new SettingsMessageClient.SettingsValue(999, 'valueName');
+
+        var topic5 = new SettingsMessageClient.STopic('settings.fueltankwarning');
+        var value5 = new SettingsMessageClient.SettingsValue(8, 'valueName');
+
+        SettingsDBCOM.LowLevelDatabaseEmulator.clearDB();
+        SettingsDBCOM.LowLevelDatabaseEmulator.createNewEntry(topic1.getName(),
+            SettingsMessageCommon.SettingsValue.stringifyValue(value1));
+        SettingsDBCOM.LowLevelDatabaseEmulator.createNewEntry(topic2.getName(),
+            SettingsMessageCommon.SettingsValue.stringifyValue(value2));
+        SettingsDBCOM.LowLevelDatabaseEmulator.createNewEntry(topic3.getName(),
+            SettingsMessageCommon.SettingsValue.stringifyValue(value3));
+        SettingsDBCOM.LowLevelDatabaseEmulator.createNewEntry(topic4.getName(),
+            SettingsMessageCommon.SettingsValue.stringifyValue(value4));
+        SettingsDBCOM.LowLevelDatabaseEmulator.createNewEntry(topic5.getName(),
+            SettingsMessageCommon.SettingsValue.stringifyValue(value5));
+
+        this.dbinf =  new SettingsDBCOM.ExampleDatabaseInterface(new SettingsMessageClient.SpecimenFactory());
+
+        var pch = postal.channel(TSConstants.st2dbChannel);
+        pch.subscribe(TSConstants.st2dbTopic, this.postal_handleMessage.bind(this));
     }
 
-    /**
-     * Handles a message that has been sent to the database (this). Only Database request messages are supported.
-     * @param m The message that has been sent to the database.
-     */
-    public handleMessage(m : Auxiliary.Message) : void {
-        var auxmap = new Auxiliary.AuxiliaryMap();
-        var topic1 = new Auxiliary.Topic('wheelbase');
-        auxmap.set(topic1, new Auxiliary.Value(4000, 'valueName'));
-        var topic1 = new Auxiliary.Topic('axletrack');
-        auxmap.set(topic1, new Auxiliary.Value(1300, 'valueName'));
-        var topic1 = new Auxiliary.Topic('steeringratio');
-        auxmap.set(topic1, new Auxiliary.Value(20, 'valueName'));
-        var topic1 = new Auxiliary.Topic('dbcapacity');
-        auxmap.set(topic1, new Auxiliary.Value(999, 'valueName'));
-        var topic1 = new Auxiliary.Topic('fueltankwarning');
-        auxmap.set(topic1, new Auxiliary.Value(8, 'valueName'));
-        Auxiliary.Broker.get().handleMessage(new Auxiliary.AuxiliarySettingsMessage(auxmap));
+    public postal_handleMessage(data) : void {
+        var answer = this.dbinf.handleSettingsMessage(data);
+        if (answer != null) {
+            var pch = postal.channel(TSConstants.db2stChannel);
+            pch.publish(TSConstants.db2stTopic, answer);
+        }
     }
+
+    /*public constructor() {
+        var pch = postal.channel(TSConstants.st2dbChannel);
+        pch.subscribe(TSConstants.st2dbTopic, this.postal_handleMessage.bind(this));
+    }
+
+
+    public postal_handleMessage(data) : void {
+        var topic1 = new SettingsMessageClient.STopic('wheelbase');
+        var value1 = new SettingsMessageClient.SValue(4000, 'valueName');
+        var sc1 = new SettingsDBCOM.SettingsContainer(topic1.getName(), value1, SettingsDBCOM.SettingsIODirection.write);
+        var topic1 = new SettingsMessageClient.STopic('axletrack');
+        var value1 = new SettingsMessageClient.SValue(1300, 'valueName');
+        var sc2 = new SettingsDBCOM.SettingsContainer(topic1.getName(), value1, SettingsDBCOM.SettingsIODirection.write);
+        var topic1 = new SettingsMessageClient.STopic('steeringratio');
+        var value1 = new SettingsMessageClient.SValue(20, 'valueName');
+        var sc3 = new SettingsDBCOM.SettingsContainer(topic1.getName(), value1, SettingsDBCOM.SettingsIODirection.write);
+
+        var topic1 = new SettingsMessageClient.STopic('dbcapacity');
+        var value1 = new SettingsMessageClient.SValue(999, 'valueName');
+        var sc4 = new SettingsDBCOM.SettingsContainer(topic1.getName(), value1, SettingsDBCOM.SettingsIODirection.write);
+
+        var topic1 = new SettingsMessageClient.STopic('fueltankwarning');
+        var value1 = new SettingsMessageClient.SValue(8, 'valueName');
+        var sc5 = new SettingsDBCOM.SettingsContainer(topic1.getName(), value1, SettingsDBCOM.SettingsIODirection.write);
+
+        var sm = new SettingsDBCOM.SettingsMessage([sc1, sc2, sc3, sc4, sc5], true);
+        var pch = postal.channel(TSConstants.db2stChannel);
+        pch.publish(TSConstants.db2stTopic, sm);
+    }*/
 }
 
 /**
@@ -351,31 +440,24 @@ class Startup {
         var database = new DummyDatabase();
         messageBuffer.initialize();
 
-        var div = document.createElement("msgDIV");
-        div.id = "msgDIV";
+        var div = document.createElement("div");
+        div.id = "settings_msgDIV";
         div.innerHTML = "No messages received yet.";
         container.appendChild(div);
     }
+
 }
 
-class Communicator {
-    private mychannel;
-    public subscribe() : void {
-        //var channelsub = postal.channel("reqsubs");
-        //var reqsub = channelsub.publish("request." + "value.steering", "value.steering");
+class TSConstants {
+    public static st2dbChannel = "settingsintern_st2db";
+    public static db2stChannel = "settingsintern_db2st";
 
-        //this.mychannel = postal.channel("values");
-        //this.mychannel.subscribe("value.steering", this.onMessageReceived.bind(this));
-    }
+    public static st2dbTopic = "settingsintern_st2db";
+    public static db2stTopic = "settingsintern_db2st";
 
-    public onMessageReceived(data) : void {
-        var msgdiv = document.getElementById("msgDIV");
-        msgdiv.innerHTML = "Message received: " + data.value.value;
-        // var swRotation = document.getElementById("swRotation");
-        // swRotation.value = data.value.value;
-        //  Event: swRotation value changed!
-    }
 }
+
+
 
 
 /**
@@ -388,5 +470,5 @@ div2.style.padding = "20px";
 div1.appendChild(div2);
 Startup.initialize(div2);
 
-//var com : Communicator = new Communicator();
-//com.subscribe();
+var pcom : Communicator.PCommunicator = new Communicator.PCommunicator("settings_msgDIV", null);
+pcom.subscribe();
