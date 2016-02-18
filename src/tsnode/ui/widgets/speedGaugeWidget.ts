@@ -79,14 +79,14 @@ class SpeedGaugeWidget extends Widget{
 
         this.config.title = this.model.get("name");
 
+        this.config.units = this.model.get("unit");
+
         this.config.maxValue = this.model.get("maxValue");
 
         if (this.model.get("ticks")) {
             this.config.majorTicks = this.model.get("ticks");
         }
        // console.log(this.model.get("ticks"));
-
-        var step = Math.round(this.config.maxValue / 10);
 
 
 
