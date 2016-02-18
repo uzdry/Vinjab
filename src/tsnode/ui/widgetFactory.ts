@@ -144,7 +144,7 @@ class WidgetFactory{
 
                 var h = highlightse[j];
 
-                var start = h.getElementsByTagName("start");
+                var start = parseInt(h.getElementsByTagName("start")[0]);
                 console.log(start);
                 var end = h.getElementsByTagName("end");
 
