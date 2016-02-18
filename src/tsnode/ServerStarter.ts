@@ -1,9 +1,3 @@
-/**
- * Created by yimeng on 14/02/16.
- */
-
-/// <reference path="../../levelup.d.ts" />
-import levelup = require("levelup");
 import {Server} from "./Server";
 import {Broker} from "./Bus";
 import {Aggregation, Distance, FuelConsumption, AverageComputation} from "./AggregatedFunctions";
