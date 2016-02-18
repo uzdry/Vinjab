@@ -144,13 +144,11 @@ class WidgetFactory{
 
                 var h = highlightse[j];
 
-                var start = parseInt(h.getElementsByTagName("start")[0]);
-                console.log(start);
-                var end = h.getElementsByTagName("end");
+                var startValue = parseInt(h.getElementsByTagName("start")[0].textContent);
+                var endValue = parseInt(h.getElementsByTagName("end")[0].textContent);
+                var colorRGB = h.getElementsByTagName("color")[0].textContent;
 
-
-
-
+                highlights.push({start: startValue, end: endValue, color: colorRGB});
             }
 
 

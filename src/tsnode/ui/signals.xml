@@ -26,17 +26,17 @@
             <highlight>
                 <start>0</start>
                 <end>50</end>
-                <color>(255,0,0,1)</color>
+                <color>(0,0,0,0)</color>
             </highlight>
             <highlight>
                 <start>50</start>
                 <end>130</end>
-                <color>(0,255,0,0.15)</color>
+                <color>(0,255,0,0.08)</color>
             </highlight>
             <highlight>
                 <start>130</start>
                 <end>220</end>
-                <color>(255,0,0,0.15)</color>
+                <color>(255,0,0,0.08)</color>
             </highlight>
         </highlights>
 
@@ -83,12 +83,12 @@
             <highlight>
                 <start>0</start>
                 <end>5000</end>
-                <color>(255,0,0,1)</color>
+                <color>(0,255,0,0.05)</color>
             </highlight>
             <highlight>
                 <start>5000</start>
                 <end>8000</end>
-                <color>(255,0,0,0.15)</color>
+                <color>(255,0,0,0.3)</color>
             </highlight>
         </highlights>
         <unit>RPM</unit>

@@ -45,13 +45,7 @@ class SpeedGaugeWidget extends Widget{
         majorTicks: [],
         minorTicks: 2,
         strokeTicks: false,
-        highlights: [
-            {from: 0, to: 50, color: 'rgba(0,   255, 0, .15)'},
-            {from: 50, to: 100, color: 'rgba(255, 255, 0, .15)'},
-            {from: 100, to: 150, color: 'rgba(255, 30,  0, .25)'},
-            {from: 150, to: 200, color: 'rgba(255, 0,  225, .25)'},
-            {from: 200, to: 220, color: 'rgba(0, 0,  255, .25)'}
-        ],
+        highlights: [],
         colors: {
             plate: '#222',
             majorTicks: '#f5f5f5',
@@ -86,7 +80,16 @@ class SpeedGaugeWidget extends Widget{
         if (this.model.get("ticks")) {
             this.config.majorTicks = this.model.get("ticks");
         }
-       // console.log(this.model.get("ticks"));
+        console.log(this.model.get("highlights"));
+
+        var high = this.model.get("highlights");
+
+
+       // this.config.highlights.resize(0);
+
+        for (var i = 0; i < high.length; i++) {
+            this.config.highlights.push({from: high[i].start, to: high[i].end, color: 'rgba' + high[i].color});
+        }
 
 
 
