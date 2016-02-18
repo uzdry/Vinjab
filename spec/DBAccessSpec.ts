@@ -8,12 +8,37 @@ import leveldown = require("leveldown");
 
 describe("init", function () {
     it("destroy and init the database", function() {
-        leveldown.destroy("../testDB", function() {
-        });
-        var db = new DBBusDevice();
+        var db;
+        db = new DBBusDevice();
+        db = undefined;
+        db = new DBBusDevice();
+        db.handleMessage(new msg.ValueMessage(msg.Topic.SPEED, new msg.Value(3, "value.speed")));
+        setTimeout(db.handleMessage(new msg.ValueMessage(msg.Topic.SPEED, new msg.Value(255, "value.speed"))), 300);
+        var simplesub = new SimpleSubscriber();
+        simplesub.subscribe(msg.Topic.VALUE_ANSWER_MSG);
+        db.handleMessage(new msg.DBRequestMessage(1, new Date(0), new Date(), msg.Topic.SPEED));
+        var vam = undefined;
+        while (!vam) {
+            setTimeout(function(){
+                vam = simplesub.message;
+            }.bind(this), 0)
+        }
+        expect(vam.getValues()).toContain(3);
+        expect(vam.getValues()).toContain(100);
+        db = null;
     });
     it("open an existing database", function() {
         var db = new DBBusDevice();
+        var simplesub = new SimpleSubscriber();
+        simplesub.subscribe(msg.Topic.REPLAY_INFO);
+        db.handleMessage(new msg.DashboardMessage("lorem", "ipsum", true));
+        var ri = undefined;
+        while(!ri) {
+            setTimeout(function() {
+                ri = <msg.ReplayInfoMessage> simplesub.message;
+            }.bind(this), 0);
+        }
+        expect(ri.finishTime.length).toBeGreaterThan(0);
     })
 });
 
@@ -33,11 +58,10 @@ describe("putAndGetValues", function () {
             expect(vam.getValues()).toContain(0);
             expect(vam.getValues()).toContain(1);
             expect(vam.getValues()).toContain(100);
-        }, 200);
+        }, 400);
     });
 
     it("flood the db with values", function () {
-        leveldown.destroy("../testDB", function() {});
         var db = new DBBusDevice();
         var simplesub = new SimpleSubscriber();
         simplesub.subscribe(msg.Topic.VALUE_ANSWER_MSG);
@@ -54,7 +78,7 @@ describe("putAndGetValues", function () {
             expect(vam.getValues()).toContain(12000);
             expect(vam.getValues()).toContain(14001);
             expect(vam.getValues().length).toBeLessThan(10001);
-        }, 200);
+        }.bind(this), 400);
     });
 });
 
@@ -71,19 +95,19 @@ describe("putAndGetDriver", function () {
                 '"SpeedGauge","id":140},{"row":1,"col":5,"size_x":3,"size_y":3,' +
                 '"name":"PercentGauge","id":150},{"row":1,"col":8,"size_x":4,"size_y":4,' +
                 '"name":"PercentGauge","id":350}]');
-        }, 200);
+        }.bind(this), 400);
     });
     it("handle driver msg and request", function() {
         var db = new DBBusDevice();
         var simplesub = new SimpleSubscriber();
         simplesub.subscribe(msg.Topic.DASHBOARD_ANS_MSG);
         db.handleMessage(new msg.DashboardMessage("testa", "DasIstEinTestString!", false));
-        db.handleMessage(new msg.DashboardMessage("testa", "DerStringHierGehtVerloren", true));
+        db.handleMessage(new msg.DashboardMessage("testa", "DerStringHierGehtVerloren.Nicht!", false));
         setTimeout(function() {
             var dam = <msg.DashboardMessage> simplesub.message;
             expect(dam.user).toBe("testa");
-            expect(dam.config).toBe("DasIstEinTestString!");
-        }, 200);
+            expect(dam.config).toBe("DerStringHierGehtVerloren.Nicht!");
+        }.bind(this), 400);
     });
 });
 
@@ -93,6 +117,6 @@ class SimpleSubscriber extends bus.BusDevice {
 
     public handleMessage(m: msg.Message): void {
         this.message = m;
+        console.log(JSON.stringify(m));
     }
-
 }
