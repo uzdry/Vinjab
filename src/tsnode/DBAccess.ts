@@ -5,6 +5,7 @@ import {BusDevice} from "./Bus";
 import {ValueAnswerMessage, Value, ReplayRequestMessage, ReplayValueMessage, DBRequestMessage, Message, ValueMessage,
     Topic, DashboardMessage, DashboardRspMessage} from "./messages";
 import {ReplayInfoMessage} from "./messages";
+import leveldown = require("leveldown");
 
 // The entry types that are to be written to the database:
 
@@ -114,16 +115,6 @@ class LevelDBAccess {
     private driveBegin: number;
 
     /**
-     * function implemented for integration testing. to be removed.
-     * @param n: to be removed
-     */
-    public test(n: number) {
-        this.db.createReadStream().on('data', function(data) {
-            console.log(data.key + " - " + data.value);
-        })
-    }
-
-    /**
      * Initializes the LevelDBAccess.
      */
     constructor() {
@@ -206,6 +197,7 @@ class LevelDBAccess {
      * @param config: The user's dashboard configuration
      */
     putUserInfo(user: string, config: string) {
+        this.deleteFromKey(user);
         this.db.put(user, JSON.stringify(new UserInfoEntry(config)), {sync: true}, function(err) {
             if(err) console.log(err);
         });
@@ -241,14 +233,15 @@ class LevelDBAccess {
      * @param k: The key of the entry to be deleted.
      */
     deleteFromKey(k: any) {
-        this.db.get(k, function(err, value) {
-            if(err && !err.notFound) {
-                console.log(err);
-            } else if(err && err.notFound) {
-            } else {
-                this.db.del(k);
-            }
-        }.bind(this));
+        try {
+            this.db.del(k, function(err) {
+                if(err && !err.notFound) {
+                    console.log(err);
+                }
+            }.bind(this));
+        } catch(e) {
+            console.log(e);
+        }
     }
 
     /**
@@ -324,9 +317,7 @@ class LevelDBAccess {
                 if(err.notFound) {
                     var standardConfig: string = '[{"row":1,"col":5,"size_x":7,"size_y":7,"name":"SpeedGauge",' +
                         '"valueID":"value.speed"}]';
-                    this.putUserInfo(userID, standardConfig, function(err) {
-                        if(err) console.log(err);
-                    });
+                    this.putUserInfo(userID, standardConfig);
                     callbackParam = new UserInfoEntry(standardConfig);
                 } else {
                     console.log(err);
@@ -401,10 +392,7 @@ class DBBusDevice extends BusDevice {
                 }.bind(this));
                 this.broker.handleMessage(new ReplayInfoMessage(this.dbAccess.replayInfo.finishTime));
             } else {
-                this.dbAccess.getDriverEntry(dbm.user, function(value) {
-                    this.dbAccess.deleteFromKey(dbm.user);
                     this.dbAccess.putUserInfo(dbm.user, dbm.config);
-                }.bind(this));
             }
         }
         //if the given Message is a replay request, a new Replay is started
