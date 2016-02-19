@@ -1,3 +1,5 @@
+///<reference path="../../levelup.d.ts"/>
+
 import {Server} from "./Server";
 import {Broker} from "./Bus";
 import {Aggregation, Distance, FuelConsumption, AverageComputation} from "./AggregatedFunctions";
@@ -23,6 +25,9 @@ class ServerStarter {
      * public constructor
      */
     constructor() {
+
+        var leveldown = require("leveldown");
+        leveldown.destroy("../../testDB", function() { });
 
         this.db = new DBBusDevice();
 
