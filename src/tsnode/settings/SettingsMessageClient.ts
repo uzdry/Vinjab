@@ -43,24 +43,21 @@ module SettingsMessageClient{
 
     export class SettingsMessage extends SettingsMessageCommon.SettingsMessage {
         private handledByDB : boolean;
-        private containers : SettingsMessageInterface.ISettingsContainer[];
+        private container : SettingsMessageInterface.ISettingsContainer;
 
-        constructor(containers : SettingsMessageInterface.ISettingsContainer[], hasBeenHandledByDB : boolean) {
+        constructor(container : SettingsMessageInterface.ISettingsContainer, hasBeenHandledByDB : boolean) {
             super(SMessage.Topic.SETTINGS_MSG);
 
-            this.containers = containers;
-            if (containers != null && containers.length == 0) {
-                this.containers = null;
-            }
+            this.container = container;
             this.handledByDB = hasBeenHandledByDB;
         }
 
-        public createMe(containers : SettingsMessageInterface.ISettingsContainer[], hasBeenHandledByDB : boolean) {
-            return new SettingsMessage(containers, hasBeenHandledByDB);
+        public createMe(container : SettingsMessageInterface.ISettingsContainer, hasBeenHandledByDB : boolean) {
+            return new SettingsMessage(container, hasBeenHandledByDB);
         }
 
-        public getContainers() : SettingsMessageInterface.ISettingsContainer[] {
-            return this.containers;
+        public getContainer() : SettingsMessageInterface.ISettingsContainer {
+            return this.container;
         }
 
         public hasBeenHandledByDB() : boolean {

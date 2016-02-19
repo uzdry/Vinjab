@@ -68,7 +68,7 @@ class ValueChangeListener {
 
 
 
-    public postal_getSettingsWriteMessage() : SettingsMessageClient.SettingsMessage {
+    public postal_getSettingsWriteMessages() : SettingsMessageClient.SettingsMessage[] {
         var sc : SettingsMessageCommon.SettingsContainer;
         var scArray : SettingsMessageCommon.SettingsContainer[];
 
@@ -76,11 +76,14 @@ class ValueChangeListener {
             var sv : SettingsMessageClient.SettingsValue =
                 new SettingsMessageClient.SettingsValue(this.settingsNodes[i].getActualValue(), "dontforgettochangeme");
             sc = new SettingsMessageCommon.SettingsContainer(this.settingsNodes[i].getTopic().getName(),
-                sv, SettingsMessageCommon.SettingsIODirection.write);
+                sv, false);
             scArray.push(sc);
         }
-        var sm : SettingsMessageClient.SettingsMessage = new SettingsMessageClient.SettingsMessage(scArray, false);
-        return sm;
+        var smArray : SettingsMessageClient.SettingsMessage[] = [];
+        for (var i = 0; i < scArray.length; i++) {
+            smArray.push(new SettingsMessageClient.SettingsMessage(scArray[i], false));
+        }
+        return smArray;
     }
 }
 
@@ -278,6 +281,7 @@ class MessageBuffer {
     public constructor(valueChangeListener : ValueChangeListener, container : Node) {
         this.valueChangeListener = valueChangeListener;
         this.container = container;
+        this.configs = new MBMap();
     }
 
     /**
@@ -308,12 +312,8 @@ class MessageBuffer {
     public postal_handleMessage(data) {
         var message = <SettingsMessageInterface.ISettingsMessage>data;
         if (message.getTopic().equals(SettingsMessageClient.STopic.SETTINGS_MSG)) {
-            var auxmap = new MBMap();
-            if (message.getContainers() != null) {
-                for (var i = 0; i < message.getContainers().length; i++) {
-                    auxmap.set(new SettingsMessageClient.STopic(message.getContainers()[i].getTopic()), message.getContainers()[i].getValue());
-                }
-                this.configs = auxmap;
+            if (message.getContainer() != null) {
+                this.configs.set(new SettingsMessageClient.STopic(message.getContainer().getTopic()), message.getContainer().getValue());
                 this.onReceiveData();
             }
         }
@@ -385,10 +385,12 @@ class DummyDatabase {
     }
 
     public postal_handleMessage(data) : void {
-        var answer = this.dbinf.handleSettingsMessage(data);
-        if (answer != null) {
+        var answers = this.dbinf.handleSettingsMessage(data);
+        if (answers != null) {
             var pch = postal.channel(TSConstants.db2stChannel);
-            pch.publish(TSConstants.db2stTopic, answer);
+            for (var i = 0; i < answers.length; i++) {
+                pch.publish(TSConstants.db2stTopic, answers[i]);
+            }
         }
     }
 

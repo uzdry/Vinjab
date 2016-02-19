@@ -25,18 +25,20 @@ module SettingsDBCOM {
         }
 
         public handleMessage(message:SettingsMessageInterface.ISettingsMessage) {
-            var buf:SettingsMessageInterface.ISettingsMessage;
+            var bufs:SettingsMessageInterface.ISettingsMessage[];
 
             switch (message.getTopic()) {
 
                 case SMessage.Topic.SETTINGS_MSG:
-                    buf = this.dbInterface.handleSettingsMessage(message);
+                    bufs = this.dbInterface.handleSettingsMessage(message);
 
-                    // There is no broker in this test, but you should publish the answer if it is not null...
-                    //  Remember: null means: no valid answer because invalid message or simply nothing to say (e.g.: echo)...
-                    /*if (buf != null) {
-                     Broker.get().handle(buf);
-                     }*/
+                    for (var i = 0; i < bufs.length; i++) {
+                        // There is no broker in this test, but you should publish the answer if it is not null...
+                        //  Remember: null means: no valid answer because invalid message or simply nothing to say (e.g.: echo)...
+                        /*if (buf != null) {
+                         Broker.get().handle(buf);
+                         }*/
+                    }
                     break;
 
                 default:
@@ -154,41 +156,45 @@ module SettingsDBCOM {
          * @returns {any} Null if there is nothing to be put on the bus afterwards, a valid SettingsMessage if something should
          *  be sent back.
          */
-        public handleSettingsMessage(message:SettingsMessageInterface.ISettingsMessage):SettingsMessageInterface.ISettingsMessage {
+        public handleSettingsMessage(message:SettingsMessageInterface.ISettingsMessage):SettingsMessageInterface.ISettingsMessage[] {
             if (message.hasBeenHandledByDB() == true) {
                 // Ignore echo.
                 return null;
             }
 
-            var containers = message.getContainers();
+            var container : SettingsMessageInterface.ISettingsContainer = message.getContainer();
 
-            if (containers == null) {
+            if (container == null) {
                 // No topics (keys) specified.
 
                 //  Can be used to clean up inconsistent database / XML structure, return every settings entry stored in the DB.
 
-                return this.specimenFactory.getMessageSpecimen().createMe(this.getAllSettingsContainersFromDB(), true);
+                var allSettings = this.getAllSettingsContainersFromDB();
+                var messageBuf : SettingsMessageInterface.ISettingsMessage[] = [];
+                for (var i = 0; i < allSettings.length; i++) {
+                    messageBuf.push(this.specimenFactory.getMessageSpecimen().createMe(allSettings[i], true));
+                }
+                return messageBuf;
             }
 
             // else: a list of topics specified.
-            for (var i = 0; i < containers.length; i++) {
-                if (containers[i].getDirection() == SettingsMessageCommon.SettingsIODirection.read) {
-                    // Read operation.
-                    containers[i].setValue(this.readEntry(containers[i].getTopic()));
+            if (container.myDirectionIsRead() == true) {
+                // Read operation.
+                container.setValue(this.readEntry(container.getTopic()));
+            } else {
+                // Write operation.
+                //  IMPORTANT : containers[i].getValue() may be NULL.
+                if (container.getValue() != null) {
+                    // Overwrite an existing value with a new value or create a new one.
+                    this.writeOrCreateEntry(container.getTopic(), container.getValue());
                 } else {
-                    // Write operation.
-                    //  IMPORTANT : containers[i].getValue() may be NULL.
-                    if (containers[i].getValue() != null) {
-                        // Overwrite an existing value with a new value or create a new one.
-                        this.writeOrCreateEntry(containers[i].getTopic(), containers[i].getValue());
-                    } else {
-                        // Overwrite an existing value with null: delete.
-                        this.deleteEntry(containers[i].getTopic());
-                    }
+                    // Overwrite an existing value with null: delete.
+                    this.deleteEntry(container.getTopic());
                 }
             }
+
             message.setHandledByDBFlag();
-            return message;
+            return [message];
         }
 
         private deleteEntry(key:string) {
@@ -237,7 +243,7 @@ module SettingsDBCOM {
             var containerBuf:SettingsMessageInterface.ISettingsContainer[] = [];
             for (var i = 0; i < strbuf.length; i++) {
                 containerBuf.push(new SettingsMessageCommon.SettingsContainer(strbuf[i], this.readEntry(strbuf[i]),
-                    SettingsMessageCommon.SettingsIODirection.read));
+                    true));
             }
             return containerBuf;
         }

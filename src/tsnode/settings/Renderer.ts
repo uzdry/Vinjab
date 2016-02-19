@@ -273,10 +273,12 @@ class TableFactory {
 
         var container = this.container;
         okbutton.onclick = function () {
-            var postal_message = valueChangeListener.postal_getSettingsWriteMessage();
+            var postal_message = valueChangeListener.postal_getSettingsWriteMessages();
             root.actualValueStored();
             var pch = postal.channel(TSConstants.st2dbChannel);
-            pch.publish(TSConstants.st2dbTopic, postal_message);
+            for (var i = 0; i < postal_message.length; i++) {
+                pch.publish(TSConstants.st2dbTopic, postal_message[i]);
+            }
             TextDebugger.refreshData(null, container);
         };
 

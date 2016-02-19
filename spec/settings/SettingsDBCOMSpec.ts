@@ -291,7 +291,7 @@ describe("SettingsDBCOM", function () {
         var smFromString:SettingsDBCOM.SettingsMessage = SettingsDBCOM.SettingsMessage.fromString(stringified);
         expect(smFromString.toString()).toEqual(stringified);
         expect(smFromString.getContainers().length).toEqual(1);
-        expect(smFromString.getContainers()[0].getDirection()).toEqual(rw);
+        expect(smFromString.getContainers()[0].myDirectionIsRead()).toEqual(rw);
         expect(smFromString.getContainers()[0].getTopic()).toEqual(topic);
         expect(smFromString.getContainers()[0].getValue()).toEqual(sv1);
     });
@@ -323,10 +323,10 @@ describe("SettingsDBCOM", function () {
         expect(smFromString.toString()).toEqual(stringified);
         expect(smFromString.hasBeenHandledByDB()).toEqual(false);
         expect(smFromString.getContainers().length).toEqual(2);
-        expect(smFromString.getContainers()[0].getDirection()).toEqual(rw1);
+        expect(smFromString.getContainers()[0].myDirectionIsRead()).toEqual(rw1);
         expect(smFromString.getContainers()[0].getTopic()).toEqual(topic1);
         expect(smFromString.getContainers()[0].getValue()).toEqual(sv1);
-        expect(smFromString.getContainers()[1].getDirection()).toEqual(rw2);
+        expect(smFromString.getContainers()[1].myDirectionIsRead()).toEqual(rw2);
         expect(smFromString.getContainers()[1].getTopic()).toEqual(topic2);
         expect(smFromString.getContainers()[1].getValue()).toEqual(sv2);
     });
