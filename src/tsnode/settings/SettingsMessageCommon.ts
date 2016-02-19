@@ -7,13 +7,6 @@
 module SettingsMessageCommon {
 
 
-    /**
-     * Permament.
-     * Used to specify the direction: read from database or write to database.
-     */
-    export enum SettingsIODirection {
-        read, write
-    }
 
     export class SettingsValue {
         public static getCountOfSplitters() : number {
@@ -48,13 +41,14 @@ module SettingsMessageCommon {
     export class SettingsContainer {
         private topic : string;
         private iValue : SettingsMessageInterface.ISettingsValue;
-        private direction : SettingsMessageCommon.SettingsIODirection;
+        private directionIsRead : boolean;
 
-        constructor(topic : string, iValue : SettingsMessageInterface.ISettingsValue, direction : SettingsMessageCommon.SettingsIODirection) {
+
+        constructor(topic : string, iValue : SettingsMessageInterface.ISettingsValue, directionIsRead : boolean) {
 
             this.topic = topic;
             this.iValue = iValue;
-            this.direction = direction;
+            this.directionIsRead = directionIsRead;
         }
 
         public static getCountOfSplitSegments() : number {
@@ -64,7 +58,7 @@ module SettingsMessageCommon {
         public static stringifyContainer(iContainer : SettingsMessageInterface.ISettingsContainer) {
 
                 var dir : string = "write";
-                if (iContainer.getDirection() == SettingsMessageCommon.SettingsIODirection.read) {
+                if (iContainer.myDirectionIsRead() == true) {
                     dir = "read";
                 }
                 return "SettingsContainer[|" + iContainer.getTopic() + "|"
@@ -84,8 +78,8 @@ module SettingsMessageCommon {
             this.iValue = value;
         }
 
-        public getDirection() : SettingsMessageCommon.SettingsIODirection {
-            return this.direction;
+        public myDirectionIsRead() : boolean {
+            return this.directionIsRead;
         }
 
         public static fromString(stringToParse : string,
@@ -102,9 +96,9 @@ module SettingsMessageCommon {
             } else {
                 var direction;
                 if (splitted[3 + svSplitters] == "read") {
-                    direction = SettingsMessageCommon.SettingsIODirection.read;
+                    direction = true;
                 } else if (splitted[3 + svSplitters] == "write") {
-                    direction = SettingsMessageCommon.SettingsIODirection.write;
+                    direction = false;
                 } else {
                     return null;
                 }
@@ -130,10 +124,9 @@ module SettingsMessageCommon {
             } else {
                 buf += "false|";
             }
-            if (message.getContainers() != null) {
-                for (var i = 0; i < message.getContainers().length; i++) {
-                    buf += SettingsMessageCommon.SettingsContainer.stringifyContainer(message.getContainers()[i]) + "|";
-                }
+            if (message.getContainer != null) {
+                    buf += SettingsMessageCommon.SettingsContainer.stringifyContainer(message.getContainer()) + "|";
+
             } else {
                 buf += "null|";
             }
@@ -144,7 +137,7 @@ module SettingsMessageCommon {
         public static fromString(stringToParse : string, specimenFactory : SettingsMessageInterface.ISpecimenFactory)
             : SettingsMessageInterface.ISettingsMessage {
             var splitted = stringToParse.split("|");
-            var containers : SettingsMessageInterface.ISettingsContainer[] = [];
+            var container : SettingsMessageInterface.ISettingsContainer = null;
             if (splitted[0] == "SettingsMessage[") {
                 for (var i = 2; i < splitted.length - SettingsMessageCommon.SettingsContainer.getCountOfSplitSegments() + 1;
                      i += SettingsMessageCommon.SettingsContainer.getCountOfSplitSegments()) {
@@ -157,7 +150,7 @@ module SettingsMessageCommon {
                         // Error.
                         return null;
                     }
-                    containers.push(sc);
+                    container = sc;
                 }
             } else {
                 return null;
@@ -170,7 +163,7 @@ module SettingsMessageCommon {
             } else {
                 return null;
             }
-            return specimenFactory.getMessageSpecimen().createMe(containers, alreadyHandled);
+            return specimenFactory.getMessageSpecimen().createMe(container, alreadyHandled);
         }
 
     }

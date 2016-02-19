@@ -9,13 +9,13 @@ module SettingsMessageInterface {
     export interface ISettingsMessage {
         getTopic() : SMessage.Topic;
         hasBeenHandledByDB() : boolean;
-        getContainers() : ISettingsContainer[];
+        getContainer() : ISettingsContainer;
         setHandledByDBFlag() : void;
-        createMe(containers : SettingsMessageInterface.ISettingsContainer[], hasBeenHandledByDB : boolean) : ISettingsMessage;
+        createMe(container : SettingsMessageInterface.ISettingsContainer, hasBeenHandledByDB : boolean) : ISettingsMessage;
     }
 
     export interface ISettingsContainer {
-        getDirection() : SettingsMessageCommon.SettingsIODirection;
+        myDirectionIsRead() : boolean;
         setValue(value : SettingsMessageInterface.ISettingsValue) : void;
         getValue() : SettingsMessageInterface.ISettingsValue;
         getTopic() : string;
