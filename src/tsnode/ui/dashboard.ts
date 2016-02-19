@@ -52,7 +52,16 @@ class Dashboard{
         }
 
         var message: DashboardMessage = new DashboardMessage(this.user, "", true);
-        postal.channel("reqsubs").publish("request.dashboard settings from database", "dashboard settings from database");
+       // postal.channel("reqsubs").publish("request.dashboard settings from database", "dashboard settings from database");
+
+        postal.publish({
+           channel: "reqsubs",
+            topic:"request.dashboard settings from database",
+            data: {
+                sku: "dashboard settings from database",
+                qty: 21 + Date.now()
+            }
+        });
 
         postal.channel("values").subscribe("dashboard settings from database", function(data, envelope){
             console.log("Input: " + JSON.stringify(data));
