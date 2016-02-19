@@ -1,6 +1,5 @@
 /// <reference path ="./google.maps.d.ts"/>
 /// <reference path ="./widget.ts"/>
-/// <reference path ="C:\Program Files (x86)\JetBrains\WebStorm 11.0.3\plugins\JavaScriptLanguage\typescriptCompiler\external\lib.es6.d.ts"/>
 
 class GoogleMapWidgetConfig implements WidgetConfig{
 
