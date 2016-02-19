@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="UTF-8" ?>
+
 <signals>
+
     <signal category="value.speed">
         <name>Geschwindigkeit</name>
         <description>Geschwindigkeit des Autos</description>
         <minValue>0</minValue>
         <maxValue>220</maxValue>
-
         <ticks>
             <tick>0</tick>
             <tick>20</tick>
@@ -21,6 +22,24 @@
             <tick>220</tick>
         </ticks>
 
+        <highlights>
+            <highlight>
+                <start>0</start>
+                <end>50</end>
+                <color>(0,0,0,0)</color>
+            </highlight>
+            <highlight>
+                <start>50</start>
+                <end>130</end>
+                <color>(0,255,0,0.08)</color>
+            </highlight>
+            <highlight>
+                <start>130</start>
+                <end>220</end>
+                <color>(255,0,0,0.08)</color>
+            </highlight>
+        </highlights>
+
         <unit>km/h</unit>
     </signal>
     <signal category="value.mass air flow">
@@ -28,7 +47,7 @@
         <description>Luftmassenstrom</description>
         <minValue></minValue>
         <maxValue></maxValue>
-        <unit>SI</unit>
+        <unit>gramm</unit>
     </signal>
     <signal category="value.coolant temperature">
         <name>Kühlertemperatur</name>
@@ -61,7 +80,16 @@
             <tick>8000</tick>
         </ticks>
         <highlights>
-            <highlight>5000</highlight>
+            <highlight>
+                <start>0</start>
+                <end>5000</end>
+                <color>(0,255,0,0.05)</color>
+            </highlight>
+            <highlight>
+                <start>5000</start>
+                <end>8000</end>
+                <color>(255,0,0,0.3)</color>
+            </highlight>
         </highlights>
         <unit>RPM</unit>
     </signal>
@@ -70,7 +98,7 @@
         <description>Lenkungswinkel in Grad</description>
         <minValue>-30</minValue>
         <maxValue>30</maxValue>
-        <unit>°</unit>
+        <unit>degree</unit>
     </signal>
     <signal category="value.intake air temperature">
         <name>Lufttemperatur</name>

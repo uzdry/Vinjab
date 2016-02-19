@@ -16,11 +16,34 @@ class DataModel extends Backbone.Model{
     constructor(options?){
         super(options);
 
-        var channel = postal.channel("values");;
-        this.subscription = channel.subscribe(this.get("tagName"), this.update.bind(this));
 
-        var channelsub = postal.channel("reqsubs");
-        var reqsub = channelsub.publish("request." + this.get("tagName"), this.get("tagName"));
+        //this.subscription = channel.subscribe(this.get("tagName"), this.update.bind(this));
+
+        var tag = this.get("tagName");
+
+        var model = this;
+
+
+        setTimeout(function() {
+            postal.publish({
+                channel: "reqsubs",
+                topic: "request." + tag,
+                data: {
+                    sku: tag,
+                    qty: 21 + Date.now()
+                }
+            });
+        }, 0);
+
+        setTimeout(function() {
+            postal.subscribe({
+                channel: "values",
+                topic: tag,
+                callback: function(data) {
+                    model.set({value: data.value.value});
+                }
+            });
+        }, 0);
 
 
     }
@@ -32,6 +55,19 @@ class DataModel extends Backbone.Model{
      */
     update(data, envelope){
         this.set({value: data.value.value});
+    }
+
+    public destroy() {
+        var tag = this.get("tagName");
+        postal.publish({
+            channel: "reqsubs",
+            topic: "stop." + tag,
+            data: {
+                sku: tag,
+                qty: 21 + Date.now()
+            }
+        });
+        super.destroy();
     }
 
 }

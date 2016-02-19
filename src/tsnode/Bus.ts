@@ -73,7 +73,7 @@ class Broker {
     public subscribe(topic:string, sub:BusDevice):void {
         if (!this.subscribers[topic]) {
             this.subscribers[topic] = new Array<BusDevice>();
-            console.log('Set created: ' + topic + " " + sub.constructor.name);
+       //     console.log('Set created: ' + topic + " " + sub.constructor.name);
         }
         this.subscribers[topic].push(sub);
     }
@@ -90,6 +90,9 @@ class Broker {
 
         var i = this.subscribers[topic].indexOf(sub);
         this.subscribers[topic].splice(i,1);
+
+        console.log(this.subscribers);
+
 
     }
 

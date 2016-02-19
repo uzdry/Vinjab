@@ -62,7 +62,7 @@ abstract class Widget extends Backbone.View<DataModel> {
         super.listenTo(object, events, callback);
         var subCounter = this.model.get("subCounter");
         if(subCounter <= 0 || subCounter === undefined){
-            postal.channel("reqsubs").publish("request." + this.model.get("tagName"), this.model.get("tagName"))
+        //    postal.channel("reqsubs").publish("request." + this.model.get("tagName"), this.model.get("tagName"));
             subCounter = 0;
         }
         this.model.set("subCounter", ++subCounter);
@@ -78,7 +78,6 @@ abstract class Widget extends Backbone.View<DataModel> {
         super.stopListening(object);
         var subCounter = this.model.get("subCounter");
         if(subCounter <= 1){
-            postal.channel("reqsubs").publish("stop." + this.model.get("tagName"), this.model.get("tagName"));
             this.model.destroy();
         }else{
             this.model.set("subCounter", --subCounter);

@@ -48,7 +48,7 @@ class BluetoothSim extends BusDevice {
         this.broker.handleMessage(new ValueMessage(Topic.SPEED, new Value(this.rpm * 0.02, "km/h")));
 
         if (this.gasTankpercent > 0) {
-            this.broker.handleMessage(new ValueMessage(Topic.FUEL, new Value(this.gasTankpercent -= 0.05, "percent")));
+            this.broker.handleMessage(new ValueMessage(Topic.FUEL, new Value(this.gasTankpercent -= 1, "percent")));
         } else {
             this.gasTankpercent = 100;
         }

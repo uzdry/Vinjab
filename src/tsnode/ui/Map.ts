@@ -1,6 +1,5 @@
 /// <reference path ="./google.maps.d.ts"/>
 /// <reference path ="./widget.ts"/>
-/// <reference path ="C:\Program Files (x86)\JetBrains\WebStorm 11.0.3\plugins\JavaScriptLanguage\typescriptCompiler\external\lib.es6.d.ts"/>
 
 class GoogleMapWidgetConfig implements WidgetConfig{
 
@@ -16,14 +15,16 @@ class GoogleMapWidgetConfig implements WidgetConfig{
 
 class GoogleMapWidget extends Widget {
 
-    static widgetCounter:number = 0;
+    static widgetCounter: number = 0;
 
     /** Tag name */
     typeID:string = "SurroundingsMap";
 
     /** Main Element of the Widget */
     map:google.maps.Map;
+
     currentLoc: google.maps.LatLng;
+    currentlyLowOnFuel: boolean;
 
     /** String that is being introduced to the grid */
     htmlElement:string;
@@ -34,18 +35,20 @@ class GoogleMapWidget extends Widget {
         this.widgetID = this.typeID + "-" + this.model.get("tagName") + "-" + GoogleMapWidget.widgetCounter;
         GoogleMapWidget.widgetCounter++;
 
+        this.htmlElement = '<li id="' + this.widgetID + '"><div ></div></li>';
+        /*
         this.htmlElement = '<li id="' + this.widgetID + '">' +
             '<div></div>' +
             '</li>';
+        */
     }
 
     initialize() {
-
+        this.listenTo(this.model, 'change:value', this.updateValue);
     }
 
     init() {
         this.initMap();
-        this.listenTo(this.model, 'change:data', this.updateValue);
     }
 
     private handleLocationError(locAvailable:Boolean, pos:google.maps.LatLng) {
@@ -62,8 +65,12 @@ class GoogleMapWidget extends Widget {
 
     updateValue() {
         var value = this.model.get("value");
-        if(value < 10) {
+
+        if(value < 10 && !this.currentlyLowOnFuel) {
+            this.currentlyLowOnFuel = true;
             this.findGasStations();
+        } else if(value > 10) {
+            this.currentlyLowOnFuel = false;
         }
     }
 
@@ -86,11 +93,13 @@ class GoogleMapWidget extends Widget {
         if (navigator.geolocation) {
             navigator.geolocation.getCurrentPosition(function (position) {
                 this.currentLoc = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
+                var image = '../../img/car_icon.png';
 
                 var marker = new google.maps.Marker({
                     position: this.currentLoc,
                     map: this.map,
-                    title: 'current location'
+                    title: 'current location',
+                    icon: image
                 });
 
                 this.map.setCenter(this.currentLoc);

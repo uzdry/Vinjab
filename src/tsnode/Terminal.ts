@@ -74,7 +74,8 @@ class Terminal {
      * @param message the message, which will be sent.
      */
     public subscribeFromServer(data) {
-        this.connection.emit('subscribe', data);
+        console.log(data);
+        this.connection.emit('subscribe', data.sku);
     }
 
     public unsubscribeFromServer(data) {

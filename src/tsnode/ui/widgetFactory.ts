@@ -117,24 +117,43 @@ class WidgetFactory{
             var maxValue: number = parseInt(elements[i].getElementsByTagName("maxValue")[0].textContent);
             var minValue: number = parseInt(elements[i].getElementsByTagName("minValue")[0].textContent);
             var desc: string = elements[i].getElementsByTagName("description")[0].textContent;
-            var tickse = elements[i].getElementsByTagName("ticks");
+            var unit: string = elements[i].getElementsByTagName("unit")[0].textContent;
+            var tickse = elements[i].getElementsByTagName("ticks"); //element ticks
             var ticksv;
-            var ticks = new Array<string>();
+            var ticks = new Array<string>(); //ticks as string values
+
+            var highlightse = elements[i].getElementsByTagName("highlight");
+            var highlightsv;
+            var highlights: Array<{}> = new Array<{}>();
 
 
-            if (!tickse[0]) {
-
-            } else {
+            if (tickse[0]) {
                 ticksv = tickse[0].getElementsByTagName("tick");
-                if (ticksv) {
-                    for (var i = 0; i < ticksv.length; i++) {
-                        ticks.push(ticksv[i].innerHTML);
-                    }
+                for (var j = 0; j < ticksv.length; j++) {
+                    ticks.push(ticksv[j].textContent);
                 }
 
-                console.log(ticksv);
             }
-            this.signalsDesc[tagName] = new SignalDescription(name, tagName, maxValue, minValue, desc, ticks);
+
+
+            for (var j = 0; j < highlightse.length; j++) {
+              /*  var h: string = highlightse[j].textContent;
+                var sepI: number = h.indexOf(";");
+                var sepC : number = h.indexOf(":");
+                highlights[j] = {start: parseInt(h.substring(0, sepI)), end: parseInt(h.substring(sepI + 1, sepC)), color: h.substring(sepC + 1, h.length).split(' ').join('')}*/
+
+                var h = highlightse[j];
+
+                var startValue = parseInt(h.getElementsByTagName("start")[0].textContent);
+                var endValue = parseInt(h.getElementsByTagName("end")[0].textContent);
+                var colorRGB = h.getElementsByTagName("color")[0].textContent;
+
+                highlights.push({start: startValue, end: endValue, color: colorRGB});
+            }
+
+
+
+            this.signalsDesc[tagName] = new SignalDescription(name, tagName, unit, maxValue, minValue, desc, ticks, highlights);
         }
         this.dashboard.updateSignalSelector(this.signalsDesc);
     }
@@ -149,20 +168,26 @@ class SignalDescription{
 
     tagName: string;
     name: string;
+    unit: string;
     maxValue: number;
     minValue: number;
     description: string;
     ticks: string[];
-    highlight;
+    highlights: {}[];
 
 
-    constructor(name:string, tagName: string, maxValue:number, minValue:number, description:string, ticks:string[]) {
+    constructor(name:string, tagName: string, unit:string, maxValue:number, minValue:number, description:string, ticks:string[], highlights: {}[]) {
         this.tagName = tagName;
         this.name = name;
+        this.unit = unit;
         this.maxValue = maxValue;
         this.minValue = minValue;
         this.description = description;
         this.ticks = ticks;
+        this.highlights = highlights;
+
+     //   console.log(highlights);
+
     }
 }
 
