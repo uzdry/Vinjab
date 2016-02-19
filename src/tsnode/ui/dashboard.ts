@@ -56,7 +56,7 @@ class Dashboard{
 
         postal.channel("values").subscribe("dashboard settings from database", function(data, envelope){
             console.log("Input: " + JSON.stringify(data));
-            if(data.user !== this.user) return;
+            if(!(data.user === this.user)) return;
             this.grid.fromSerialized(data.config);
             postal.channel("reqsubs").publish("stop.dashboard settings from database", "dashboard settings from database");
         }.bind(this));

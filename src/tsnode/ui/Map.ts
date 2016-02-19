@@ -94,11 +94,13 @@ class GoogleMapWidget extends Widget {
         if (navigator.geolocation) {
             navigator.geolocation.getCurrentPosition(function (position) {
                 this.currentLoc = new google.maps.LatLng(position.coords.latitude, position.coords.longitude);
+                var image = '../../img/car_icon.png';
 
                 var marker = new google.maps.Marker({
                     position: this.currentLoc,
                     map: this.map,
-                    title: 'current location'
+                    title: 'current location',
+                    icon: image
                 });
 
                 this.map.setCenter(this.currentLoc);

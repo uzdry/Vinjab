@@ -316,7 +316,17 @@ class LevelDBAccess {
             if(err) {
                 if(err.notFound) {
                     var standardConfig: string = '[{"row":1,"col":5,"size_x":7,"size_y":7,"name":"SpeedGauge",' +
-                        '"valueID":"value.speed"}]';
+                        '"valueID":"value.speed"},{"row":1,"col":1,"size_x":4,"size_y":4,"name":"SpeedGauge",' +
+                        '"valueID":"value.engine torque"},{"row":1,"col":12,"size_x":4,"size_y":4,"name":"TextWidget",' +
+                        '"valueID":"value.catalyst temperature"},{"row":1,"col":5,"size_x":8,"size_y":8,' +
+                        '"name":"SpeedGauge","valueID":"value.speed"},{"row":5,"col":1,"size_x":4,"size_y":4,' +
+                        '"name":"TextWidget","valueID":"value.temperature outside"},{"row":1,"col":1,' +
+                        '"size_x":4,"size_y":4,"name":"SpeedGauge","valueID":"value.engine torque"},' +
+                        '{"row":1,"col":13,"size_x":9,"size_y":2,"name":"TextWidget",' +
+                        '"valueID":"value.aggregated.fuel consumption"},{"row":3,"col":13,"size_x":9,"size_y":2,' +
+                        '"name":"TextWidget","valueID":"value.avg.speed"},{"row":5,"col":13,"size_x":4,"size_y":4,' +
+                        '"name":"PercentGauge","valueID":"value.accelerator pedal position"},{"row":5,"col":17,' +
+                        '"size_x":4,"size_y":4,"name":"PercentGauge","valueID":"value.aggregated.fuel per hour"}]';
                     this.putUserInfo(userID, standardConfig);
                     callbackParam = new UserInfoEntry(standardConfig);
                 } else {
@@ -388,7 +398,6 @@ class DBBusDevice extends BusDevice {
             if(dbm.request) {
                 this.dbAccess.getDriverEntry(dbm.user, function(value) {
                     this.broker.handleMessage(new DashboardRspMessage(dbm.user, value.dashboardConfig));
-                    console.log(value.dashboardConfig);
                 }.bind(this));
                 this.broker.handleMessage(new ReplayInfoMessage(this.dbAccess.replayInfo.finishTime));
             } else {
@@ -405,9 +414,9 @@ class DBBusDevice extends BusDevice {
                     }.bind(this));
             }
         }
-        //  } else if (m instanceof SettingsMessage) {
-        // TODO: understand the organisation David's Settings Message and put them to the db accordingly
-        // }
+        else if(m.topic.name == Topic.SETTINGS_MSG.name) {
+       //     var smsg = <SettingsMessage> m;
+        }
     }
 
     /**
@@ -416,7 +425,7 @@ class DBBusDevice extends BusDevice {
      * @param t: The string for which the other string is to be checked
      * @returns {boolean}: True, if string s starts with string t
      */
-    private static startsWith(s: string, t: string): boolean {
+    static startsWith(s: string, t: string): boolean {
         var i = 0;
         while(i < s.length && i < t.length) {
             if(s[i] == t[i]) {
