@@ -61,6 +61,10 @@ class Dashboard{
             postal.channel("reqsubs").publish("stop.dashboard settings from database", "dashboard settings from database");
         }.bind(this));
 
+        postal.channel("values").subscribe("replay information", function(data, envelope){
+            this.updateDrivesSelector(data.finishTime);
+        }.bind(this));
+
         postal.channel("toServer").publish("", message);
 
         $(document).on( "click", ".gridster ul li", function() {
@@ -195,15 +199,14 @@ class Dashboard{
      * Updates all drives in the ReplayModus
      * @param drives Array with Objets that contain the length of the drive
      */
-    updateDrivesSelector(drives: any[]){
+    updateDrivesSelector(drives: number[]){
         var drivesOption: Array<DDSlickOptions> = [];
 
         for(var i in drives){
-            if(!drives.hasOwnProperty(i)) continue;
 
             var option = new DDSlickOptions();
             option.text = "Fahrt: " + i;
-            option.description = "Dauer: " + drives[i];
+            option.description = "Dauer: " + (drives[i]/60000).toFixed(0) + " Minuten";
             option.value = i;
 
             drivesOption.push(option);
@@ -213,7 +216,7 @@ class Dashboard{
 
         $('#dDrives').ddslick({
             data: drivesOption,
-            selectText: "Select the Widget to be shown"
+            selectText: 'Wähle die zu anzeigende Fahrt'
         });
     }
 

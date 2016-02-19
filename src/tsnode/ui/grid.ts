@@ -99,7 +99,7 @@ class Grid {
 
         widget.init();
 
-        console.log(this.serialize());
+        //console.log(this.serialize());
 
         return widget;
 
