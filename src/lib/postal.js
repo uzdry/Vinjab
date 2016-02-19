@@ -417,7 +417,7 @@ function getCacher( topic, pubCache, cacheKey, done, envelope ) {
 		var cache;
         if ( _config.resolver.compare( subDef.topic, topic, headers ) ) {
 			if ( !headers.resolverNoCache ) {
-                console.log(pubCache);
+                //console.log(pubCache);
                 if (cache) {
                     cache = pubCache[ cacheKey ] = ( pubCache[ cacheKey ] || [] );
                     cache.push( subDef );

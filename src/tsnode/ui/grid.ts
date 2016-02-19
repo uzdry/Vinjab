@@ -38,6 +38,7 @@ class Grid {
         this.gridster = $(".gridster ul").gridster({
             widget_base_dimensions: [this.cube_sizex, this.cube_sizey],
             widget_margins: [5, 5],
+            autogrow_cols: true,
             resize: {
                 enabled: true,
 

@@ -182,6 +182,11 @@ interface GridsterOptions {
      * An object with all options for Resizable class you want to overwrite.  @see GridsterResizable or docs for more info.
      **/
     resize?: GridsterResizable;
+
+    /**
+     * Allows the grid to grow all the way in x direction
+     */
+    autogrow_cols?: boolean;
 }
 
 interface JQuery {

@@ -47,6 +47,7 @@ class Terminal {
 
 
     public incomingMsg(msg) {
+        console.log(msg);
         var message = JSON.parse(msg);
 
         //setTimeout(this.synchronousPublish.bind(this), 0, message);
