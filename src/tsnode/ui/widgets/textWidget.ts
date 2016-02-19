@@ -72,6 +72,8 @@ class TextWidget extends Widget{
     }
 
     resize(size_x: number, size_y:number){
+        this.value = this.model.get("value");
+        if(!this.value) this.value = 0;
         this.htmlText.innerHTML = "<span style='font-size: " + size_x + "%'>" + this.model.get("name") + "</span><br >" +
         "<br ><span style='font-size: 200%;'>" + this.value.toFixed(2) + "</span>"
         this.htmlText.style.setProperty("width", (size_x * 1.1) + "px");

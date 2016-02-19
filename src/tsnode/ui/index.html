@@ -13,9 +13,9 @@
     <script type="text/javascript" src="../../lib/postal.js"></script>
     <script type="text/javascript" src="../../../bower_components/postal.diagnostics/lib/postal.diagnostics.js"></script>
 
-    <script src="http://underscorejs.org/underscore.js"></script>
+    <script src="../../lib/underscore-min.js"></script>
     <script type="text/javascript" src="../../../node_modules/jquery/dist/jquery.js"></script>
-    <script src="http://backbonejs.org/backbone.js"></script>
+    <script src="../../lib/backbone-min.js"></script>
     <script src="../../../node_modules/gridster/dist/jquery.gridster.js" type="text/javascript" charset="utf-8"></script>
     <script src="../../../node_modules/socket.io-client/socket.io.js"></script>
     <script src="../../js/canv-gauge/gauge.js"></script>
@@ -50,7 +50,13 @@
 </head>
 
 <body>
-<p><button id="bDashboard">Dashboard</button><button id="bEditMode">EditMode</button><button id="bSettings">Settings</button><button id="bParkingSensor">ParkingSensor</button></p>
+<p>
+    <button id="bDashboard">Dashboard</button>
+    <button id="bEditMode">EditMode</button>
+    <button id="bSettings">Settings</button>
+    <button id="bParkingSensor">ParkingSensor</button>
+    <button id="bReplayMode">ReplayMode</button>
+</p>
 <div id="dEditMode" style="display: none;">
     <div class="demo-content">
         <div id="dSignals">
@@ -64,7 +70,12 @@
     <br>
     DeleteMode: <input type="checkbox" id="cDeleteMode">
 </div>
-
+<div id="dReplayMode" style="display: none">
+    <div class="demo-content">
+        <div id="dDrives"></div>
+    </div>
+    <button id="bStartReplay">Start</button>
+</div>
 <div id="dDashboard" >
 <div class="gridster">
     <ul></ul>

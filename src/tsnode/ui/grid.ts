@@ -71,7 +71,8 @@ class Grid {
      */
     removeWidget(id: string){
         var widget: Widget = this.widgets[id];
-        this.widgets[id].remove();
+        delete this.widgets[id];
+        delete this.widgetsJQuery[id];
         widget.destroy();
     }
 
@@ -99,7 +100,7 @@ class Grid {
 
         widget.init();
 
-        console.log(this.serialize());
+        //console.log(this.serialize());
 
         return widget;
 

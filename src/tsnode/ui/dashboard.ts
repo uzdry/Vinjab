@@ -15,6 +15,7 @@ import {DashboardMessage} from "../messages";
 import {WidgetFactory, SignalDescription} from "./widgetFactory";
 import {Grid} from "./grid";
 import {GoogleMapWidgetConfig} from "./Map";
+import {ReplayRequestMessage} from "../messages";
 
 class Dashboard{
     /** MVC Stuff */
@@ -28,12 +29,14 @@ class Dashboard{
     idSelector:HTMLSelectElement = <HTMLSelectElement>document.getElementById("valueSelect");
     button:HTMLButtonElement = <HTMLButtonElement>document.getElementById("addButton");
     deleteCheck: HTMLInputElement = <HTMLInputElement>document.getElementById("cDeleteMode");
+    startButton:HTMLButtonElement = <HTMLButtonElement>document.getElementById("bStartReplay");
 
     options:string[];
 
     /** Cookie Stuff */
     user: string;
 
+    replayState: boolean = false;
 
     constructor(){
 
@@ -58,6 +61,10 @@ class Dashboard{
             postal.channel("reqsubs").publish("stop.dashboard settings from database", "dashboard settings from database");
         }.bind(this));
 
+        postal.channel("values").subscribe("replay information", function(data, envelope){
+            this.updateDrivesSelector(data.finishTime);
+        }.bind(this));
+
         postal.channel("toServer").publish("", message);
 
         $(document).on( "click", ".gridster ul li", function() {
@@ -69,6 +76,7 @@ class Dashboard{
         });
 
         this.button.onclick = this.addWidget.bind(this);
+        this.startButton.onclick = this.startReplay.bind(this);
 
         this.initTabs();
     }
@@ -117,6 +125,20 @@ class Dashboard{
 
         var widget = this.widgetFactory.createWidget(widgetName.selectedData.value, signalName.selectedData.value);
         this.grid.addWidget(widget);
+    }
+
+    /**
+     * Starts the Replay
+     */
+    private startReplay(){
+        var drivesNumber = $('#dDrives').data('ddslick');
+
+        if(drivesNumber.selectedIndex < 0) return;
+
+        var msg: ReplayRequestMessage = new ReplayRequestMessage(drivesNumber.selectedData.value, this.user, !this.replayState);
+        this.replayState = !this.replayState;
+
+        postal.channel("toServer").publish("", msg);
     }
 
     /**
@@ -174,34 +196,65 @@ class Dashboard{
     }
 
     /**
+     * Updates all drives in the ReplayModus
+     * @param drives Array with Objets that contain the length of the drive
+     */
+    updateDrivesSelector(drives: number[]){
+        var drivesOption: Array<DDSlickOptions> = [];
+
+        for(var i in drives){
+
+            var option = new DDSlickOptions();
+            option.text = "Fahrt: " + i;
+            option.description = "Dauer: " + (drives[i]/60000).toFixed(0) + " Minuten";
+            option.value = i;
+
+            drivesOption.push(option);
+        }
+
+        $('#dDrives').ddslick('destroy');
+
+        $('#dDrives').ddslick({
+            data: drivesOption,
+            selectText: 'Wähle die zu anzeigende Fahrt'
+        });
+    }
+
+    /**
      * Initialise changing the dashboard
      */
     initTabs(){
         this.grid.gridster.disable();
         this.grid.gridster.disable_resize();
+
         $( "#bDashboard" ).click(function() {
             if($("#dEditMode").is(":visible")){
                 console.log("Saving DashboardConfig");
                 postal.channel("toServer").publish("" ,new DashboardMessage(this.user, this.grid.serialize(), false));
             }
+
+            this.grid.gridster.disable();
+            this.grid.gridster.disable_resize();
+
             $( "#dDashboard" ).show( "slow" );
             $( "#dSettings").hide("slow");
             $( "#dEditMode").hide("slow");
             $( "#dParkingSensor").hide("slow");
-            this.grid.gridster.disable();
-            this.grid.gridster.disable_resize();
+            $( "#dReplayMode").hide("slow");
         }.bind(this));
         $( "#bSettings" ).click(function() {
             $( "#dDashboard" ).hide( "slow" );
             $( "#dSettings").show("slow");
             $( "#dEditMode").hide("slow");
             $( "#dParkingSensor").hide("slow");
+            $( "#dReplayMode").hide("slow");
         }.bind(this));
         $( "#bEditMode" ).click(function() {
             $( "#dDashboard" ).show( "slow" );
             $( "#dSettings").hide("slow");
             $( "#dEditMode").show("slow");
             $( "#dParkingSensor").hide("slow");
+            $( "#dReplayMode").hide("slow");
             this.grid.gridster.enable();
             this.grid.gridster.enable_resize();
         }.bind(this));
@@ -210,6 +263,14 @@ class Dashboard{
             $( "#dSettings").hide("slow");
             $( "#dEditMode").hide("slow");
             $( "#dParkingSensor").show("slow");
+            $( "#dReplayMode").hide("slow");
+        }.bind(this));
+        $("#bReplayMode").click(function(){
+            $( "#dDashboard" ).show( "slow" );
+            $( "#dSettings").hide("slow");
+            $( "#dEditMode").hide("slow");
+            $( "#dParkingSensor").hide("slow");
+            $( "#dReplayMode").show("slow");
         }.bind(this));
     }
 
@@ -222,7 +283,7 @@ class DDSlickOptions{
     /** the shown text */
     text:string;
     /** the returned value */
-    value:string;
+    value:any;
     /** the shown description */
     description:string;
     /** the shown picture for each option */
