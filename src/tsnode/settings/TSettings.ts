@@ -326,7 +326,7 @@ class MessageBuffer {
     getValueOf(topic : SettingsMessageClient.STopic) : number {
 
         var val1 = this.configs.get(topic);
-        return this.configs.get(topic).numericalValue();
+        return val1.numericalValue();
 
         //return this.configs.get(topic).numericalValue();
     }
@@ -350,32 +350,61 @@ class DummyDatabase {
 
     public constructor() {
 
-        var topic1 = new SettingsMessageClient.STopic("settings.wheelbase");
-        var value1 = new SettingsMessageClient.SettingsValue(4000, 'valueName');
+        var topics : SettingsMessageClient.STopic[] = [];
+        var values : SettingsMessageClient.SettingsValue[] = [];
 
-        var topic2 = new SettingsMessageClient.STopic("settings.axletrack");
-        var value2 = new SettingsMessageClient.SettingsValue(1300, 'valueName');
 
-        var topic3 = new SettingsMessageClient.STopic('settings.steeringratio');
-        var value3 = new SettingsMessageClient.SettingsValue(20, 'valueName');
+        topics[0] = new SettingsMessageClient.STopic("settings.wheelbase");
+        values[0] = new SettingsMessageClient.SettingsValue(4000, 'valueName');
 
-        var topic4 = new SettingsMessageClient.STopic('settings.dbcapacity');
-        var value4 = new SettingsMessageClient.SettingsValue(999, 'valueName');
+        topics[1] = new SettingsMessageClient.STopic("settings.axletrack");
+        values[1] = new SettingsMessageClient.SettingsValue(1300, 'valueName');
 
-        var topic5 = new SettingsMessageClient.STopic('settings.fueltankwarning');
-        var value5 = new SettingsMessageClient.SettingsValue(8, 'valueName');
+        topics[2] = new SettingsMessageClient.STopic('settings.steeringratio');
+        values[2] = new SettingsMessageClient.SettingsValue(20, 'valueName');
 
+        topics[3] = new SettingsMessageClient.STopic('settings.dbcapacity');
+        values[3] = new SettingsMessageClient.SettingsValue(999, 'valueName');
+
+        topics[4] = new SettingsMessageClient.STopic('settings.fueltankwarning');
+        values[4] = new SettingsMessageClient.SettingsValue(8, 'valueName');
+
+        topics[5] = new SettingsMessageClient.STopic('settings.parkingsensor.camera.posx');
+        values[5] = new SettingsMessageClient.SettingsValue(0, 'valueName');
+
+        topics[6] = new SettingsMessageClient.STopic('settings.parkingsensor.camera.posy');
+        values[6] = new SettingsMessageClient.SettingsValue(800, 'valueName');
+
+        topics[7] = new SettingsMessageClient.STopic('settings.parkingsensor.camera.posz');
+        values[7] = new SettingsMessageClient.SettingsValue(0, 'valueName');
+
+        topics[8] = new SettingsMessageClient.STopic('settings.parkingsensor.camera.rotx');
+        values[8] = new SettingsMessageClient.SettingsValue(20, 'valueName');
+
+        topics[9] = new SettingsMessageClient.STopic('settings.parkingsensor.camera.roty');
+        values[9] = new SettingsMessageClient.SettingsValue(0, 'valueName');
+
+        topics[10] = new SettingsMessageClient.STopic('settings.parkingsensor.camera.rotz');
+        values[10] = new SettingsMessageClient.SettingsValue(0, 'valueName');
+
+        topics[11] = new SettingsMessageClient.STopic('settings.parkingsensor.camera.hres');
+        values[11] = new SettingsMessageClient.SettingsValue(640, 'valueName');
+
+        topics[12] = new SettingsMessageClient.STopic('settings.parkingsensor.camera.vres');
+        values[12] = new SettingsMessageClient.SettingsValue(480, 'valueName');
+
+        topics[13] = new SettingsMessageClient.STopic('settings.parkingsensor.camera.haov');
+        values[13] = new SettingsMessageClient.SettingsValue(106, 'valueName');
+
+        topics[14] = new SettingsMessageClient.STopic('settings.parkingsensor.camera.vaov');
+        values[14] = new SettingsMessageClient.SettingsValue(90, 'valueName');
+
+        for (var i = 0; i < topics.length; i++) {
+
+            SettingsDBCOM.LowLevelDatabaseEmulator.createNewEntry(topics[i].getName(),
+                SettingsMessageCommon.SettingsValue.stringifyValue(values[i]));
+        }
         //SettingsDBCOM.LowLevelDatabaseEmulator.clearDB();
-        SettingsDBCOM.LowLevelDatabaseEmulator.createNewEntry(topic1.getName(),
-            SettingsMessageCommon.SettingsValue.stringifyValue(value1));
-        SettingsDBCOM.LowLevelDatabaseEmulator.createNewEntry(topic2.getName(),
-            SettingsMessageCommon.SettingsValue.stringifyValue(value2));
-        SettingsDBCOM.LowLevelDatabaseEmulator.createNewEntry(topic3.getName(),
-            SettingsMessageCommon.SettingsValue.stringifyValue(value3));
-        SettingsDBCOM.LowLevelDatabaseEmulator.createNewEntry(topic4.getName(),
-            SettingsMessageCommon.SettingsValue.stringifyValue(value4));
-        SettingsDBCOM.LowLevelDatabaseEmulator.createNewEntry(topic5.getName(),
-            SettingsMessageCommon.SettingsValue.stringifyValue(value5));
 
         this.dbinf =  new SettingsDBCOM.ExampleDatabaseInterface(new SettingsMessageClient.SpecimenFactory());
 
