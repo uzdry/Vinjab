@@ -4,13 +4,12 @@
 ///<reference path= "../../../typings/bluetooth-obd2/bluetooth-obd2.d.ts" />
 import {BusDevice} from "./../Bus";
 import {ValueAnswerMessage, DBRequestMessage, Message, ValueMessage, Topic} from "./../messages";
-import {write} from "fs";
 
 
 class BluetoothObd2 extends BusDevice{
 
-    counter = 0;
-    array = [
+    static counter = 0;
+    static array = [
     'ATZ',
     'ATD',
     'ATAL',
@@ -70,11 +69,12 @@ class BluetoothObd2 extends BusDevice{
         this.dataReceivedMarker = {};
 
 
+
         //if the obd device is connected, request the speed value for every second.
         this.btOBDReader.on('connected', function () {
 
-            this.write(this.array[this.counter]);
-            this.counter++;
+            this.write(BluetoothObd2.array[BluetoothObd2.counter]);
+            BluetoothObd2.counter++;
 
         });
 
@@ -99,11 +99,11 @@ class BluetoothObd2 extends BusDevice{
             console.log(JSON.stringify(receivedMessage));
             this.broker.handleMessage(receivedMessage);
 
-            this.write(this.array[this.counter]);
-                if (this.counter < this.array.length - 1) {
-                    this.counter++;
+            this.write(this.array[BluetoothObd2.counter]);
+                if (BluetoothObd2.counter < BluetoothObd2.array.length - 1) {
+                    BluetoothObd2.counter++;
                 } else {
-                    this.counter = this.counter - 14;
+                    BluetoothObd2.counter = BluetoothObd2.counter - 14;
                 }
 
 
