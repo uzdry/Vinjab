@@ -4,7 +4,7 @@ import levelup = require("levelup");
 import {BusDevice} from "./Bus";
 import {ValueAnswerMessage, Value, ReplayRequestMessage, ReplayValueMessage, DBRequestMessage, Message, ValueMessage,
     Topic, DashboardMessage, DashboardRspMessage} from "./messages";
-import {ReplayInfoMessage} from "./messages";
+import {ReplayInfoMessage, SettingsRequestMessage, SettingsResponseMessage} from "./messages";
 import {Utils} from "./Utils";
 import leveldown = require("leveldown");
 
@@ -172,7 +172,7 @@ class LevelDBAccess {
                 }
             }
         }.bind(this)).on('end', function () {
-            while(this.replayInfo.finishTime[0] == null){
+            while(this.replayInfo.finishTime[0] == null && this.replayInfo.finishTime.length != 0){
                 this.replayInfo.finishTime.shift();
             }
             console.log("RI: " + JSON.stringify(this.replayInfo.finishTime));
@@ -189,9 +189,9 @@ class LevelDBAccess {
         //initializes the key
         var key: ValueEntryKey = new ValueEntryKey(this.DBInfo.currentDrive,
             new Date().getTime() - this.driveBegin);
-            console.log(JSON.stringify(key));
-            console.log(new Date().getTime());
-            console.log(this.driveBegin);
+            //console.log(JSON.stringify(key));
+            //console.log(new Date().getTime());
+            //console.log(this.driveBegin);
         //puts the value to the db with its key
         this.db.put(JSON.stringify(key), JSON.stringify(new SensorValueEntry(topicID, value, unit)), {sync: true},
             function(err) {
@@ -352,6 +352,23 @@ class LevelDBAccess {
             callback(callbackParam);
         }.bind(this));
     }
+
+    public putSettings(s: string) {
+        this.deleteFromKey("SETTINGS");
+        this.db.put("SETTINGS", s, function(err){
+            if(err) console.log(err);
+        });
+    }
+
+    public getSettings(callback) {
+        this.db.get("SETTINGS", function(err, value) {
+            if(err){
+                console.log(err);
+            } else {
+                callback(value)
+            }
+        }.bind(this));
+    }
 }
 
 /**
@@ -426,11 +443,15 @@ class DBBusDevice extends BusDevice {
                     }.bind(this));
             }
         }
-        else if(m.topic.name == Topic.SETTINGS_MSG.name) {
-       //     var smsg = <SettingsMessage> m;
-
-
-
+        else if(m.topic.name == Topic.SETTINGS_REQ_MSG.name) {
+            var srm = <SettingsRequestMessage> m;
+            if(srm.readFromDB){
+                this.dbAccess.getSettings(function(settings){
+                    this.broker.handleMessage(new SettingsResponseMessage(settings));
+                }.bind(this));
+            } else {
+                this.dbAccess.putSettings(srm.settings);
+            }
         }
     }
 }
