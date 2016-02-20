@@ -1,4 +1,3 @@
-
 /// <reference path="../../../typings/postal/postal.d.ts"/>
 /// <reference path="./TextDebugger.ts"/>
 /// <reference path="./Renderer.ts"/>
@@ -69,7 +68,7 @@ class ValueChangeListener {
 
     public postal_getSettingsWriteMessages() : SettingsMessageClient.SettingsMessage[] {
         var sc : SettingsMessageCommon.SettingsContainer;
-        var scArray : SettingsMessageCommon.SettingsContainer[];
+        var scArray : SettingsMessageCommon.SettingsContainer[] = [];
 
         for (var i = 0; i < this.settingsNodes.length; i++) {
             var sv : SettingsMessageClient.SettingsValue =
@@ -182,7 +181,6 @@ class SCommunicator {
      */
     private static parseNumericParameter(parameter : any, messageBuffer : MessageBuffer, valueChangeListener : ValueChangeListener, container : Node) {
         var topicName = SCommunicator.getValue('topicName', parameter);
-
         var topic = new SettingsMessageClient.STopic(topicName);
 
         var childPar = new SettingsParameter(SCommunicator.getValue("ruid", parameter), SCommunicator.getValue("name", parameter), SCommunicator.getValue("description", parameter),
@@ -326,7 +324,7 @@ class MessageBuffer {
     getValueOf(topic : SettingsMessageClient.STopic) : number {
 
         var val1 = this.configs.get(topic);
-        return this.configs.get(topic).numericalValue();
+        return val1.numericalValue();
 
         //return this.configs.get(topic).numericalValue();
     }
@@ -350,37 +348,69 @@ class DummyDatabase {
 
     public constructor() {
 
-        var topic1 = new SettingsMessageClient.STopic("settings.wheelbase");
-        var value1 = new SettingsMessageClient.SettingsValue(4000, 'valueName');
+        var topics : SettingsMessageClient.STopic[] = [];
+        var values : SettingsMessageClient.SettingsValue[] = [];
 
-        var topic2 = new SettingsMessageClient.STopic("settings.axletrack");
-        var value2 = new SettingsMessageClient.SettingsValue(1300, 'valueName');
 
-        var topic3 = new SettingsMessageClient.STopic('settings.steeringratio');
-        var value3 = new SettingsMessageClient.SettingsValue(20, 'valueName');
+        topics[0] = new SettingsMessageClient.STopic("settings.wheelbase");
+        values[0] = new SettingsMessageClient.SettingsValue(4000, 'valueName');
 
-        var topic4 = new SettingsMessageClient.STopic('settings.dbcapacity');
-        var value4 = new SettingsMessageClient.SettingsValue(999, 'valueName');
+        topics[1] = new SettingsMessageClient.STopic("settings.axletrack");
+        values[1] = new SettingsMessageClient.SettingsValue(1300, 'valueName');
 
-        var topic5 = new SettingsMessageClient.STopic('settings.fueltankwarning');
-        var value5 = new SettingsMessageClient.SettingsValue(8, 'valueName');
+        topics[2] = new SettingsMessageClient.STopic('settings.steeringratio');
+        values[2] = new SettingsMessageClient.SettingsValue(20, 'valueName');
 
-        //SettingsDBCOM.LowLevelDatabaseEmulator.clearDB();
-        SettingsDBCOM.LowLevelDatabaseEmulator.createNewEntry(topic1.getName(),
-            SettingsMessageCommon.SettingsValue.stringifyValue(value1));
-        SettingsDBCOM.LowLevelDatabaseEmulator.createNewEntry(topic2.getName(),
-            SettingsMessageCommon.SettingsValue.stringifyValue(value2));
-        SettingsDBCOM.LowLevelDatabaseEmulator.createNewEntry(topic3.getName(),
-            SettingsMessageCommon.SettingsValue.stringifyValue(value3));
-        SettingsDBCOM.LowLevelDatabaseEmulator.createNewEntry(topic4.getName(),
-            SettingsMessageCommon.SettingsValue.stringifyValue(value4));
-        SettingsDBCOM.LowLevelDatabaseEmulator.createNewEntry(topic5.getName(),
-            SettingsMessageCommon.SettingsValue.stringifyValue(value5));
+        topics[3] = new SettingsMessageClient.STopic('settings.dbcapacity');
+        values[3] = new SettingsMessageClient.SettingsValue(999, 'valueName');
+
+        topics[4] = new SettingsMessageClient.STopic('settings.fueltankwarning');
+        values[4] = new SettingsMessageClient.SettingsValue(8, 'valueName');
+
+        topics[5] = new SettingsMessageClient.STopic('settings.parkingsensor.camera.posx');
+        values[5] = new SettingsMessageClient.SettingsValue(0, 'valueName');
+
+        topics[6] = new SettingsMessageClient.STopic('settings.parkingsensor.camera.posy');
+        values[6] = new SettingsMessageClient.SettingsValue(800, 'valueName');
+
+        topics[7] = new SettingsMessageClient.STopic('settings.parkingsensor.camera.posz');
+        values[7] = new SettingsMessageClient.SettingsValue(0, 'valueName');
+
+        topics[8] = new SettingsMessageClient.STopic('settings.parkingsensor.camera.rotx');
+        values[8] = new SettingsMessageClient.SettingsValue(20, 'valueName');
+
+        topics[9] = new SettingsMessageClient.STopic('settings.parkingsensor.camera.roty');
+        values[9] = new SettingsMessageClient.SettingsValue(0, 'valueName');
+
+        topics[10] = new SettingsMessageClient.STopic('settings.parkingsensor.camera.rotz');
+        values[10] = new SettingsMessageClient.SettingsValue(0, 'valueName');
+
+        topics[11] = new SettingsMessageClient.STopic('settings.parkingsensor.camera.hres');
+        values[11] = new SettingsMessageClient.SettingsValue(640, 'valueName');
+
+        topics[12] = new SettingsMessageClient.STopic('settings.parkingsensor.camera.vres');
+        values[12] = new SettingsMessageClient.SettingsValue(480, 'valueName');
+
+        topics[13] = new SettingsMessageClient.STopic('settings.parkingsensor.camera.haov');
+        values[13] = new SettingsMessageClient.SettingsValue(106, 'valueName');
+
+        topics[14] = new SettingsMessageClient.STopic('settings.parkingsensor.camera.vaov');
+        values[14] = new SettingsMessageClient.SettingsValue(90, 'valueName');
 
         this.dbinf =  new SettingsDBCOM.ExampleDatabaseInterface(new SettingsMessageClient.SpecimenFactory());
 
         var pch = postal.channel(TSConstants.st2dbChannel);
         pch.subscribe(TSConstants.st2dbTopic, this.postal_handleMessage.bind(this));
+
+        for (var i = 0; i < topics.length; i++) {
+            var sm = new SettingsMessageClient.SettingsMessage(
+                new SettingsMessageCommon.SettingsContainer(topics[i].getName(),
+                values[i], false), false);
+            postal.channel(TSConstants.st2dbChannel).publish(TSConstants.st2dbTopic, sm);
+        }
+
+
+
     }
 
     public postal_handleMessage(data) : void {
@@ -392,36 +422,6 @@ class DummyDatabase {
             }
         }
     }
-
-    /*public constructor() {
-        var pch = postal.channel(TSConstants.st2dbChannel);
-        pch.subscribe(TSConstants.st2dbTopic, this.postal_handleMessage.bind(this));
-    }
-
-
-    public postal_handleMessage(data) : void {
-        var topic1 = new SettingsMessageClient.STopic('wheelbase');
-        var value1 = new SettingsMessageClient.SValue(4000, 'valueName');
-        var sc1 = new SettingsDBCOM.SettingsContainer(topic1.getName(), value1, SettingsDBCOM.SettingsIODirection.write);
-        var topic1 = new SettingsMessageClient.STopic('axletrack');
-        var value1 = new SettingsMessageClient.SValue(1300, 'valueName');
-        var sc2 = new SettingsDBCOM.SettingsContainer(topic1.getName(), value1, SettingsDBCOM.SettingsIODirection.write);
-        var topic1 = new SettingsMessageClient.STopic('steeringratio');
-        var value1 = new SettingsMessageClient.SValue(20, 'valueName');
-        var sc3 = new SettingsDBCOM.SettingsContainer(topic1.getName(), value1, SettingsDBCOM.SettingsIODirection.write);
-
-        var topic1 = new SettingsMessageClient.STopic('dbcapacity');
-        var value1 = new SettingsMessageClient.SValue(999, 'valueName');
-        var sc4 = new SettingsDBCOM.SettingsContainer(topic1.getName(), value1, SettingsDBCOM.SettingsIODirection.write);
-
-        var topic1 = new SettingsMessageClient.STopic('fueltankwarning');
-        var value1 = new SettingsMessageClient.SValue(8, 'valueName');
-        var sc5 = new SettingsDBCOM.SettingsContainer(topic1.getName(), value1, SettingsDBCOM.SettingsIODirection.write);
-
-        var sm = new SettingsDBCOM.SettingsMessage([sc1, sc2, sc3, sc4, sc5], true);
-        var pch = postal.channel(TSConstants.db2stChannel);
-        pch.publish(TSConstants.db2stTopic, sm);
-    }*/
 }
 
 /**
@@ -436,9 +436,10 @@ class Startup {
         TextDebugger.refreshData(null, container);
         var valueChangeListener = new ValueChangeListener(textDebugger);
 
+        var database = new DummyDatabase();
+
         var messageBuffer = new MessageBuffer(valueChangeListener, container);
 
-        var database = new DummyDatabase();
         messageBuffer.initialize();
 
         var div = document.createElement("div");

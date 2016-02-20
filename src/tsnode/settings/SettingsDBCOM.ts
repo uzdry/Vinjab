@@ -170,6 +170,7 @@ module SettingsDBCOM {
                 //  Can be used to clean up inconsistent database / XML structure, return every settings entry stored in the DB.
 
                 var allSettings = this.getAllSettingsContainersFromDB();
+
                 var messageBuf : SettingsMessageInterface.ISettingsMessage[] = [];
                 for (var i = 0; i < allSettings.length; i++) {
                     messageBuf.push(this.specimenFactory.getMessageSpecimen().createMe(allSettings[i], true));
