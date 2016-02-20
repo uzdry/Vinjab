@@ -26,6 +26,7 @@
     "underscore": "~1.8.3"
   },
   "dependencies": {
+    "binding": "0.0.0",
     "bluetooth-obd": "^0.2.2",
     "bower": "^1.7.7",
     "chartjs": "^0.3.1",
