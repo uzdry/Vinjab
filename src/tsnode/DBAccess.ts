@@ -315,18 +315,14 @@ class LevelDBAccess {
             var callbackParam;
             if(err) {
                 if(err.notFound) {
-                    var standardConfig: string = '[{"row":1,"col":5,"size_x":7,"size_y":7,"name":"SpeedGauge",' +
-                        '"valueID":"value.speed"},{"row":1,"col":1,"size_x":4,"size_y":4,"name":"SpeedGauge",' +
-                        '"valueID":"value.engine torque"},{"row":1,"col":12,"size_x":4,"size_y":4,"name":"TextWidget",' +
-                        '"valueID":"value.catalyst temperature"},{"row":1,"col":5,"size_x":8,"size_y":8,' +
-                        '"name":"SpeedGauge","valueID":"value.speed"},{"row":5,"col":1,"size_x":4,"size_y":4,' +
-                        '"name":"TextWidget","valueID":"value.temperature outside"},{"row":1,"col":1,' +
-                        '"size_x":4,"size_y":4,"name":"SpeedGauge","valueID":"value.engine torque"},' +
-                        '{"row":1,"col":13,"size_x":9,"size_y":2,"name":"TextWidget",' +
-                        '"valueID":"value.aggregated.fuel consumption"},{"row":3,"col":13,"size_x":9,"size_y":2,' +
-                        '"name":"TextWidget","valueID":"value.avg.speed"},{"row":5,"col":13,"size_x":4,"size_y":4,' +
-                        '"name":"PercentGauge","valueID":"value.accelerator pedal position"},{"row":5,"col":17,' +
-                        '"size_x":4,"size_y":4,"name":"PercentGauge","valueID":"value.aggregated.fuel per hour"}]';
+                    var standardConfig: string = '[{\"row\":1,\"col\":11,\"size_x\":7,\"size_y\":7,\"name\":' +
+                        '\"SpeedGauge\",\"valueID\":\"value.speed\"},{\"row\":1,\"col\":1,\"size_x\":8,\"size_y\":' +
+                        '7,\"name\":\"SpeedGauge\",\"valueID\":\"value.RPM\"},{\"row\":8,\"col\":2,\"size_x\":6,' +
+                        '\"size_y\":5,\"name\":\"TextWidget\",\"valueID\":\"value.engine runtime\"},{\"row\":8,' +
+                        '\"col\":8,\"size_x\":5,\"size_y\":5,\"name\":\"PercentGauge\",\"valueID\":\"value.fuel\"},' +
+                        '{\"row\":8,\"col\":14,\"size_x\":4,\"size_y\":2,\"name\":\"TextWidget\",\"valueID\":' +
+                        '\"value.aggregated.fuel consumption\"},{\"row\":10,\"col\":14,\"size_x\":5,\"size_y\":2,' +
+                        '\"name\":\"TextWidget\",\"valueID\":\"value.temperature outside\"}]';
                     this.putUserInfo(userID, standardConfig);
                     callbackParam = new UserInfoEntry(standardConfig);
                 } else {
