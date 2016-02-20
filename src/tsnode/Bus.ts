@@ -108,7 +108,7 @@ class Broker {
         this.subscribers[topic].splice(i,1);
 
         if (this.subscribers[Msg.Topic.SPEED.name]) {
-            console.log(this.subscribers[Msg.Topic.SPEED.name].length + '');
+            //console.log(this.subscribers[Msg.Topic.SPEED.name].length + '');
         }
 
 

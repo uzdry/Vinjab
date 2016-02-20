@@ -162,6 +162,9 @@ class Dashboard{
         var msg: ReplayRequestMessage = new ReplayRequestMessage(drivesNumber.selectedData.value, this.user, !this.replayState);
         this.replayState = !this.replayState;
 
+        if(this.replayState) this.startButton.innerHTML = "Stop";
+        else this.startButton.innerHTML = "Start";
+
         postal.channel("toServer").publish("", msg);
     }
 

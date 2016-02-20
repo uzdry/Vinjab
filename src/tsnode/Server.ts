@@ -60,13 +60,18 @@ class Server extends BusDevice{
                 } else if (Utils.startsWith(message.topic.name, 'dashboard')) {
                     message = new DashboardMessage(message.user, message.config, message.request);
                 } else if (Utils.startsWith(message.topic.name, 'replay')) {
+                    p.setUser(message.callerID);
+                    p.setReplayState(message.startStop);
+
+                    if(message.startStop) p.subscribe(Topic.REPLAY_ANS);
+                    else p.unsubscribe(Topic.REPLAY_ANS);
+
                     message = new ReplayRequestMessage(message.driverNr, message.callerID, message.startStop);
                 }
                 p.broker.handleMessage(message);
             });
 
             socket.on('subscribe', function(msg) {
-
                 p.subscribe(new Topic(msg));
             });
 
