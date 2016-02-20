@@ -51,4 +51,86 @@
             <topicName>settings.dbcapacity</topicName>
         </npar>
     </dir>
+    <dir>
+        <ruid>parkingsensor</ruid>
+        <name>Einparkhilfe</name>
+        <description>Einstellungen der Rückfahrkamera und der Einparkhilfe</description>
+        <imageURL>../../img/settings/parkingsensor/parkingsensor.png</imageURL>
+        <dir>
+            <ruid>camera</ruid>
+            <name>Kamera</name>
+            <description>Einstellungen der Rückfahrkamera</description>
+            <imageURL>../../img/settings/parkingsensor/camera/camera.png</imageURL>
+            <npar>
+                <ruid>posx</ruid>
+                <name>Position X</name>
+                <description>Position der Kamera entlang der x-Achse</description>
+                <imageURL>../../img/settings/parkingsensor/camera/posx.png</imageURL>
+                <topicName>settings.parkingsensor.camera.posx</topicName>
+            </npar>
+            <npar>
+                <ruid>posy</ruid>
+                <name>Position Y</name>
+                <description>Position der Kamera entlang der y-Achse</description>
+                <imageURL>../../img/settings/parkingsensor/camera/posy.png</imageURL>
+                <topicName>settings.parkingsensor.camera.posy</topicName>
+            </npar>
+            <npar>
+                <ruid>posz</ruid>
+                <name>Position Z</name>
+                <description>Position der Kamera entlang der z-Achse</description>
+                <imageURL>../../img/settings/parkingsensor/camera/posz.png</imageURL>
+                <topicName>settings.parkingsensor.camera.posz</topicName>
+            </npar>
+            <npar>
+                <ruid>rotx</ruid>
+                <name>Rotation X</name>
+                <description>Rotation der Kamera um die x-Achse</description>
+                <imageURL>../../img/settings/parkingsensor/camera/rotx.png</imageURL>
+                <topicName>settings.parkingsensor.camera.rotx</topicName>
+            </npar>
+            <npar>
+                <ruid>roty</ruid>
+                <name>Rotation Y</name>
+                <description>Rotation der Kamera um die y-Achse</description>
+                <imageURL>../../img/settings/parkingsensor/camera/roty.png</imageURL>
+                <topicName>settings.parkingsensor.camera.roty</topicName>
+            </npar>
+            <npar>
+                <ruid>rotz</ruid>
+                <name>Rotation Z</name>
+                <description>Rotation der Kamera um die z-Achse</description>
+                <imageURL>../../img/settings/parkingsensor/camera/rotz.png</imageURL>
+                <topicName>settings.parkingsensor.camera.rotz</topicName>
+            </npar>
+            <npar>
+                <ruid>hres</ruid>
+                <name>Horizontale Auflösung</name>
+                <description>Horizontale Auflösung der Kamera</description>
+                <imageURL>../../img/settings/parkingsensor/camera/hres.png</imageURL>
+                <topicName>settings.parkingsensor.camera.hres</topicName>
+            </npar>
+            <npar>
+                <ruid>vres</ruid>
+                <name>Vertikale Auflösung</name>
+                <description>Vertikale Auflösung der Kamera</description>
+                <imageURL>../../img/settings/parkingsensor/camera/vres.png</imageURL>
+                <topicName>settings.parkingsensor.camera.vres</topicName>
+            </npar>
+            <npar>
+                <ruid>haov</ruid>
+                <name>Horizontaler Bildwinkel</name>
+                <description>Horizontaler Kamerabildwinkel (gemessen in Grad)</description>
+                <imageURL>../../img/settings/parkingsensor/camera/haov.png</imageURL>
+                <topicName>settings.parkingsensor.camera.haov</topicName>
+            </npar>
+            <npar>
+                <ruid>vaov</ruid>
+                <name>Vertikaler Bildwinkel</name>
+                <description>Vertikaler Kamerabildwinkel (gemessen in Grad)</description>
+                <imageURL>../../img/settings/parkingsensor/camera/vaov.png</imageURL>
+                <topicName>settings.parkingsensor.camera.vaov</topicName>
+            </npar>
+        </dir>
+    </dir>
 </root>
