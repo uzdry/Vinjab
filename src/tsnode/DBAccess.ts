@@ -301,7 +301,7 @@ class LevelDBAccess {
                 var parsed = JSON.parse(data.key);
                 if (parsed.hasOwnProperty('time') && parsed.hasOwnProperty('driveNr')) {
                     var sve = new SensorValueEntry(JSON.parse(data.value).topic, JSON.parse(data.value).value,
-                                JSON.parse(data.unit));
+                                JSON.parse(data.value).unit);
                     if (sve.topic == topicID || topicID == "value.*") {
                         listOfKeys[listOfKeys.length] = new ValueEntryKey(parsed.driveNr, parsed.time);
                         listOfEntries[listOfEntries.length] = sve;
@@ -364,6 +364,7 @@ class DBBusDevice extends BusDevice {
         this.subscribe(Topic.DBREQ_MSG);
         this.subscribe(Topic.DASHBOARD_MSG);
         this.subscribe(Topic.REPLAY_REQ);
+        this.subscribeAll(Topic.VALUES);
     }
 
     /**
@@ -391,8 +392,8 @@ class DBBusDevice extends BusDevice {
             }.bind(this));
         }
         //If the given message is a regular value message, it is written to the db
-        else if (Utils.startsWith(m.topic.name, "value.")) {
-            var valuemes = <ValueMessage> m;
+        else if (Utils.startsWith(m.topic.name, "value.") || m instanceof ValueMessage) {
+            var valuemes = <ValueMessage> m
             this.dbAccess.putSensorValue(valuemes.topic.name, valuemes.value.value, valuemes.value.identifier);
         }
         //If the given message is a DashboardMessage, it is either written to the db or fetched from the db
