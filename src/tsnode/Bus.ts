@@ -28,11 +28,14 @@ class BusDevice {
     }
 
     public subscribeAll(topics: Msg.Topic[]): void {
-        for (var x in topics) {
-            this.broker.subscribe(x.name, this);
+        for (var i in topics) {
+            this.broker.subscribe(topics[i].name, this);
         }
     }
 
+    public unsubscribeAll() {
+        this.broker.unsubscribeAll(this);
+    }
 
     public unsubscribe(t:Msg.Topic) {
         this.broker.unsubscribe(t.name, this);
@@ -50,7 +53,8 @@ class Broker {
 
     private static instance:Broker;
   //  private subs: Map<string, Set<BusDevice>>;
-    private subscribers: { [path:string]:Array<BusDevice>; };
+
+    private subscribers: { [topic:string]:Array<BusDevice>; };
 
     constructor() {
      //   this.subs = new Map<string, Set<BusDevice>>();
@@ -78,6 +82,18 @@ class Broker {
         this.subscribers[topic].push(sub);
     }
 
+    public unsubscribeAll(sub: BusDevice) {
+        for (var i = 0; i < Msg.Topic.VALUES.length; i++) {
+            if (this.subscribers[Msg.Topic.VALUES[i].name]) {
+                for (var j = 0; j < this.subscribers[Msg.Topic.VALUES[i].name].length; j++) {
+                    if (this.subscribers[Msg.Topic.VALUES[i].name][j] == sub) {
+                        this.unsubscribe(Msg.Topic.VALUES[i].name, sub);
+                    }
+                }
+            }
+        }
+    }
+
     public unsubscribe(topic:string, sub:BusDevice):void {
 
     //    this.subscribers.get(topic).delete(sub);
@@ -91,7 +107,10 @@ class Broker {
         var i = this.subscribers[topic].indexOf(sub);
         this.subscribers[topic].splice(i,1);
 
-        console.log(this.subscribers);
+        if (this.subscribers[Msg.Topic.SPEED.name]) {
+            console.log(this.subscribers[Msg.Topic.SPEED.name].length + '');
+        }
+
 
 
     }

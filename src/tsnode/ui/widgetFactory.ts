@@ -19,6 +19,8 @@ class WidgetFactory{
 
     private dashboard: Dashboard;
 
+    cnt: number = 0;
+
 
     /**
      * The Constructor of the widget factory saves some objects
@@ -62,8 +64,8 @@ class WidgetFactory{
      * @param widgetConfig The config thats to be used
      */
     addWidget(widgetConfig: WidgetConfig){
+        console.log(widgetConfig.type_name);
         this.widgetConfigurations[widgetConfig.type_name] = widgetConfig;
-        this.dashboard.updateWidgetSelector(this.widgetConfigurations);
     }
 
     /**
@@ -86,7 +88,7 @@ class WidgetFactory{
     /**
      * Is used to initiate the decoding of available Signals
      */
-    private getSignalsInit(){
+    private getSignalsInit() {
         var xhttp = new XMLHttpRequest();
 
         xhttp.onreadystatechange = function() {
@@ -134,6 +136,7 @@ class WidgetFactory{
                 }
 
             }
+
 
 
             for (var j = 0; j < highlightse.length; j++) {

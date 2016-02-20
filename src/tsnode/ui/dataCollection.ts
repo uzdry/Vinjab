@@ -25,6 +25,9 @@ class DataCollection extends Backbone.Collection<DataModel> {
      * @returns {DataModel} A Datamodel that matches the given options
      */
     getOrCreate(options){
+        if (!options) {
+            return;
+        }
         var model:DataModel = this.findWhere({tagName: options.tagName});
         if(model == undefined){
             model = new DataModel(options);

@@ -10,7 +10,7 @@
 
 	if ( typeof define === "function" && define.amd ) {
 		// AMD. Register as an anonymous module.
-		define( [ "../../bower_components/lodash/lodash" ], function(_ ) {
+		define( [ "lodash" ], function( _ ) {
 			return factory( _, root );
 		} );
 
@@ -34,6 +34,8 @@
 		configuration: _.extend( {}, _defaultConfig )
 	};
 	var _config = postal.configuration;
+
+
 
 var ChannelDefinition = function( channelName, bus ) {
 	this.bus = bus;
@@ -69,6 +71,7 @@ ChannelDefinition.prototype.publish = function() {
 	envelope.channel = this.channel;
 	this.bus.publish( envelope, callback );
 };
+
 
 var SubscriptionDefinition = function( channel, topic, callback ) {
 	if ( arguments.length !== 3 ) {
@@ -304,6 +307,7 @@ for ( var i = 0; i < 6; i++ ) {
 
 
 
+
 var bindingsResolver = _config.resolver = {
 	cache: {},
 	regex: {},
@@ -390,6 +394,8 @@ var bindingsResolver = _config.resolver = {
 };
 
 
+
+
 var pubInProgress = 0;
 var unSubQueue = [];
 var autoCompactIndex = 0;
@@ -415,10 +421,9 @@ function getCacher( topic, pubCache, cacheKey, done, envelope ) {
 	var headers = envelope && envelope.headers || {};
 	return function( subDef ) {
 		var cache;
-        if ( _config.resolver.compare( subDef.topic, topic, headers ) ) {
+		if ( _config.resolver.compare( subDef.topic, topic, headers ) ) {
 			if ( !headers.resolverNoCache ) {
-                //console.log(pubCache);
-                if (cache) {
+				if (cache) {
                     cache = pubCache[ cacheKey ] = ( pubCache[ cacheKey ] || [] );
                     cache.push( subDef );
                 }
@@ -627,6 +632,7 @@ _.extend( postal, {
 				idx = 0;
 				// remove SubscriptionDefinition from channel list
 				while ( idx < len ) {
+
 					if ( topicSubs[ idx ] === subDef ) {
 						topicSubs.splice( idx, 1 );
 						break;
@@ -675,11 +681,14 @@ _.extend( postal, {
 	}
 } );
 
+
+
 	if ( global && Object.prototype.hasOwnProperty.call( global, "__postalReady__" ) && _.isArray( global.__postalReady__ ) ) {
 		while ( global.__postalReady__.length ) {
 			global.__postalReady__.shift().onReady( postal );
 		}
 	}
+
 
 	return postal;
 } ) );
