@@ -483,7 +483,7 @@ class Replay extends BusDevice {
     private send() {
         this.cnt++;
         this.broker.handleMessage(new ReplayValueMessage(new ValueMessage(new Topic(this.vals[this.cnt].topic),
-            new Value(this.vals[this.cnt].value, this.vals[this.cnt].unit))));
+            new Value(this.vals[this.cnt].value, this.vals[this.cnt].unit)), this.callerID));
         if(this.cnt + 1 == this.times.length) {
             clearInterval(this.repl);
         } else {
