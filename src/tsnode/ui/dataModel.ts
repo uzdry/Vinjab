@@ -4,6 +4,8 @@
 
 
 //import {ValueMessage} from "../messages";
+//import {DBRequestMessage} from "../messages";
+import {Topic} from "../messages";
 class DataModel extends Backbone.Model{
 
     /** The subscription as object so that it can be accessed lateron */

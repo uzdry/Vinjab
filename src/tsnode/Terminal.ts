@@ -64,7 +64,6 @@ class Terminal {
      * @param data the data that is to be send
      */
     public toServer(data){
-        console.log(data);
         var msgstr = JSON.stringify(data);
         this.connection.emit('message', msgstr);
     }
@@ -74,7 +73,7 @@ class Terminal {
      * @param message the message, which will be sent.
      */
     public subscribeFromServer(data) {
-        console.log(data);
+        //console.log(data);
         this.connection.emit('subscribe', data.sku);
     }
 

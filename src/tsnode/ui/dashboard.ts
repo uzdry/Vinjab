@@ -51,30 +51,7 @@ class Dashboard{
             document.cookie = "user=" + this.user;
         }
 
-        var message: DashboardMessage = new DashboardMessage(this.user, "", true);
-       // postal.channel("reqsubs").publish("request.dashboard settings from database", "dashboard settings from database");
-
-        postal.publish({
-           channel: "reqsubs",
-            topic:"request.dashboard settings from database",
-            data: {
-                sku: "dashboard settings from database",
-                qty: 21 + Date.now()
-            }
-        });
-
-        postal.channel("values").subscribe("dashboard settings from database", function(data, envelope){
-            console.log("Input: " + JSON.stringify(data));
-            if(!(data.user === this.user)) return;
-            this.grid.fromSerialized(data.config);
-            postal.channel("reqsubs").publish("stop.dashboard settings from database", "dashboard settings from database");
-        }.bind(this));
-
-        postal.channel("values").subscribe("replay information", function(data, envelope){
-            this.updateDrivesSelector(data.finishTime);
-        }.bind(this));
-
-        postal.channel("toServer").publish("", message);
+        this.initSubs();
 
         $(document).on( "click", ".gridster ul li", function() {
             if((<HTMLInputElement>document.getElementById("cDeleteMode")).checked) {
@@ -89,6 +66,44 @@ class Dashboard{
 
         this.initTabs();
     }
+
+
+    initSubs(){
+        var message: DashboardMessage = new DashboardMessage(this.user, "", true);
+
+        postal.publish({
+            channel: "reqsubs",
+            topic:"request.dashboard settings from database",
+            data: {
+                sku: "dashboard settings from database",
+                qty: 21 + Date.now()
+            }
+        });
+
+        postal.publish({
+            channel: "reqsubs",
+            topic:"request.replay information",
+            data: {
+                sku: "replay information",
+                qty: 21 + Date.now()
+            }
+        });
+
+        postal.channel("values").subscribe("dashboard settings from database", function(data, envelope){
+            if(!(data.user === this.user)) return;
+            this.grid.fromSerialized(data.config);
+            postal.channel("reqsubs").publish("stop.dashboard settings from database", "dashboard settings from database");
+        }.bind(this));
+
+        postal.channel("values").subscribe("replay information", function(data, envelope){
+            console.log(data);
+            this.updateDrivesSelector(data.finishTime);
+            postal.channel("reqsubs").publish("stop.replay information", "replay information");
+        }.bind(this));
+
+        postal.channel("toServer").publish("", message);
+    }
+
 
     /**
      * Returns a certain cookie
@@ -243,7 +258,6 @@ class Dashboard{
 
         $( "#bDashboard" ).click(function() {
             if($("#dEditMode").is(":visible")){
-                console.log("Saving DashboardConfig");
                 postal.channel("toServer").publish("" ,new DashboardMessage(this.user, this.grid.serialize(), false));
             }
 
