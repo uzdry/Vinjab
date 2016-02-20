@@ -44,6 +44,9 @@ class Topic {
     static REPLAY_ANS =         new Topic("replay answer");
     static REPLAY_INFO =        new Topic("replay information");
 
+    static SETTINGS_REQ_MSG =   new Topic("settings request message");
+    static SETTINGS_RSP_MSG =   new Topic("settings response message");
+
     static VALUES: Topic[] = [     Topic.SPEED,
         Topic.MAF,
         Topic.COOLANT_TEMP,
@@ -69,7 +72,10 @@ class Topic {
         Topic.FUEL_CONSUMPTION,
         Topic.MILEAGE,
         Topic.AVG_SPEED,
-        Topic.FUEL_CONSUMPTION_H];
+        Topic.FUEL_CONSUMPTION_H,
+
+        Topic.SETTINGS_REQ_MSG,
+        Topic.SETTINGS_RSP_MSG];
 
     name:string;
 
@@ -201,7 +207,6 @@ class DashboardRspMessage extends Message {
         this.user = usr;
         this.config = cnfg;
     }
-
 }
 
 class Value {
@@ -223,5 +228,25 @@ class Value {
 
 }
 
+class SettingsRequestMessage extends Message {
+    settings : string;
+    // True if the value should be read from the database, false if it should be written to the database.
+    readFromDB : boolean;
+
+    constructor(settings : string, readFromDB : boolean) {
+        super(Topic.SETTINGS_REQ_MSG);
+        this.settings = settings;
+        this.readFromDB = readFromDB;
+    }
+}
+
+class SettingsResponseMessage extends Message {
+    settings : string;
+
+    constructor(settings : string) {
+        super(Topic.SETTINGS_RSP_MSG);
+        this.settings = settings;
+    }
+}
 
 export {Topic, Message, ValueMessage, ReplayInfoMessage, ValueAnswerMessage, DBRequestMessage, ReplayValueMessage, ReplayRequestMessage, Value, DashboardMessage, DashboardRspMessage};
