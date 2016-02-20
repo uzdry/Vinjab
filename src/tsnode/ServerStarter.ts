@@ -1,5 +1,3 @@
-///<reference path="../../levelup.d.ts"/>
-
 import {Server} from "./Server";
 import {Broker} from "./Bus";
 import {Aggregation, Distance, FuelConsumption, AverageComputation} from "./AggregatedFunctions";
@@ -14,7 +12,6 @@ class ServerStarter {
 
     private db;
     private server;
-    private broker;
 
     private distance;
     private fuelConsumption;

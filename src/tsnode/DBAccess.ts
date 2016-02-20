@@ -1,4 +1,5 @@
-/// <reference path="../../levelup.d.ts" />
+/// <reference path="../../typings/levelup/levelup.d.ts" />
+/// <reference path ="C:\Program Files (x86)\JetBrains\WebStorm 11.0.3\plugins\JavaScriptLanguage\typescriptCompiler\external\lib.es6.d.ts"/>
 
 import levelup = require("levelup");
 import {BusDevice} from "./Bus";
@@ -291,7 +292,6 @@ class LevelDBAccess {
         }
         this.db.createReadStream({gte: gte, lte: lte}).on('data', function (data) {
             var parsed = JSON.parse(data.key);
-            console.log(parsed);
             if (parsed.hasOwnProperty('time') && parsed.hasOwnProperty('driveNr')) {
                 var sve = new SensorValueEntry(JSON.parse(data.value).topic, JSON.parse(data.value).value);
                 if (sve.topic == topicID || topicID == "value.*") {
@@ -338,6 +338,11 @@ class LevelDBAccess {
             callback(callbackParam);
         }.bind(this));
     }
+
+    showDatabase() {
+        this.db.createReadStream().on('data', function(data) {
+        })
+    }
 }
 
 /**
@@ -356,7 +361,6 @@ class DBBusDevice extends BusDevice {
         this.dbAccess = new LevelDBAccess();
         this.subscribe(Topic.SETTINGS_MSG);
         this.subscribe(Topic.DBREQ_MSG);
-        this.subscribeAll(Topic.VALUES);
         this.subscribe(Topic.DASHBOARD_MSG);
         this.subscribe(Topic.REPLAY_REQ);
     }
@@ -377,7 +381,6 @@ class DBBusDevice extends BusDevice {
      * @param m: The message received from the Bus.
      */
     public handleMessage(m: Message): void {
-
         //If the given message is a DBRequestMessage, the Request is handled and a response message is sent.
         if(m.topic.name == Topic.DBREQ_MSG.name) {
             //handling of a Value Request: Values are fetched from the DB and a value response is sent
@@ -386,11 +389,10 @@ class DBBusDevice extends BusDevice {
                 this.sendValueMessage(dbValueReq.reqTopic, res, tim);
             }.bind(this));
         }
-
         //If the given message is a regular value message, it is written to the db
-        else if (DBBusDevice.startsWith(m.topic.name, "value.")) {
+        else if (m.topic.name.startsWith("value.") || m instanceof ValueMessage) {
             var valuemes = <ValueMessage> m;
-            this.dbAccess.putSensorValue(valuemes.value.getIdentifier(), valuemes.value.numericalValue);
+            this.dbAccess.putSensorValue(valuemes.topic.name, valuemes.value.numericalValue);
         }
         //If the given message is a DashboardMessage, it is either written to the db or fetched from the db
         else if(m.topic.name == Topic.DASHBOARD_MSG.name) {
@@ -400,6 +402,7 @@ class DBBusDevice extends BusDevice {
                     this.broker.handleMessage(new DashboardRspMessage(dbm.user, value.dashboardConfig));
                 }.bind(this));
                 this.broker.handleMessage(new ReplayInfoMessage(this.dbAccess.replayInfo.finishTime));
+                this.dbAccess.showDatabase();
             } else {
                     this.dbAccess.putUserInfo(dbm.user, dbm.config);
             }
@@ -417,24 +420,6 @@ class DBBusDevice extends BusDevice {
         else if(m.topic.name == Topic.SETTINGS_MSG.name) {
        //     var smsg = <SettingsMessage> m;
         }
-    }
-
-    /**
-     * Assisting method. Checks if a given string starts with another given string.
-     * @param s: The string that is to be checked for start string
-     * @param t: The string for which the other string is to be checked
-     * @returns {boolean}: True, if string s starts with string t
-     */
-    static startsWith(s: string, t: string): boolean {
-        var i = 0;
-        while(i < s.length && i < t.length) {
-            if(s[i] == t[i]) {
-                i++;
-            } else {
-                return false;
-            }
-        }
-        return true;
     }
 }
 
