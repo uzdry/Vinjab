@@ -73,7 +73,7 @@ class Terminal {
      * @param message the message, which will be sent.
      */
     public subscribeFromServer(data) {
-        console.log(data);
+        //console.log(data);
         this.connection.emit('subscribe', data.sku);
     }
 

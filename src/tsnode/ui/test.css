@@ -54,12 +54,12 @@ body {
 }
 
 .gridster .gs-w {
-    /* background: #DDD; */
+    background-color: rgba(128,128,128,0.2);
     cursor: pointer;
 }
 
 .gridster .player {
-    background: #000000;
+    background: #423d32;
 }
 
 

@@ -96,6 +96,7 @@ class Dashboard{
         }.bind(this));
 
         postal.channel("values").subscribe("replay information", function(data, envelope){
+            console.log(data);
             this.updateDrivesSelector(data.finishTime);
             postal.channel("reqsubs").publish("stop.replay information", "replay information");
         }.bind(this));

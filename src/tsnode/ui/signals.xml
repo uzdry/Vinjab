@@ -176,7 +176,7 @@
         <description>Temperatur außerhalb des Autos</description>
         <minValue>-20</minValue>
         <maxValue>60</maxValue>
-        <unit>°</unit>
+        <unit>°C</unit>
     </signal>
     <signal category="value.engine torque">
         <name>Motormoment</name>

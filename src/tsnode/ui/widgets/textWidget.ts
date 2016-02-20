@@ -40,8 +40,10 @@ class TextWidget extends Widget{
 
 
     init() {
+        if(!this.value) this.value = 0;
         this.htmlText = <HTMLParagraphElement>document.getElementById(this.widgetID);
-        this.htmlText.innerHTML = this.model.get("name") + "<br >" + this.value;
+        this.htmlText.innerHTML = this.model.get("name") + "<br >" +
+            "<br >" + this.value.toFixed(2) + " " + this.model.get("unit");
     }
 
     constructor(options?){
@@ -68,7 +70,7 @@ class TextWidget extends Widget{
         if (this.value) {
 
         this.htmlText.innerHTML = this.model.get("name") + "<br >" +
-            "<br >" + this.value.toFixed(2) ;
+            "<br >" + this.value.toFixed(2) + " " + this.model.get("unit") ;
         }
         return this;
     }
@@ -76,11 +78,6 @@ class TextWidget extends Widget{
     resize(size_x: number, size_y:number){
         var resizer = $(""+this.widgetID);
         var size;
-
-        console.log(this.htmlText);
-
-        console.log("ID: " + this.widgetID + "w: " + resizer.width() + " | h: " + resizer.height());
-        console.log(resizer);
 
         resizer.css("font-size", "10px");
 
