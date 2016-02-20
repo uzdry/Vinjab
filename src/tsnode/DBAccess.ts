@@ -217,14 +217,15 @@ class LevelDBAccess {
             this.db.createKeyStream().on('data', function(data){
                 var key = data;
                 if(key[0] == '{' && key[1] == '"') { //check if the string could be a JSON-String
-                    if(JSON.parse(data).hasOwnProperty('time')) {
+                    if(JSON.parse(data).hasOwnProperty('time') && JSON.parse(data).hasOwnProperty('driveNr')) {
                         listOfKeys.push(data);
                     }
                 }
             }.bind(this)).on('end', function() { //function on the end of the stream, does the actual reducing
                 var newSize: number = this.DBInfo.maxCapacity * 0.9;
+                var maxToDelete: number = this.DBInfo.size - newSize
                 var i: number = 0;
-                while(this.DBInfo.size > newSize){
+                while(i < newSize){
                     //if a key is among the oldest keys, it is deleted:
                     this.deleteFromKey(listOfKeys[i]);
                     this.decrementSize();
@@ -242,7 +243,6 @@ class LevelDBAccess {
         try {
             this.db.del(k, function(err) {
                 if(err && !err.notFound) {
-                    console.log(err);
                 }
             }.bind(this));
         } catch(e) {
