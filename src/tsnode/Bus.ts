@@ -29,7 +29,7 @@ class BusDevice {
 
     public subscribeAll(topics: Msg.Topic[]): void {
         for (var i in topics) {
-            this.broker.subscribe(Msg.Topics[i].name, this);
+            this.broker.subscribe(topics[i].name, this);
         }
     }
 
