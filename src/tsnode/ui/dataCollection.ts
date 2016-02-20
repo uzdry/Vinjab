@@ -3,7 +3,6 @@
 ///<reference path="dataModel.ts" />
 
 import Model = Backbone.Model;
-
 class DataCollection extends Backbone.Collection<DataModel> {
 
     /** Model type */
