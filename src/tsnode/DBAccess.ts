@@ -6,6 +6,7 @@ import {BusDevice} from "./Bus";
 import {ValueAnswerMessage, Value, ReplayRequestMessage, ReplayValueMessage, DBRequestMessage, Message, ValueMessage,
     Topic, DashboardMessage, DashboardRspMessage} from "./messages";
 import {ReplayInfoMessage} from "./messages";
+import {Utils} from "./Utils";
 import leveldown = require("leveldown");
 
 // The entry types that are to be written to the database:
@@ -388,7 +389,7 @@ class DBBusDevice extends BusDevice {
             }.bind(this));
         }
         //If the given message is a regular value message, it is written to the db
-        else if (m.topic.name.startsWith("value.") || m instanceof ValueMessage) {
+        else if (Utils.startsWith(m.topic.name, "value.")) {
             var valuemes = <ValueMessage> m;
             this.dbAccess.putSensorValue(valuemes.topic.name, valuemes.value.numericalValue);
         }
@@ -472,7 +473,7 @@ class Replay extends BusDevice {
         this.vals = vals;
         this.times = times;
         while(this.continueLoop) {
-            setInterval(this.send.bind(this), this.slp);
+            setTimeout(this.send.bind(this), this.slp);
         }
     }
 
