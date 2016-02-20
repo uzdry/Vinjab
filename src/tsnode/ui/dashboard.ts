@@ -173,7 +173,10 @@ class Dashboard{
         //Demo 1---------------------
         $('#dSignals').ddslick({
             data: signalsData,
-            selectText: "Select the Signal to be shown"
+            selectText: "Select the Signal to be shown",
+            onSelected: function(data){
+                dashboard.updateWidgetSelector(dashboard.widgetFactory.getOptions());
+            }
         });
     }
 
@@ -200,8 +203,10 @@ class Dashboard{
 
         $('#dWidgets').ddslick({
             data: widgetData,
-            selectText: "Select the Widget to be shown"
+            selectText: "select option",
+            defaultSelectedIndex: 0
         });
+
     }
 
     /**
@@ -307,7 +312,6 @@ dashboard.widgetFactory.addWidget(new TextWidgetConfig());
 dashboard.widgetFactory.addWidget(new PercentGaugeWidgetConfig());
 dashboard.widgetFactory.addWidget(new LineChartWidgetConfig());
 dashboard.widgetFactory.addWidget(new GoogleMapWidgetConfig());
-
 
 
 export {DDSlickOptions, Dashboard}

@@ -49,6 +49,7 @@ class Server extends BusDevice{
 
             socket.on('disconnect', function(){
                 console.log('user disconnected');
+                p.unsubscribeAll();
             });
 
             socket.on('message', function(msg){

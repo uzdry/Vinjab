@@ -26,17 +26,11 @@ class ServerStarter {
      */
     constructor() {
 
-        var leveldown = require("leveldown");
-        leveldown.destroy("../../testDB", function() { });
-
         this.db = new DBBusDevice();
 
         this.aggregations = new Array<Aggregation>();
 
         this.server = new Server();
-
-        this.distance = new Distance();
-        this.fuelConsumption = new FuelConsumption();
 
         this.source = new BluetoothSim();
 

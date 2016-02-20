@@ -93,17 +93,19 @@ class Grid {
         if (typeof col === 'undefined') { col = 0; }
         if (typeof row === 'undefined') { row = 0; }
 
-        widget.htmlWrapper = this.gridster.add_widget(widget.htmlElement, size_x, size_y, col, row);
+        if (widget) {
+            widget.htmlWrapper = this.gridster.add_widget(widget.htmlElement, size_x, size_y, col, row);
+            this.widgetsJQuery[widget.widgetID]=widget.htmlWrapper;
 
-        this.widgetsJQuery[widget.widgetID]=widget.htmlWrapper;
+            this.widgets[widget.widgetID]=widget;
 
-        this.widgets[widget.widgetID]=widget;
+            widget.init();
 
-        widget.init();
+            //console.log(this.serialize());
 
-        //console.log(this.serialize());
+            return widget;
+        }
 
-        return widget;
 
     }
 

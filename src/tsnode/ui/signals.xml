@@ -179,11 +179,11 @@
         <unit>°</unit>
     </signal>
     <signal category="value.engine torque">
-        <name>Motormoment</name>
-        <description>Moment des Motors</description>
+        <name>Drehmoment</name>
+        <description>Drehmoment des Motors</description>
         <minValue>0</minValue>
-        <maxValue>3000</maxValue>
-        <unit>TODO</unit>
+        <maxValue>200</maxValue>
+        <unit>Nm</unit>
     </signal>
     <!--     <signal category="value.exhaust gas temperature">
             <name>GasTemperatur</name>
