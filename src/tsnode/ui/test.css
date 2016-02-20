@@ -1,6 +1,7 @@
 .gridster * {
     margin:0;
     padding:0;
+    color:white;
 }
 
 ul {
@@ -29,7 +30,7 @@ body {
 /*/
 
 .gridster ul {
-    background-color: #EFEFEF;
+    /*background-color: #EFEFEF; */
 }
 
 .gridster li {
@@ -53,12 +54,12 @@ body {
 }
 
 .gridster .gs-w {
-    background: #DDD;
+    /* background: #DDD; */
     cursor: pointer;
 }
 
 .gridster .player {
-    background: #BBB;
+    background: #000000;
 }
 
 
