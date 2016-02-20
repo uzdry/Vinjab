@@ -3,7 +3,7 @@
 <signals>
 
     <signal category="value.speed">
-        <name>Geschwindigkeit</name>
+        <name>Tacho</name>
         <description>Geschwindigkeit des Autos</description>
         <minValue>0</minValue>
         <maxValue>220</maxValue>
@@ -50,14 +50,14 @@
         <unit>gramm</unit>
     </signal>
     <signal category="value.coolant temperature">
-        <name>Kühlertemperatur</name>
+        <name>Kühlertemp.</name>
         <description>Temperatur des Kühlers</description>
         <minValue>0</minValue>
         <maxValue>100</maxValue>
         <unit>°C</unit>
     </signal>
     <signal category="value.fuel pressure">
-        <name>Treibstoffdruck</name>
+        <name>Treib.-druck</name>
         <description>Treibstoffdruck in bar</description>
         <minValue>0</minValue>
         <maxValue>10</maxValue>
@@ -101,7 +101,7 @@
         <unit>degree</unit>
     </signal>
     <signal category="value.intake air temperature">
-        <name>Lufttemperatur</name>
+        <name>Lufttemp.</name>
         <description>Temperatur der eingezogenen Luft</description>
         <minValue>0</minValue>
         <maxValue>60</maxValue>
@@ -151,7 +151,7 @@
         <unit></unit>
     </signal>
 -->    <signal category="value.catalyst temperature">
-        <name>KatalysatorTemperatur</name>
+        <name>Cat.-Temp.</name>
         <description>Temperatur des Katalysators</description>
         <minValue>0</minValue>
         <maxValue>800</maxValue>
@@ -172,7 +172,7 @@
             <unit>%</unit>
         </signal>
    <signal category="value.temperature outside">
-        <name>Außentemperatur</name>
+        <name>Außentemp.</name>
         <description>Temperatur außerhalb des Autos</description>
         <minValue>-20</minValue>
         <maxValue>60</maxValue>
@@ -207,14 +207,14 @@
             <unit>cm</unit>
         </signal>
         -->    <signal category="value.avg.aggregated.fuel consumption">
-        <name>Durchschnittverbrauch</name>
+        <name>Durchsch.-Verbr.</name>
         <description>Durschnittlicher Treibstoffverbrauch</description>
         <minValue>0</minValue>
         <maxValue>20</maxValue>
         <unit>l/100km</unit>
     </signal>
     <signal category="value.aggregated.fuel consumption">
-        <name>Treibstoffverbrauch</name>
+        <name>Treib.-Verbrauch</name>
         <description>Aktueller Treibstoffverbrauch</description>
         <minValue>0</minValue>
         <maxValue>20</maxValue>
@@ -228,7 +228,7 @@
         <unit>km</unit>
     </signal>
     <signal category="value.avg.speed">
-        <name>Durchschnittsgeschwindigkeit</name>
+        <name>Durchsch.-Gsch.</name>
         <description>Durchschnittliche Geschwindigkeit</description>
         <minValue>0</minValue>
         <maxValue>220</maxValue>
