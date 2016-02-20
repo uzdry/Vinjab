@@ -431,8 +431,8 @@ class Replay extends BusDevice {
     private slp: number;
     private vals: SensorValueEntry[];
     private times: number[];
-    private continueLoop: boolean;
     private callerID: string;
+    private repl;
 
     /**
      * Initializes the Replay with a given ReplayInformation-object and the user ID of the user calling for that
@@ -444,7 +444,6 @@ class Replay extends BusDevice {
         super();
         this.replayInfo = ri;
         this.cnt = 0;
-        this.continueLoop = true;
         this.callerID = callerID;
         this.subscribe(Topic.REPLAY_REQ);
     }
@@ -458,7 +457,7 @@ class Replay extends BusDevice {
         if(m.topic.name == Topic.REPLAY_REQ.name) {
             var rreq = <ReplayRequestMessage> m;
             if (!rreq.startStop && rreq.callerID == this.callerID) {
-                this.continueLoop = false;
+                clearInterval(this.repl);
             }
         }
     }
@@ -472,9 +471,7 @@ class Replay extends BusDevice {
     public replay(vals: SensorValueEntry[], times: number[]) {
         this.vals = vals;
         this.times = times;
-        while(this.continueLoop) {
-            setTimeout(this.send.bind(this), this.slp);
-        }
+        this.repl = setInterval(this.send.bind(this), this.slp);
     }
 
     /**
@@ -485,7 +482,7 @@ class Replay extends BusDevice {
         this.cnt++;
         this.broker.handleMessage(new ReplayValueMessage(new Value(this.vals[this.cnt].value, this.vals[this.cnt].topic)));
         if(this.cnt + 1 == this.times.length) {
-            this.continueLoop = false;
+            clearInterval(this.repl);
         } else {
             this.slp = this.times[this.cnt + 1] - this.times[this.cnt];
         }
