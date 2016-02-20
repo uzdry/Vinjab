@@ -1,5 +1,4 @@
 /// <reference path="../../typings/levelup/levelup.d.ts" />
-/// <reference path ="C:\Program Files (x86)\JetBrains\WebStorm 11.0.3\plugins\JavaScriptLanguage\typescriptCompiler\external\lib.es6.d.ts"/>
 
 import levelup = require("levelup");
 import {BusDevice} from "./Bus";
@@ -19,15 +18,17 @@ import leveldown = require("leveldown");
 class SensorValueEntry {
     topic: string;
     value: any;
+    unit: string;
 
     /**
      * Initializes the entry with its topic and value
      * @param topic: The topic of the value's type
      * @param value: The value to be written to the database
      */
-    constructor(topic: string, value:any) {
+    constructor(topic: string, value:any, unit: string) {
         this.topic = topic;
         this.value = value;
+        this.unit = unit;
     }
 }
 
@@ -177,13 +178,13 @@ class LevelDBAccess {
      * @param topicID: The topic corresponding to the given value
      * @param value: The value that is to be written to the db
      */
-    putSensorValue(topicID: string, value: any) {
+    putSensorValue(topicID: string, value: any, unit: string) {
         //initializes the key
         var key: ValueEntryKey = new ValueEntryKey(this.DBInfo.currentDrive,
             new Date().getDate() - this.driveBegin);
 
         //puts the value to the db with its key
-        this.db.put(JSON.stringify(key), JSON.stringify(new SensorValueEntry(topicID, value)), {sync: true},
+        this.db.put(JSON.stringify(key), JSON.stringify(new SensorValueEntry(topicID, value, unit)), {sync: true},
             function(err) {
                 if (err) console.log("Error in putting Entry:" + err);
             });
@@ -299,7 +300,8 @@ class LevelDBAccess {
             if(key[0] == '{' && key[1] == '"') { //check if the string could be a JSON-String
                 var parsed = JSON.parse(data.key);
                 if (parsed.hasOwnProperty('time') && parsed.hasOwnProperty('driveNr')) {
-                    var sve = new SensorValueEntry(JSON.parse(data.value).topic, JSON.parse(data.value).value);
+                    var sve = new SensorValueEntry(JSON.parse(data.value).topic, JSON.parse(data.value).value,
+                                JSON.parse(data.unit));
                     if (sve.topic == topicID || topicID == "value.*") {
                         listOfKeys[listOfKeys.length] = new ValueEntryKey(parsed.driveNr, parsed.time);
                         listOfEntries[listOfEntries.length] = sve;
@@ -323,13 +325,13 @@ class LevelDBAccess {
             var callbackParam;
             if(err) {
                 if(err.notFound) {
-                    var standardConfig: string = '[{\"row\":1,\"col\":11,\"size_x\":7,\"size_y\":7,\"name\":' +
-                        '\"SpeedGauge\",\"valueID\":\"value.speed\"},{\"row\":1,\"col\":1,\"size_x\":8,\"size_y\":' +
-                        '7,\"name\":\"SpeedGauge\",\"valueID\":\"value.RPM\"},{\"row\":8,\"col\":2,\"size_x\":6,' +
-                        '\"size_y\":5,\"name\":\"TextWidget\",\"valueID\":\"value.engine runtime\"},{\"row\":8,' +
-                        '\"col\":8,\"size_x\":5,\"size_y\":5,\"name\":\"PercentGauge\",\"valueID\":\"value.fuel\"},' +
-                        '{\"row\":8,\"col\":14,\"size_x\":4,\"size_y\":2,\"name\":\"TextWidget\",\"valueID\":' +
-                        '\"value.aggregated.fuel consumption\"},{\"row\":10,\"col\":14,\"size_x\":5,\"size_y\":2,' +
+                    var standardConfig: string = '[{\"row\":1,\"col\":9,\"size_x\":9,\"size_y\":7,\"name\":' +
+                        '\"SpeedGauge\",\"valueID\":\"value.speed\"},{\"row\":1,\"col\":1,\"size_x\":8,\"size_y\":7,' +
+                        '\"name\":\"SpeedGauge\",\"valueID\":\"value.RPM\"},{\"row\":8,\"col\":1,\"size_x\":6,' +
+                        '\"size_y\":5,\"name\":\"TextWidget\",\"valueID\":\"value.engine runtime\"},{\"row\":8,\"col\":' +
+                        '7,\"size_x\":5,\"size_y\":5,\"name\":\"PercentGauge\",\"valueID\":\"value.fuel\"},{\"row\":8,' +
+                        '\"col\":12,\"size_x\":6,\"size_y\":2,\"name\":\"TextWidget\",\"valueID\":' +
+                        '\"value.aggregated.fuel consumption\"},{\"row\":10,\"col\":12,\"size_x\":6,\"size_y\":2,' +
                         '\"name\":\"TextWidget\",\"valueID\":\"value.temperature outside\"}]';
                     this.putUserInfo(userID, standardConfig);
                     callbackParam = new UserInfoEntry(standardConfig);
@@ -391,7 +393,7 @@ class DBBusDevice extends BusDevice {
         //If the given message is a regular value message, it is written to the db
         else if (Utils.startsWith(m.topic.name, "value.")) {
             var valuemes = <ValueMessage> m;
-            this.dbAccess.putSensorValue(valuemes.topic.name, valuemes.value.numericalValue);
+            this.dbAccess.putSensorValue(valuemes.topic.name, valuemes.value.value, valuemes.value.identifier);
         }
         //If the given message is a DashboardMessage, it is either written to the db or fetched from the db
         else if(m.topic.name == Topic.DASHBOARD_MSG.name) {
@@ -480,7 +482,8 @@ class Replay extends BusDevice {
      */
     private send() {
         this.cnt++;
-        this.broker.handleMessage(new ReplayValueMessage(new Value(this.vals[this.cnt].value, this.vals[this.cnt].topic)));
+        this.broker.handleMessage(new ReplayValueMessage(new ValueMessage(new Topic(this.vals[this.cnt].topic),
+            new Value(this.vals[this.cnt].value, this.vals[this.cnt].unit))));
         if(this.cnt + 1 == this.times.length) {
             clearInterval(this.repl);
         } else {
