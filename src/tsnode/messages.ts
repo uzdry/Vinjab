@@ -169,11 +169,13 @@ class ReplayRequestMessage extends Message {
 }
 
 class ReplayValueMessage extends Message {
-    public value: Value;
+    public valueMessage: ValueMessage;
+    public caller: string;
 
-    constructor(pValue: Value ) {
+    constructor(pValueMessage: ValueMessage, caller: string) {
         super(Topic.REPLAY_ANS);
-        this.value= pValue;
+        this.valueMessage= pValueMessage;
+        this.caller = caller;
     }
 }
 

@@ -44,6 +44,9 @@ class Grid {
 
                 stop: function(e, ui, $widget) {
 
+                    // Show the children again
+                    $widget.children().show(0);
+
                     var outerHTML = $widget[0].outerHTML;
                     var size_x:number = parseInt(outerHTML.match("data-sizex=\"(.*?)\"")[1]);
                     var size_y:number = parseInt(outerHTML.match("data-sizey=\"(.*?)\"")[1]);
@@ -51,14 +54,13 @@ class Grid {
 
                     this.widgets[name].resize(size_x * this.cube_sizex, size_y * this.cube_sizey);
 
-                    // Show the children again
-                    $widget.children().show("fast");
+
 
                 }.bind(this),
 
                 start: function(e, ui, $widget) {
                     // Hide the widget until the resizing stops
-                    $widget.children().hide("fast");
+                    $widget.children().hide(0);
                 }
             }
         }).data('gridster');
