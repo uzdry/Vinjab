@@ -11,7 +11,6 @@ class BluetoothSim extends BusDevice {
         super();
 
         this.rpm = 1200;
-        this.rpm = 1200;
 
         this.gasTankpercent = 100;
 
@@ -22,7 +21,7 @@ class BluetoothSim extends BusDevice {
     }
 
     public init() {
-        setInterval(this.publish.bind(this), 1000);
+        setInterval(this.publish.bind(this), 100);
     }
 
     handleMessage(m: Message): void {
@@ -56,9 +55,6 @@ class BluetoothSim extends BusDevice {
         this.broker.handleMessage(new ValueMessage(Topic.STEERING, new Value(this.steeringAngle+=0.02 % 540, "degrees")));
         this.broker.handleMessage(new ValueMessage(Topic.MAF, new Value(60 , "grams")));
         this.broker.handleMessage(new ValueMessage(Topic.COOLANT_TEMP, new Value(90 , "degrees celsius")));
-
-
-
 
     }
 

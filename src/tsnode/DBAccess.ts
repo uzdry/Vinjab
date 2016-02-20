@@ -1,5 +1,4 @@
 /// <reference path="../../typings/levelup/levelup.d.ts" />
-/// <reference path ="C:\Program Files (x86)\JetBrains\WebStorm 11.0.3\plugins\JavaScriptLanguage\typescriptCompiler\external\lib.es6.d.ts"/>
 
 import levelup = require("levelup");
 import {BusDevice} from "./Bus";
@@ -323,13 +322,13 @@ class LevelDBAccess {
             var callbackParam;
             if(err) {
                 if(err.notFound) {
-                    var standardConfig: string = '[{\"row\":1,\"col\":11,\"size_x\":7,\"size_y\":7,\"name\":' +
-                        '\"SpeedGauge\",\"valueID\":\"value.speed\"},{\"row\":1,\"col\":1,\"size_x\":8,\"size_y\":' +
-                        '7,\"name\":\"SpeedGauge\",\"valueID\":\"value.RPM\"},{\"row\":8,\"col\":2,\"size_x\":6,' +
-                        '\"size_y\":5,\"name\":\"TextWidget\",\"valueID\":\"value.engine runtime\"},{\"row\":8,' +
-                        '\"col\":8,\"size_x\":5,\"size_y\":5,\"name\":\"PercentGauge\",\"valueID\":\"value.fuel\"},' +
-                        '{\"row\":8,\"col\":14,\"size_x\":4,\"size_y\":2,\"name\":\"TextWidget\",\"valueID\":' +
-                        '\"value.aggregated.fuel consumption\"},{\"row\":10,\"col\":14,\"size_x\":5,\"size_y\":2,' +
+                    var standardConfig: string = '[{\"row\":1,\"col\":9,\"size_x\":9,\"size_y\":7,\"name\":' +
+                        '\"SpeedGauge\",\"valueID\":\"value.speed\"},{\"row\":1,\"col\":1,\"size_x\":8,\"size_y\":7,' +
+                        '\"name\":\"SpeedGauge\",\"valueID\":\"value.RPM\"},{\"row\":8,\"col\":1,\"size_x\":6,' +
+                        '\"size_y\":5,\"name\":\"TextWidget\",\"valueID\":\"value.engine runtime\"},{\"row\":8,\"col\":' +
+                        '7,\"size_x\":5,\"size_y\":5,\"name\":\"PercentGauge\",\"valueID\":\"value.fuel\"},{\"row\":8,' +
+                        '\"col\":12,\"size_x\":6,\"size_y\":2,\"name\":\"TextWidget\",\"valueID\":' +
+                        '\"value.aggregated.fuel consumption\"},{\"row\":10,\"col\":12,\"size_x\":6,\"size_y\":2,' +
                         '\"name\":\"TextWidget\",\"valueID\":\"value.temperature outside\"}]';
                     this.putUserInfo(userID, standardConfig);
                     callbackParam = new UserInfoEntry(standardConfig);
