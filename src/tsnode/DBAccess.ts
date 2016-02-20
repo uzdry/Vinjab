@@ -19,15 +19,17 @@ import leveldown = require("leveldown");
 class SensorValueEntry {
     topic: string;
     value: any;
+    unit: string;
 
     /**
      * Initializes the entry with its topic and value
      * @param topic: The topic of the value's type
      * @param value: The value to be written to the database
      */
-    constructor(topic: string, value:any) {
+    constructor(topic: string, value:any, unit: string) {
         this.topic = topic;
         this.value = value;
+        this.unit = unit;
     }
 }
 
@@ -177,13 +179,13 @@ class LevelDBAccess {
      * @param topicID: The topic corresponding to the given value
      * @param value: The value that is to be written to the db
      */
-    putSensorValue(topicID: string, value: any) {
+    putSensorValue(topicID: string, value: any, unit: string) {
         //initializes the key
         var key: ValueEntryKey = new ValueEntryKey(this.DBInfo.currentDrive,
             new Date().getDate() - this.driveBegin);
 
         //puts the value to the db with its key
-        this.db.put(JSON.stringify(key), JSON.stringify(new SensorValueEntry(topicID, value)), {sync: true},
+        this.db.put(JSON.stringify(key), JSON.stringify(new SensorValueEntry(topicID, value, unit)), {sync: true},
             function(err) {
                 if (err) console.log("Error in putting Entry:" + err);
             });
@@ -299,7 +301,8 @@ class LevelDBAccess {
             if(key[0] == '{' && key[1] == '"') { //check if the string could be a JSON-String
                 var parsed = JSON.parse(data.key);
                 if (parsed.hasOwnProperty('time') && parsed.hasOwnProperty('driveNr')) {
-                    var sve = new SensorValueEntry(JSON.parse(data.value).topic, JSON.parse(data.value).value);
+                    var sve = new SensorValueEntry(JSON.parse(data.value).topic, JSON.parse(data.value).value,
+                                JSON.parse(data.unit));
                     if (sve.topic == topicID || topicID == "value.*") {
                         listOfKeys[listOfKeys.length] = new ValueEntryKey(parsed.driveNr, parsed.time);
                         listOfEntries[listOfEntries.length] = sve;
@@ -391,7 +394,7 @@ class DBBusDevice extends BusDevice {
         //If the given message is a regular value message, it is written to the db
         else if (Utils.startsWith(m.topic.name, "value.")) {
             var valuemes = <ValueMessage> m;
-            this.dbAccess.putSensorValue(valuemes.topic.name, valuemes.value.numericalValue);
+            this.dbAccess.putSensorValue(valuemes.topic.name, valuemes.value.value, valuemes.value.identifier);
         }
         //If the given message is a DashboardMessage, it is either written to the db or fetched from the db
         else if(m.topic.name == Topic.DASHBOARD_MSG.name) {
@@ -480,7 +483,8 @@ class Replay extends BusDevice {
      */
     private send() {
         this.cnt++;
-        this.broker.handleMessage(new ReplayValueMessage(new Value(this.vals[this.cnt].value, this.vals[this.cnt].topic)));
+        this.broker.handleMessage(new ReplayValueMessage(new ValueMessage(new Topic(this.vals[this.cnt].topic),
+            new Value(this.vals[this.cnt].value, this.vals[this.cnt].unit))));
         if(this.cnt + 1 == this.times.length) {
             clearInterval(this.repl);
         } else {
