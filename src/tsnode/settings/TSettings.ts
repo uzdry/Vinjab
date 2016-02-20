@@ -1,4 +1,3 @@
-
 /// <reference path="../../../typings/postal/postal.d.ts"/>
 /// <reference path="./TextDebugger.ts"/>
 /// <reference path="./Renderer.ts"/>
@@ -69,7 +68,7 @@ class ValueChangeListener {
 
     public postal_getSettingsWriteMessages() : SettingsMessageClient.SettingsMessage[] {
         var sc : SettingsMessageCommon.SettingsContainer;
-        var scArray : SettingsMessageCommon.SettingsContainer[];
+        var scArray : SettingsMessageCommon.SettingsContainer[] = [];
 
         for (var i = 0; i < this.settingsNodes.length; i++) {
             var sv : SettingsMessageClient.SettingsValue =
@@ -182,7 +181,6 @@ class SCommunicator {
      */
     private static parseNumericParameter(parameter : any, messageBuffer : MessageBuffer, valueChangeListener : ValueChangeListener, container : Node) {
         var topicName = SCommunicator.getValue('topicName', parameter);
-
         var topic = new SettingsMessageClient.STopic(topicName);
 
         var childPar = new SettingsParameter(SCommunicator.getValue("ruid", parameter), SCommunicator.getValue("name", parameter), SCommunicator.getValue("description", parameter),
@@ -399,17 +397,20 @@ class DummyDatabase {
         topics[14] = new SettingsMessageClient.STopic('settings.parkingsensor.camera.vaov');
         values[14] = new SettingsMessageClient.SettingsValue(90, 'valueName');
 
-        for (var i = 0; i < topics.length; i++) {
-
-            SettingsDBCOM.LowLevelDatabaseEmulator.createNewEntry(topics[i].getName(),
-                SettingsMessageCommon.SettingsValue.stringifyValue(values[i]));
-        }
-        //SettingsDBCOM.LowLevelDatabaseEmulator.clearDB();
-
         this.dbinf =  new SettingsDBCOM.ExampleDatabaseInterface(new SettingsMessageClient.SpecimenFactory());
 
         var pch = postal.channel(TSConstants.st2dbChannel);
         pch.subscribe(TSConstants.st2dbTopic, this.postal_handleMessage.bind(this));
+
+        for (var i = 0; i < topics.length; i++) {
+            var sm = new SettingsMessageClient.SettingsMessage(
+                new SettingsMessageCommon.SettingsContainer(topics[i].getName(),
+                values[i], false), false);
+            postal.channel(TSConstants.st2dbChannel).publish(TSConstants.st2dbTopic, sm);
+        }
+
+
+
     }
 
     public postal_handleMessage(data) : void {
@@ -421,36 +422,6 @@ class DummyDatabase {
             }
         }
     }
-
-    /*public constructor() {
-        var pch = postal.channel(TSConstants.st2dbChannel);
-        pch.subscribe(TSConstants.st2dbTopic, this.postal_handleMessage.bind(this));
-    }
-
-
-    public postal_handleMessage(data) : void {
-        var topic1 = new SettingsMessageClient.STopic('wheelbase');
-        var value1 = new SettingsMessageClient.SValue(4000, 'valueName');
-        var sc1 = new SettingsDBCOM.SettingsContainer(topic1.getName(), value1, SettingsDBCOM.SettingsIODirection.write);
-        var topic1 = new SettingsMessageClient.STopic('axletrack');
-        var value1 = new SettingsMessageClient.SValue(1300, 'valueName');
-        var sc2 = new SettingsDBCOM.SettingsContainer(topic1.getName(), value1, SettingsDBCOM.SettingsIODirection.write);
-        var topic1 = new SettingsMessageClient.STopic('steeringratio');
-        var value1 = new SettingsMessageClient.SValue(20, 'valueName');
-        var sc3 = new SettingsDBCOM.SettingsContainer(topic1.getName(), value1, SettingsDBCOM.SettingsIODirection.write);
-
-        var topic1 = new SettingsMessageClient.STopic('dbcapacity');
-        var value1 = new SettingsMessageClient.SValue(999, 'valueName');
-        var sc4 = new SettingsDBCOM.SettingsContainer(topic1.getName(), value1, SettingsDBCOM.SettingsIODirection.write);
-
-        var topic1 = new SettingsMessageClient.STopic('fueltankwarning');
-        var value1 = new SettingsMessageClient.SValue(8, 'valueName');
-        var sc5 = new SettingsDBCOM.SettingsContainer(topic1.getName(), value1, SettingsDBCOM.SettingsIODirection.write);
-
-        var sm = new SettingsDBCOM.SettingsMessage([sc1, sc2, sc3, sc4, sc5], true);
-        var pch = postal.channel(TSConstants.db2stChannel);
-        pch.publish(TSConstants.db2stTopic, sm);
-    }*/
 }
 
 /**
@@ -465,9 +436,10 @@ class Startup {
         TextDebugger.refreshData(null, container);
         var valueChangeListener = new ValueChangeListener(textDebugger);
 
+        var database = new DummyDatabase();
+
         var messageBuffer = new MessageBuffer(valueChangeListener, container);
 
-        var database = new DummyDatabase();
         messageBuffer.initialize();
 
         var div = document.createElement("div");
