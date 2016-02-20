@@ -8,4 +8,3 @@ ch.publish("value.speed");
 ch.publish("value.speed");
 ch.publish("value.rpm");
 ch.publish("value.speed");
-//# sourceMappingURL=main.js.map

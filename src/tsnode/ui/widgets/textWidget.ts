@@ -42,8 +42,8 @@ class TextWidget extends Widget{
     init() {
         if(!this.value) this.value = 0;
         this.htmlText = <HTMLParagraphElement>document.getElementById(this.widgetID);
-        this.htmlText.innerHTML = this.model.get("name") + "<br >" +
-            "<br >" + this.value.toFixed(2) + " " + this.model.get("unit");
+        this.htmlText.innerHTML = "<span id='name" + this.widgetID + "'>" + this.model.get("name") + "</span><br >" +
+            "<br><span id='value"+ this.widgetID + "'>" + this.value.toFixed(2) + " " + this.model.get("unit") + "</span>";
     }
 
     constructor(options?){
@@ -53,7 +53,7 @@ class TextWidget extends Widget{
         TextWidget.widgetCounter++;
 
         this.htmlElement = "<li><div style='text-align: center; vertical-align: middle; height: 220px; width: 220px; box-sizing: border-box;" +
-            "display:table-cell;' id=\"" + this.widgetID  + "\"> </div></li>";
+            "display:table-cell; font-size: 100%' id=\"" + this.widgetID  + "\"> </div></li>";
         this.value = options.value;
         this.id = options.id;
     }
@@ -69,29 +69,34 @@ class TextWidget extends Widget{
 
         if (this.value) {
 
-        this.htmlText.innerHTML = this.model.get("name") + "<br >" +
-            "<br >" + this.value.toFixed(2) + " " + this.model.get("unit") ;
+        this.htmlText.innerHTML = "<span id='name" + this.widgetID + "'>" + this.model.get("name") + "</span><br >" +
+            "<br><span id='value"+ this.widgetID + "'>" + this.value.toFixed(2) + " " + this.model.get("unit") + "</span>";
         }
         return this;
     }
 
     resize(size_x: number, size_y:number){
-        var resizer = $(""+this.widgetID);
-        var size;
+        var name = document.getElementById("name" + this.widgetID);
+        var value = document.getElementById("value" + this.widgetID);
 
-        resizer.css("font-size", "10px");
+        var width, height, factor, curSize, newSize : number;
 
-        var factor_x = resizer.width() / size_x;
-        var factor_y = resizer.height() / size_y;
+        if(name.offsetWidth > value.offsetWidth) width = name.offsetWidth;
+        else width = value.offsetWidth;
 
-        if(factor_x < factor_y){
-            resizer.css("font_size", (10 * factor_x).toFixed(1) + "px");
-        }else{
-            resizer.css("font_size", (10 * factor_y).toFixed(1) + "px")
-        }
+        if(name.offsetHeight > value.offsetHeight) height = 2 * name.offsetHeight;
+        else height = 2 * value.offsetHeight;
+
+        if(size_x/width > size_y/height) factor = size_y/height;
+        else factor = size_x/width;
+
+        curSize = parseInt(this.htmlText.style.getPropertyValue("font-size").split("%")[0], 10);
+
+        newSize = factor * curSize;
 
         this.htmlText.style.setProperty("width", (size_x * 1.1) + "px");
         this.htmlText.style.setProperty("height", (size_y * 1.1) + "px");
+        this.htmlText.style.setProperty("font-size", newSize.toFixed(2) + "%");
     }
 
     destroy(){
