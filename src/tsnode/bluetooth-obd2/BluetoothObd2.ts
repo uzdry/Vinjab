@@ -2,17 +2,16 @@
  * Created by yimeng on 29/01/16.
  */
 ///<reference path= "../../../typings/bluetooth-obd2/bluetooth-obd2.d.ts" />
-//import {BusDevice} from "./../Bus";
+import {BusDevice} from "./../Bus";
 import {ValueAnswerMessage, DBRequestMessage, Message, ValueMessage, Topic} from "./../messages";
 import {write} from "fs";
 
-var dataReceivedMarker = {};
 var counter = 0;
 var array = [
     'ATZ',
     'ATD',
-//    'ATAL',
-//    'ATAT2',
+    'ATAL',
+    'ATAT2',
     'ATH0',
     'ATE0',
     'ATE0',
@@ -32,53 +31,27 @@ var array = [
     'ATH0',
     '0100',
     '0120',
+    '012F',
     '0100',
-    '011F',
-    '011F',
-    '011F',
-    '011F',
-    '011F',
-    '011F',
-    '011F',
-    '011F',
-    '011F',
-    '011F',
-    '011F',
-    '011F',
-    '011F',
-    '011F',
-    '011F',
-    '011F',
-    '011F',
-    '011F',
-    '011F',
-    '011F',
-    '011F',
-    '011F',
-    '011F',
-    '011F',
-    '011F',
+    '010A',
     '010C',
-    '010C',
-    '010C',
-    '010C',
-    '010C',
-    '010C',
-    '010C',
-    '010C',
-    '010C',
-    '010C',
-    '010C',
-    '010C',
-    '010C',
-    '010C',
-    '010C',
-    '010C'
-]
+    '010D',
+    '010E',
+    '010F',
+    '0110',
+    '0111',
+    '012F',
+    '013C',
+    '0146',
+    '0149',
+    '0163',
+    '0167',
+    '016B',
+    '0173',
+];
 
 
-class BluetoothObd2 //extends BusDevice{
-{
+class BluetoothObd2 extends BusDevice{
     /**
      * the OBDReader Object to find OBD-Device and receive data
      */
@@ -90,7 +63,7 @@ class BluetoothObd2 //extends BusDevice{
     private dataReceivedMarker;
 
     constructor() {
-        //super();
+        super();
 
         var OBDReader = require('bluetooth-obd');
         this.btOBDReader = new OBDReader();
@@ -103,17 +76,11 @@ class BluetoothObd2 //extends BusDevice{
             this.write(array[counter]);
             counter++;
 
-            //vss = vehicle speed sensor
-            //this.btOBDReader.requestValueByName("vss");
-            //this.addPoller("runtm");
-
-            //Request all values each second.
-            //this.startPolling(1000);
         });
 
         this.btOBDReader.on('error', function (error) {
             console.log(error);
-        })
+        });
 
         this.btOBDReader.on('debug', function (data) {
             console.log('Debug: ' + data);
@@ -124,40 +91,69 @@ class BluetoothObd2 //extends BusDevice{
             var dataString = JSON.stringify(data);
             console.log("output: " + dataString);
 
+
+
             if(Object.keys(data).length === 0) return;
 
-            //if (dataString.indexOf("\n") >= 0 || dataString.indexOf("\\n") >= 0) {
-                if (counter < array.length) {
+                if (counter < array.length - 1) {
+
+                    var recievedMessage = this.convertData(data);
+                    console.log(JSON.stringify(recievedMessage));
+                    this.broker.handleMessage(recievedMessage);
 
                     this.write(array[counter]);
                     counter++;
-                }
-            //}
+                } else {
 
-        });
+                    var recievedMessage = this.convertData(data);
+                    this.broker.handleMessage(recievedMessage);
+
+                    this.write(array[counter]);
+                    counter = counter - 14;
+                }
+
+
+        }.bind(this));
 
         // Use first device with 'obd' in the name
         this.btOBDReader.autoconnect('obd');
-
-        //this.handleMessage()
-    }
-
-    private sendNext(){
-
     }
 
     /**
-     * if a new value with pidName is asked for, then add the poller with this pidName
-     * @param pidName the name of the asked parameter
+     * capsule the recieved data as a value message object
+     * @param data the data recieved from OBD2
+     * @returns {ValueMessage} the corresponding value message object
      */
-    public askForValue(pidName: string) : void {
-        this.btOBDReader.addPoller(pidName);
+    private convertData(data) : ValueMessage {
+        var value: ValueMessage;
+        switch(data.pid) {
+            case '0A': value = new ValueMessage(Topic.FUEL_PRESSURE, data.value);   break;
+            case '0C': value = new ValueMessage(Topic.RPM, data.value);             break;
+            case '0D': value = new ValueMessage(Topic.SPEED, data.value);           break;
+            case '0E': value = new ValueMessage(Topic.ENGINE_RUNTIME, data.value);  break;
+            case '0F': value = new ValueMessage(Topic.INTAKE_TEMP, data.value);     break;
+            case '10': value = new ValueMessage(Topic.MAF, data.value);             break;
+            case '11': value = new ValueMessage(Topic.THROTTLE, data.value);        break;
+            case '2F': value = new ValueMessage(Topic.FUEL, data.value);            break;
+            case '3C': value = new ValueMessage(Topic.CAT_TEMP, data.value);        break;
+            case '46': value = new ValueMessage(Topic.TEMP_OUT, data.value);        break;
+            case '49': value = new ValueMessage(Topic.ACCELERATOR, data.value);     break;
+            case '63': value = new ValueMessage(Topic.TORQUE, data.value);          break;
+            case '67': value = new ValueMessage(Topic.COOLANT_TEMP, data.value);    break;
+            case '6B': value = new ValueMessage(Topic.EGR_STATE, data.value);       break;
+            case '73': value = new ValueMessage(Topic.EGP, data.value);             break;
+            default : value = data; break;
+        }
+        return value;
     }
 
+    /**
+     * put the message on the bus
+     * @param message the message to be put on the bus
+     */
+    public handleMessage(message:Message) : void {
+    }
 
-    //public handleMessage(m : Message): void {
-    //    this.broker.handleMessage(m);
-    //}
 
 
 }
