@@ -14,8 +14,8 @@ class StyleConstants {
     // Back button
     public backButtonId : string = "settings_backButton";
     public backButtonWidth : string = "50px";
-    public backButtonEnabledColor : string = "GreenYellow";
-    public backButtonDisabledColor : string = "Gray";
+    public backButtonEnabledColor : string = "White";
+    public backButtonDisabledColor : string = "White";
     public backButtonImgSrc : string = "../../img/settings/leftarrow.png";
     public backButtonImgHeight : string = "50px";
     public backButtonImgWidth : string = "50px";
@@ -26,30 +26,33 @@ class StyleConstants {
     public imageHeight : string = "100px";
 
     // Folders
-    public nonEmptyFolderTextColumnBgColor : string = "LightSkyBlue";
-    public emptyFolderTextColumnBgColor : string = "PaleVioletRed";
+    public nonEmptyFolderTextColumnBgColor : string = "White";
+    public emptyFolderTextColumnBgColor : string = "White";
 
-    public nonEmptyFolderInputColumnBgColor : string = "DeepSkyBlue";
-    public emptyFolderInputColumnBgColor : string = "MediumVioletRed";
+    public nonEmptyFolderInputColumnBgColor : string = "White";
+    public emptyFolderInputColumnBgColor : string = "White";
 
     // Values
-    public valueTextColumnBgColor : string = "LightGray";
-    public valueInputColumnBgColor : string = "Gray";
+    public valueTextColumnBgColor : string = "White";
+    public valueInputColumnBgColor : string = "White";
     public valueInputColumnWidth : string = "320px";
 
-    public valueNumericUpDownHeight : string = "80px";
+    public valueNumericUpDownHeight : string = "100%";
     public valueNumericUpDownFontSize : string = "50px";
-    public valueNumericUpDownWidth : string = "300px";
+    public valueNumericUpDownWidth : string = "100%";
 
     // OK button
     public OKButtonPosition : string = "relative";
-    public OKButtonWidth : string = "60%";
-    public OKButtonMarginLeft = '20%';
-    public OKButtonHeight = '60%';
+    public OKButtonWidth : string = "100%";
+    public OKButtonMarginLeft = '0px';
+    public OKButtonHeight = '100%';
     public OKButtonFontSize = '18px';
     public OKButtonRowHeight = '60px';
     public OKButtonCellAlign = 'center';
-    public OKButtonCellBgColor = 'Orange';
+    public OKButtonCellBgColor = 'White';
+
+    public hoverONColor = "LightGray";
+    public hoverOFFColor = "White";
 }
 
 /**
@@ -77,6 +80,29 @@ class TableFactory {
         this.valueChangeListener = valueChangeListener;
     }
 
+    setHoverColors(td : HTMLTableCellElement) : void {
+        var styleConstants = this.styleConstants;
+        td.style.cursor = "pointer";
+        if (td.id != "settings_backButton") {
+            td.onmouseover = function () {
+                var tr = td.parentElement;
+
+                for (var i = 0; i < tr.children.length; i++) {
+                    if (tr.children[i].id != "settings_backButton") {
+                        (<HTMLTableCellElement>tr.children[i]).style.backgroundColor = styleConstants.hoverONColor;
+                    }
+                }
+            };
+            td.onmouseleave = function () {
+                var tr = td.parentElement;
+                for (var i = 0; i < tr.children.length; i++) {
+                    if (tr.children[i].id != "settings_backButton") {
+                        (<HTMLTableCellElement>tr.children[i]).style.backgroundColor = styleConstants.hoverOFFColor;
+                    }
+                }
+            };
+        }
+    }
     /**
      * Adds a new row to the table that contains a folder or a parameter.
      * The information source is the actualSettingsNode and the amount of the rows already present.
@@ -90,15 +116,28 @@ class TableFactory {
         var actualDir = this.actualSettingsNode;
 
         var tr = document.createElement('tr');
+
         tr.style.height = this.styleConstants.tableRowHeight;
 
         var valueChangeListener = this.valueChangeListener;
 
         if (rowId == 0) {
-            this.backButton = document.createElement('td');
-            this.backButton.id = this.styleConstants.backButtonId;
-            this.backButton.style.width = this.styleConstants.backButtonWidth;
+            this.backButton = null;
             if (actualDir.getParent() != actualDir) {
+                this.backButton = document.createElement('td');
+                this.backButton.style.cursor = "pointer";
+                this.backButton.id = "settings_backButton";
+                var styleConstants = this.styleConstants;
+                var backButton = this.backButton;
+                this.backButton.onmouseover = function() {
+                    backButton.style.backgroundColor = styleConstants.hoverONColor;
+                };
+
+                this.backButton.onmouseleave = function() {
+                    backButton.style.backgroundColor = styleConstants.hoverOFFColor;
+                };
+                this.backButton.id = this.styleConstants.backButtonId;
+                this.backButton.style.width = this.styleConstants.backButtonWidth;
                 this.backButton.style.backgroundColor = this.styleConstants.backButtonEnabledColor;
                 var container = this.container;
                 this.backButton.onclick = function () {
@@ -107,26 +146,37 @@ class TableFactory {
                     var t = new TableFactory(container, valueChangeListener);
                     t.createTable(actualDir.getParent());
                 };
-            } else {
-                this.backButton.style.backgroundColor = this.styleConstants.backButtonDisabledColor;
+                var img = document.createElement('img');
+                img.src = this.styleConstants.backButtonImgSrc;
+                img.style.width = this.styleConstants.backButtonImgWidth;
+                img.style.height = this.styleConstants.backButtonImgHeight;
+                this.backButton.appendChild(img);
+                tr.appendChild(this.backButton);
             }
-            var img = document.createElement('img');
-            img.src = this.styleConstants.backButtonImgSrc;
-            img.style.width = this.styleConstants.backButtonImgWidth;
-            img.style.height = this.styleConstants.backButtonImgHeight;
-            this.backButton.appendChild(img);
-            tr.appendChild(this.backButton);
         } else {
-            this.backButton.rowSpan = this.backButton.rowSpan + 1;
+            if (this.backButton != null) {
+                this.backButton.rowSpan = this.backButton.rowSpan + 1;
+            }
         }
 
         var td = document.createElement('td');
+
         td.style.width = this.styleConstants.imageColumnWidth;
         var img = document.createElement('img');
         img.src = actualRowNode.getImageURL();
         img.style.width = this.styleConstants.imageWidth;
         img.style.height = this.styleConstants.imageHeight;
         td.appendChild(img);
+
+        if (actualRowNode.isDirectory() && actualRowNode.getElements().length > 0) {
+            td.onclick = function () {
+                var table = document.getElementById('settings_table');
+                container.removeChild(table);
+                var t = new TableFactory(container, valueChangeListener);
+                t.createTable(actualRowNode);
+            };
+        }
+
         tr.appendChild(td);
 
         td = document.createElement('td');
@@ -175,6 +225,7 @@ class TableFactory {
             } else {
                 td.style.backgroundColor = this.styleConstants.emptyFolderTextColumnBgColor;
             }
+            td.colSpan = 3;
         }
         else {
             td.style.backgroundColor = this.styleConstants.valueTextColumnBgColor;
@@ -187,7 +238,7 @@ class TableFactory {
         var fullUid = actualRowNode.getFullUid();
 
         if (actualRowNode.isDirectory()) {
-            if (actualRowNode.getElements().length > 0) {
+            /*if (actualRowNode.getElements().length > 0) {
                 td.style.backgroundColor = this.styleConstants.nonEmptyFolderInputColumnBgColor;
                 var container = this.container;
                 td.onclick = function () {
@@ -198,8 +249,7 @@ class TableFactory {
                 };
             } else {
                 td.style.backgroundColor = this.styleConstants.emptyFolderInputColumnBgColor;
-            }
-
+            }*/
         }
         else {
             td.style.backgroundColor = this.styleConstants.valueInputColumnBgColor;
@@ -216,9 +266,15 @@ class TableFactory {
             };
             form.appendChild(input);
             td.appendChild(form);
+            td.style.width = this.styleConstants.valueInputColumnWidth;
+            tr.appendChild(td);
         }
-        td.style.width = this.styleConstants.valueInputColumnWidth;
-        tr.appendChild(td);
+
+        for (var i = 0; i < tr.children.length; i++) {
+            if (tr.children[i].id != "settings_backButton") {
+                this.setHoverColors(<HTMLTableCellElement>tr.children[i]);
+            }
+        }
 
         this.tableBody.appendChild(tr);
     }
@@ -260,6 +316,7 @@ class TableFactory {
         okbutton.style.height = this.styleConstants.OKButtonHeight;
         okbutton.style.fontSize = this.styleConstants.OKButtonFontSize;
         okbutton.appendChild(document.createTextNode('Save configuration!'));
+        okbutton.style.cursor = "pointer";
 
         var root = actualSettingsNode;
         while (true) {

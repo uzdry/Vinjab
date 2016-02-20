@@ -172,9 +172,10 @@ class ReplayValueMessage extends Message {
     public valueMessage: ValueMessage;
     public caller: string;
 
-    constructor(pValueMessage: ValueMessage) {
+    constructor(pValueMessage: ValueMessage, caller: string) {
         super(Topic.REPLAY_ANS);
         this.valueMessage= pValueMessage;
+        this.caller = caller;
     }
 }
 
