@@ -301,7 +301,7 @@ class LevelDBAccess {
                 var parsed = JSON.parse(data.key);
                 if (parsed.hasOwnProperty('time') && parsed.hasOwnProperty('driveNr')) {
                     var sve = new SensorValueEntry(JSON.parse(data.value).topic, JSON.parse(data.value).value,
-                                JSON.parse(data.unit));
+                                JSON.parse(data.value).unit);
                     if (sve.topic == topicID || topicID == "value.*") {
                         listOfKeys[listOfKeys.length] = new ValueEntryKey(parsed.driveNr, parsed.time);
                         listOfEntries[listOfEntries.length] = sve;
