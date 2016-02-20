@@ -122,7 +122,7 @@ class LevelDBAccess {
      */
     constructor() {
         // sets the begin of the current drive to the current Date in ms
-        this.driveBegin = new Date().getDate();
+        this.driveBegin = new Date().getTime();
 
         // initializes or opens the LevelUP-instance on a specified path
         this.db = levelup('./testDB', function(err, db){
@@ -159,16 +159,23 @@ class LevelDBAccess {
         this.replayInfo = new ReplayInfo();
         this.db.createReadStream().on('data', function(data) {
             var key = <string> data.key;
+            console.log("keys read: " + key);
             this.DBInfo.size++;
             if(key[0] == '{' && key[1] == '"') { //check if the string could be a JSON-String
-                var parsed = JSON.parse(data.key);
+                var parsed = JSON.parse(key);
+                console.log("CREATION OF RI: " + key);
                 if (parsed.hasOwnProperty('time') && parsed.hasOwnProperty('driveNr')) {
-                    if (typeof this.replayInfo.finishTime[parsed.driveNr] == 'undefined' ||
-                        this.replayInfo.finishTime[parsed.driveNr] < parsed.time) {
+                    if(this.replayInfo.finishTime[parsed.driveNr] == null ||
+                        this.replayInfo.finishTime[parsed.driveNr] < parsed.time){
                         this.replayInfo.finishTime[parsed.driveNr] = parsed.time;
                     }
                 }
             }
+        }.bind(this)).on('end', function () {
+            while(this.replayInfo.finishTime[0] == null){
+                this.replayInfo.finishTime.shift();
+            }
+            console.log("RI: " + JSON.stringify(this.replayInfo.finishTime));
         }.bind(this));
         this.currentDriver = null;
     }
@@ -181,17 +188,18 @@ class LevelDBAccess {
     putSensorValue(topicID: string, value: any, unit: string) {
         //initializes the key
         var key: ValueEntryKey = new ValueEntryKey(this.DBInfo.currentDrive,
-            new Date().getDate() - this.driveBegin);
-
+            new Date().getTime() - this.driveBegin);
+            console.log(JSON.stringify(key));
+            console.log(new Date().getTime());
+            console.log(this.driveBegin);
         //puts the value to the db with its key
         this.db.put(JSON.stringify(key), JSON.stringify(new SensorValueEntry(topicID, value, unit)), {sync: true},
             function(err) {
                 if (err) console.log("Error in putting Entry:" + err);
             });
-
         //increments the size variable and, if necessary, deletes entries from the db
         this.incrementSize();
-        this.deleteOnMaxCapacity();
+       // this.deleteOnMaxCapacity();
     }
 
     /**
@@ -387,7 +395,7 @@ class DBBusDevice extends BusDevice {
         if(m.topic.name == Topic.DBREQ_MSG.name) {
             //handling of a Value Request: Values are fetched from the DB and a value response is sent
             var dbValueReq = <DBRequestMessage> m;
-            this.dbAccess.getEntries(dbValueReq.reqTopic.getName(), dbValueReq.driveNr, dbValueReq.beginDate.getDate(), dbValueReq.endDate.getDate(), function(res, tim){
+            this.dbAccess.getEntries(dbValueReq.reqTopic.getName(), dbValueReq.driveNr, dbValueReq.beginDate.getTime(), dbValueReq.endDate.getTime(), function(res, tim){
                 this.sendValueMessage(dbValueReq.reqTopic, res, tim);
             }.bind(this));
         }
