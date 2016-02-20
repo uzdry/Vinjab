@@ -6,8 +6,11 @@ import {BusDevice} from "./../Bus";
 import {ValueAnswerMessage, DBRequestMessage, Message, ValueMessage, Topic} from "./../messages";
 import {write} from "fs";
 
-var counter = 0;
-var array = [
+
+class BluetoothObd2 extends BusDevice{
+
+    counter = 0;
+    array = [
     'ATZ',
     'ATD',
     'ATAL',
@@ -48,10 +51,7 @@ var array = [
     '0167',
     '016B',
     '0173',
-];
-
-
-class BluetoothObd2 extends BusDevice{
+    ];
     /**
      * the OBDReader Object to find OBD-Device and receive data
      */
@@ -73,8 +73,8 @@ class BluetoothObd2 extends BusDevice{
         //if the obd device is connected, request the speed value for every second.
         this.btOBDReader.on('connected', function () {
 
-            this.write(array[counter]);
-            counter++;
+            this.write(this.array[this.counter]);
+            this.counter++;
 
         });
 
@@ -95,21 +95,15 @@ class BluetoothObd2 extends BusDevice{
 
             if(Object.keys(data).length === 0) return;
 
-                if (counter < array.length - 1) {
+            var receivedMessage = this.convertData(data);
+            console.log(JSON.stringify(receivedMessage));
+            this.broker.handleMessage(receivedMessage);
 
-                    var recievedMessage = this.convertData(data);
-                    console.log(JSON.stringify(recievedMessage));
-                    this.broker.handleMessage(recievedMessage);
-
-                    this.write(array[counter]);
-                    counter++;
+            this.write(this.array[this.counter]);
+                if (this.counter < this.array.length - 1) {
+                    this.counter++;
                 } else {
-
-                    var recievedMessage = this.convertData(data);
-                    this.broker.handleMessage(recievedMessage);
-
-                    this.write(array[counter]);
-                    counter = counter - 14;
+                    this.counter = this.counter - 14;
                 }
 
 
@@ -159,8 +153,6 @@ class BluetoothObd2 extends BusDevice{
 }
 
 export {BluetoothObd2};
-
-var obd = new BluetoothObd2();
 
 
 

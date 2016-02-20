@@ -5,6 +5,7 @@ import {BusDevice} from "./Bus";
 import {ValueAnswerMessage, Value, ReplayRequestMessage, ReplayValueMessage, DBRequestMessage, Message, ValueMessage,
     Topic, DashboardMessage, DashboardRspMessage} from "./messages";
 import {ReplayInfoMessage} from "./messages";
+import {Utils} from "./Utils";
 import leveldown = require("leveldown");
 
 // The entry types that are to be written to the database:
@@ -212,8 +213,11 @@ class LevelDBAccess {
 
             //function on every item of the stream; adds all value keys to an array
             this.db.createKeyStream().on('data', function(data){
-                if(JSON.parse(data).hasOwnProperty('time')) {
-                    listOfKeys.push(data);
+                var key = data;
+                if(key[0] == '{' && key[1] == '"') { //check if the string could be a JSON-String
+                    if(JSON.parse(data).hasOwnProperty('time')) {
+                        listOfKeys.push(data);
+                    }
                 }
             }.bind(this)).on('end', function() { //function on the end of the stream, does the actual reducing
                 var newSize: number = this.DBInfo.maxCapacity * 0.9;
@@ -290,14 +294,18 @@ class LevelDBAccess {
             var gte = JSON.stringify(new ValueEntryKey(this.DBInfo.currentDrive, beginDate));
         }
         this.db.createReadStream({gte: gte, lte: lte}).on('data', function (data) {
-            var parsed = JSON.parse(data.key);
-            if (parsed.hasOwnProperty('time') && parsed.hasOwnProperty('driveNr')) {
-                var sve = new SensorValueEntry(JSON.parse(data.value).topic, JSON.parse(data.value).value);
-                if (sve.topic == topicID || topicID == "value.*") {
-                    listOfKeys[listOfKeys.length] = new ValueEntryKey(parsed.driveNr, parsed.time);
-                    listOfEntries[listOfEntries.length] = sve;
+            var key = data.key;
+            if(key[0] == '{' && key[1] == '"') { //check if the string could be a JSON-String
+                var parsed = JSON.parse(data.key);
+                if (parsed.hasOwnProperty('time') && parsed.hasOwnProperty('driveNr')) {
+                    var sve = new SensorValueEntry(JSON.parse(data.value).topic, JSON.parse(data.value).value);
+                    if (sve.topic == topicID || topicID == "value.*") {
+                        listOfKeys[listOfKeys.length] = new ValueEntryKey(parsed.driveNr, parsed.time);
+                        listOfEntries[listOfEntries.length] = sve;
+                    }
                 }
             }
+
         }.bind(this)).on('end', function () {
             callback(listOfEntries, listOfKeys);
         }.bind(this));
@@ -332,11 +340,6 @@ class LevelDBAccess {
             }
             callback(callbackParam);
         }.bind(this));
-    }
-
-    showDatabase() {
-        this.db.createReadStream().on('data', function(data) {
-        })
     }
 }
 
@@ -385,7 +388,7 @@ class DBBusDevice extends BusDevice {
             }.bind(this));
         }
         //If the given message is a regular value message, it is written to the db
-        else if (m.topic.name.startsWith("value.") || m instanceof ValueMessage) {
+        else if (Utils.startsWith(m.topic.name, "value.")) {
             var valuemes = <ValueMessage> m;
             this.dbAccess.putSensorValue(valuemes.topic.name, valuemes.value.numericalValue);
         }
@@ -397,7 +400,6 @@ class DBBusDevice extends BusDevice {
                     this.broker.handleMessage(new DashboardRspMessage(dbm.user, value.dashboardConfig));
                 }.bind(this));
                 this.broker.handleMessage(new ReplayInfoMessage(this.dbAccess.replayInfo.finishTime));
-                this.dbAccess.showDatabase();
             } else {
                     this.dbAccess.putUserInfo(dbm.user, dbm.config);
             }
@@ -428,8 +430,8 @@ class Replay extends BusDevice {
     private slp: number;
     private vals: SensorValueEntry[];
     private times: number[];
-    private continueLoop: boolean;
     private callerID: string;
+    private repl;
 
     /**
      * Initializes the Replay with a given ReplayInformation-object and the user ID of the user calling for that
@@ -441,7 +443,6 @@ class Replay extends BusDevice {
         super();
         this.replayInfo = ri;
         this.cnt = 0;
-        this.continueLoop = true;
         this.callerID = callerID;
         this.subscribe(Topic.REPLAY_REQ);
     }
@@ -455,7 +456,7 @@ class Replay extends BusDevice {
         if(m.topic.name == Topic.REPLAY_REQ.name) {
             var rreq = <ReplayRequestMessage> m;
             if (!rreq.startStop && rreq.callerID == this.callerID) {
-                this.continueLoop = false;
+                clearInterval(this.repl);
             }
         }
     }
@@ -469,9 +470,7 @@ class Replay extends BusDevice {
     public replay(vals: SensorValueEntry[], times: number[]) {
         this.vals = vals;
         this.times = times;
-        while(this.continueLoop) {
-            setInterval(this.send.bind(this), this.slp);
-        }
+        this.repl = setInterval(this.send.bind(this), this.slp);
     }
 
     /**
@@ -482,7 +481,7 @@ class Replay extends BusDevice {
         this.cnt++;
         this.broker.handleMessage(new ReplayValueMessage(new Value(this.vals[this.cnt].value, this.vals[this.cnt].topic)));
         if(this.cnt + 1 == this.times.length) {
-            this.continueLoop = false;
+            clearInterval(this.repl);
         } else {
             this.slp = this.times[this.cnt + 1] - this.times[this.cnt];
         }
