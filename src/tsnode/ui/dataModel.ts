@@ -4,6 +4,8 @@
 
 
 //import {ValueMessage} from "../messages";
+import {DBRequestMessage} from "../messages";
+import {Topic} from "../messages";
 class DataModel extends Backbone.Model{
 
     /** The subscription as object so that it can be accessed lateron */
@@ -68,6 +70,11 @@ class DataModel extends Backbone.Model{
             }
         });
         super.destroy();
+    }
+
+    public requestData(){
+        var msg = new DBRequestMessage(null, new Date(0), new Date(), new Topic(this.get("tagName")));
+
     }
 
 }
