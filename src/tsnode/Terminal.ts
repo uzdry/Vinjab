@@ -4,6 +4,7 @@
 /// <reference path="../../typings/socket.io-client/socket.io-client.d.ts"/>
 /// <reference path="../../typings/postal/postal.d.ts"/>
 import {Message, Value, ValueMessage, Topic} from "./messages";
+import {TSConstants} from "./settings/TSettings";
 /**
  * This class is the connection in the client side.
  */
@@ -43,6 +44,24 @@ class Terminal {
         this.channelval = postal.channel("values");
 
         this.connection.on('message', this.incomingMsg.bind(this));
+
+        this.forwardSettingsMsg();
+
+    }
+
+    private forwardSettingsMsg() {
+      /*  postal.subscribe({
+            channel: TSConstants.db2stChannel,
+            topic: TSConstants.db2stTopic,
+            callback: function(data) {
+                console.log(data);
+            }
+        });*/
+
+        var schan = postal.channel(TSConstants.db2stChannel);
+        var sub = schan.subscribe(TSConstants.db2stTopic, function(data) {
+            console.log(data);
+        })
     }
 
 

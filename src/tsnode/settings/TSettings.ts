@@ -450,12 +450,12 @@ class Startup {
 
 }
 
-class TSConstants {
+export class TSConstants {
     public static st2dbChannel = "settingsintern_st2db";
     public static db2stChannel = "settingsintern_db2st";
 
-    public static st2dbTopic = "settingsintern_st2db";
-    public static db2stTopic = "settingsintern_db2st";
+    public static st2dbTopic = "settings.intern_st2db";
+    public static db2stTopic = "settings.intern_db2st";
 
 }
 

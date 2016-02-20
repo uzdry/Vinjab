@@ -6,7 +6,6 @@
 //import {ValueMessage} from "../messages";
 //import {DBRequestMessage} from "../messages";
 import {Topic} from "../messages";
-import {DBRequestMessage} from "../messages";
 class DataModel extends Backbone.Model{
 
     /** The subscription as object so that it can be accessed lateron */
@@ -62,6 +61,7 @@ class DataModel extends Backbone.Model{
 
     public destroy() {
         var tag = this.get("tagName");
+        console.log(tag +  'destroyed');
         postal.publish({
             channel: "reqsubs",
             topic: "stop." + tag,
@@ -72,13 +72,4 @@ class DataModel extends Backbone.Model{
         });
         super.destroy();
     }
-
-    public requestData(){
-        //var message = new DBRequestMessage()
-    }
-
-    public destroyData(){
-
-    }
-
 }
