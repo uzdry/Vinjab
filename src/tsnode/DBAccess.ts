@@ -213,8 +213,11 @@ class LevelDBAccess {
 
             //function on every item of the stream; adds all value keys to an array
             this.db.createKeyStream().on('data', function(data){
-                if(JSON.parse(data).hasOwnProperty('time')) {
-                    listOfKeys.push(data);
+                var key = data;
+                if(key[0] == '{' && key[1] == '"') { //check if the string could be a JSON-String
+                    if(JSON.parse(data).hasOwnProperty('time')) {
+                        listOfKeys.push(data);
+                    }
                 }
             }.bind(this)).on('end', function() { //function on the end of the stream, does the actual reducing
                 var newSize: number = this.DBInfo.maxCapacity * 0.9;
@@ -291,14 +294,18 @@ class LevelDBAccess {
             var gte = JSON.stringify(new ValueEntryKey(this.DBInfo.currentDrive, beginDate));
         }
         this.db.createReadStream({gte: gte, lte: lte}).on('data', function (data) {
-            var parsed = JSON.parse(data.key);
-            if (parsed.hasOwnProperty('time') && parsed.hasOwnProperty('driveNr')) {
-                var sve = new SensorValueEntry(JSON.parse(data.value).topic, JSON.parse(data.value).value);
-                if (sve.topic == topicID || topicID == "value.*") {
-                    listOfKeys[listOfKeys.length] = new ValueEntryKey(parsed.driveNr, parsed.time);
-                    listOfEntries[listOfEntries.length] = sve;
+            var key = data.key;
+            if(key[0] == '{' && key[1] == '"') { //check if the string could be a JSON-String
+                var parsed = JSON.parse(data.key);
+                if (parsed.hasOwnProperty('time') && parsed.hasOwnProperty('driveNr')) {
+                    var sve = new SensorValueEntry(JSON.parse(data.value).topic, JSON.parse(data.value).value);
+                    if (sve.topic == topicID || topicID == "value.*") {
+                        listOfKeys[listOfKeys.length] = new ValueEntryKey(parsed.driveNr, parsed.time);
+                        listOfEntries[listOfEntries.length] = sve;
+                    }
                 }
             }
+
         }.bind(this)).on('end', function () {
             callback(listOfEntries, listOfKeys);
         }.bind(this));
@@ -333,11 +340,6 @@ class LevelDBAccess {
             }
             callback(callbackParam);
         }.bind(this));
-    }
-
-    showDatabase() {
-        this.db.createReadStream().on('data', function(data) {
-        })
     }
 }
 
@@ -398,7 +400,6 @@ class DBBusDevice extends BusDevice {
                     this.broker.handleMessage(new DashboardRspMessage(dbm.user, value.dashboardConfig));
                 }.bind(this));
                 this.broker.handleMessage(new ReplayInfoMessage(this.dbAccess.replayInfo.finishTime));
-                this.dbAccess.showDatabase();
             } else {
                     this.dbAccess.putUserInfo(dbm.user, dbm.config);
             }
