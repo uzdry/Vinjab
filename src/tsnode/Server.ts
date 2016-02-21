@@ -67,6 +67,11 @@ class Server extends BusDevice{
                     else p.unsubscribe(Topic.REPLAY_ANS);
 
                     message = new ReplayRequestMessage(message.driverNr, message.callerID, message.startStop);
+                } else if (Utils.startsWith(message.topic.name, 'settings')) {
+                    console.log("OK, dann halt");
+
+                } else {
+                    return;
                 }
                 p.broker.handleMessage(message);
             });
