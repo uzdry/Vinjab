@@ -168,7 +168,7 @@ class TableFactory {
         img.style.height = this.styleConstants.imageHeight;
         td.appendChild(img);
 
-        if (actualRowNode.isDirectory() && actualRowNode.getElements().length > 0) {
+        if (actualRowNode.getType() == SettingsType.directory && actualRowNode.getElements().length > 0) {
             var tf = this;
             td.onclick = function () {
                 var table = document.getElementById('settings_table');
@@ -200,11 +200,9 @@ class TableFactory {
         innerTD = document.createElement('td');
 
         var ending = "";
-        if (actualRowNode.isDirectory()) {
+        if (actualRowNode.getType() == SettingsType.directory) {
             ending = ".*";
         }
-        //innerTD.innerHTML = "Debug | Topic Name → " + actualRowNode.getFullUid() + ending;
-
         innerTR.appendChild(innerTD);
         innerTBody.appendChild(innerTR);
 
@@ -212,7 +210,7 @@ class TableFactory {
 
         td.appendChild(innerTable);
 
-        if (actualRowNode.isDirectory()) {
+        if (actualRowNode.getType() == SettingsType.directory) {
             if (actualRowNode.getElements().length > 0) {
                 td.style.backgroundColor = this.styleConstants.nonEmptyFolderTextColumnBgColor;
                 var container = this.container;
@@ -237,23 +235,7 @@ class TableFactory {
 
         td = document.createElement('td');
 
-        var fullUid = actualRowNode.getFullUid();
-
-        if (actualRowNode.isDirectory()) {
-            /*if (actualRowNode.getElements().length > 0) {
-                td.style.backgroundColor = this.styleConstants.nonEmptyFolderInputColumnBgColor;
-                var container = this.container;
-                td.onclick = function () {
-                    var table = document.getElementById('settings_table');
-                    container.removeChild(table);
-                    var t = new TableFactory(container, valueChangeListener);
-                    t.createTable(actualRowNode);
-                };
-            } else {
-                td.style.backgroundColor = this.styleConstants.emptyFolderInputColumnBgColor;
-            }*/
-        }
-        else {
+        if (actualRowNode.getType() == SettingsType.nparameter) {
             td.style.backgroundColor = this.styleConstants.valueInputColumnBgColor;
             var form = document.createElement('form');
             var input = document.createElement('input');
@@ -262,12 +244,47 @@ class TableFactory {
             input.style.fontSize = this.styleConstants.valueNumericUpDownFontSize;
             input.style.width = this.styleConstants.valueNumericUpDownWidth;
             input.value = '' + actualRowNode.getValue();
-            (<SettingsParameter>actualRowNode).setView(input);
+            var npar = (<SettingsNParameter>actualRowNode);
+            input.min = "" + npar.getMinValue();
+            input.max = "" + npar.getMaxValue();
+            (<SettingsNParameter>actualRowNode).setView(input);
             input.onchange = function() {
                 actualRowNode.setValue(this.value);
                 //changeListener.valueChanged(fullUid, this.value, actualRowNode.getValue());
             };
             form.appendChild(input);
+            td.appendChild(form);
+            td.style.width = this.styleConstants.valueInputColumnWidth;
+            tr.appendChild(td);
+        } else if (actualRowNode.getType() == SettingsType.lparameter) {
+            td.style.backgroundColor = this.styleConstants.valueInputColumnBgColor;
+            var form = document.createElement('form');
+            var select = document.createElement('select');
+
+            //input.type = 'number';
+            select.style.height = this.styleConstants.valueNumericUpDownHeight;
+            select.style.fontSize = this.styleConstants.valueNumericUpDownFontSize;
+            select.style.width = this.styleConstants.valueNumericUpDownWidth;
+            var lpar = (<SettingsLParameter>actualRowNode);
+            for (var i = 0; i < lpar.getOptions().length; i++) {
+                var opt = document.createElement("option");
+                opt.text = lpar.getOptions()[i].getName();
+                select.options.add(opt, lpar.getOptions()[i].getID());
+            }
+            select.selectedIndex = lpar.getValue();
+            lpar.setView(select);
+
+            select.onchange = function() {
+                actualRowNode.setValue(this.selectedIndex);
+            };
+
+            /*input.value = '' + actualRowNode.getValue();
+            (<SettingsNParameter>actualRowNode).setView(input);
+            input.onchange = function() {
+                actualRowNode.setValue(this.value);
+                //changeListener.valueChanged(fullUid, this.value, actualRowNode.getValue());
+            };*/
+            form.appendChild(select);
             td.appendChild(form);
             td.style.width = this.styleConstants.valueInputColumnWidth;
             tr.appendChild(td);

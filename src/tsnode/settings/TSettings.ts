@@ -108,6 +108,9 @@ module TSettings {
                 } else if (childNodes[i].tagName == "npar") {
                     child = this.parseNumericParameter(childNodes[i]);
                     settingsDir.appendChild(child);
+                } else if (childNodes[i].tagName == "lpar") {
+                    child = this.parseListParameter(childNodes[i]);
+                    settingsDir.appendChild(child);
                 }
             }
             return settingsDir;
@@ -118,19 +121,39 @@ module TSettings {
          * @param parameter The numeric parameter to be parsed.
          * @param messageBuffer The message buffer that is to be used to communicate with the database.
          * @param valueChangeListener The value change listener that will be notified when the value of any parameter changes.
-         * @returns {SettingsParameter} The input parameter that is now fully parsed and all the properties are valid based on the XML file.
+         * @returns {SettingsNParameter} The input parameter that is now fully parsed and all the properties are valid based on the XML file.
          */
-        private parseNumericParameter(parameter : any) {
-            var topicName = XMLParser.getValue('topicName', parameter);
-            var topic = topicName;
+        private parseNumericParameter(parameter : any) : SettingsNParameter {
+            var topic = XMLParser.getValue('topicName', parameter);
 
             var defaultValue = new SettingsData.SettingsContainer(XMLParser.getValue("topicName", parameter), XMLParser.getValue("defaultValue", parameter),
                 XMLParser.getValue("unit", parameter));
-            var childPar = new SettingsParameter(XMLParser.getValue("ruid", parameter), XMLParser.getValue("name", parameter), XMLParser.getValue("description", parameter),
-                XMLParser.getValue("imageURL", parameter), topic, XMLParser.getValue("unit", parameter), defaultValue, this.clientSideBuffer, this.container);
+            var childPar = new SettingsNParameter(XMLParser.getValue("ruid", parameter), XMLParser.getValue("name", parameter), XMLParser.getValue("description", parameter),
+                XMLParser.getValue("imageURL", parameter), XMLParser.getValue("unit", parameter), defaultValue,
+                XMLParser.getValue("minValue", parameter), XMLParser.getValue("maxValue", parameter), this.clientSideBuffer, this.container);
             return childPar;
         }
 
+        private parseListParameter(parameter : any) : SettingsLParameter {
+            var topic = XMLParser.getValue('topicName', parameter);
+
+            var defaultValue = new SettingsData.SettingsContainer(XMLParser.getValue("topicName", parameter), XMLParser.getValue("defaultValue", parameter),
+                XMLParser.getValue("unit", parameter));
+
+            var options : SettingsLParameterOption[] = [];
+            for (var i = 0; i < parameter.childNodes.length; i++) {
+                if (parameter.childNodes[i].tagName == "option") {
+                    var id = XMLParser.getValue("id", parameter.childNodes[i]);
+                    var name = XMLParser.getValue("name", parameter.childNodes[i]);
+                    options.push(new SettingsLParameterOption(id, name));
+                }
+            }
+
+            var childPar = new SettingsLParameter(XMLParser.getValue("ruid", parameter), XMLParser.getValue("name", parameter), XMLParser.getValue("description", parameter),
+                XMLParser.getValue("imageURL", parameter), XMLParser.getValue("unit", parameter), defaultValue, options,
+                this.clientSideBuffer, this.container);
+            return childPar;
+        }
         /**
          * Gets the value of a tag of an XML node.
          * @param tag The tag we are looking for.
@@ -144,6 +167,19 @@ module TSettings {
                 }
             }
             return "XML error. Tag \"" + tag + "\" is missing.";
+        }
+
+        private static getValues(tag : string, directory : any) : string[] {
+            var buf : string[] = [];
+            for (var i = 0; i < directory.childNodes.length; i++) {
+                if (directory.childNodes[i].tagName == tag) {
+                    buf.push(directory.childNodes[i].innerHTML);
+                }
+            }
+            if (buf.length != 0) {
+                return buf;
+            }
+            return ["XML error. Tag \"" + tag + "\" is missing."];
         }
 
 
@@ -314,11 +350,11 @@ module TSettings {
             var allNodes : SettingsNode[] = [];
             root.getElementsRecursively(allNodes);
 
-            var valueNodes : SettingsParameter[] = [];
+            var valueNodes : SettingsNParameter[] = [];
 
             for (var i = 0; i < allNodes.length; i++) {
-                if (allNodes[i].isDirectory() == false) {
-                    valueNodes.push(<SettingsParameter>allNodes[i]);
+                if (allNodes[i].getType() != SettingsType.directory) {
+                    valueNodes.push(<SettingsNParameter>allNodes[i]);
                 }
             }
 
