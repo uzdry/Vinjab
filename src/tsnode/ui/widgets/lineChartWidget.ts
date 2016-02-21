@@ -9,7 +9,7 @@ class LineChartWidgetConfig implements WidgetConfig{
 
     "type_name" = "LineChartWidget";
 
-    "display_name" = "line graph Widget";
+    "display_name" = "line graph widget";
 
     newInstance(options):Widget {
         return new LineChartWidget(options);

@@ -11,6 +11,8 @@ class DataModel extends Backbone.Model{
     /** The subscription as object so that it can be accessed lateron */
     subscription: ISubscriptionDefinition<any>;
 
+    listeningWidgetsCNT = 0;
+
     /**
      * A Datamodel that contains the values received from the Server
      * @param options Options according to the BackboneJS specifications
@@ -71,5 +73,10 @@ class DataModel extends Backbone.Model{
             }
         });
         super.destroy();
+    }
+
+
+    public hasSubscribers() {
+
     }
 }
