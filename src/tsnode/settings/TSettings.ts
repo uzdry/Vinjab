@@ -335,9 +335,10 @@ module TSettings {
         public dbCallBack(data) {
             postal.unsubscribe(this.mysub);
             var msg = SettingsData.SettingsData.parseMe(data.settings);
-            this.realDBState = msg;
             this.messageBuffer = new TSettings.ClientSideBuffer(this.container);
-            if (msg.getContainers() == null || msg.getContainers().length != 15) {
+
+            this.realDBState = msg;
+            if (msg == null || data.settings == "" || msg.getContainers() == null) {
                 this.onDBInvalid();
             } else {
                 TSettings.Startup.initialize(div2, this.messageBuffer);
