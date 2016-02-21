@@ -4,6 +4,8 @@
 /// <reference path="../../typings/socket.io-client/socket.io-client.d.ts"/>
 /// <reference path="../../typings/postal/postal.d.ts"/>
 import {Message, Value, ValueMessage, Topic} from "./messages";
+import {SettingsRequestMessage} from "./messages";
+import {SettingsResponseMessage} from "./messages";
 /**
  * This class is the connection in the client side.
  */
@@ -17,6 +19,8 @@ class Terminal {
     private channelsub;
 
     private channelval;
+
+    private channelSettings;
 
     private toServerChannel;
 
@@ -41,6 +45,7 @@ class Terminal {
 
 
         this.channelval = postal.channel("values");
+        this.channelSettings = postal.channel("settingsintern_db2st");
 
         this.connection.on('message', this.incomingMsg.bind(this));
 
@@ -57,20 +62,27 @@ class Terminal {
             }
         });*/
 
+
+
         var schan = postal.channel("settingsintern_st2db");
-        var sub = schan.subscribe("settings.intern_st2db", function(data) {
+        var sub = schan.subscribe("settings.intern_st2dbRead", function(data) {
             console.log(data);
+            console.log(new SettingsRequestMessage(<string>data, true));
         });
 
-        var schan2 = postal.channel("settingsintern_db2st");
-        var sub2 = schan2.subscribe("settings.intern_db2st", function(data) {
+        var sub2 = schan.subscribe("settings.intern_st2dbWrite", function(data) {
             console.log(data);
+            console.log(new SettingsRequestMessage(<string>data, false));
         });
     }
 
 
     public incomingMsg(msg) {
         var message = JSON.parse(msg);
+
+        if (message.getTopic() == Topic.SETTINGS_RSP_MSG) {
+            this.channelSettings.publish(message.topic.name, (<SettingsResponseMessage>message).settings);
+        }
 
         //setTimeout(this.synchronousPublish.bind(this), 0, message);
         this.channelval.publish(message.topic.name, message);

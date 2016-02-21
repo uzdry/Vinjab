@@ -69,8 +69,12 @@ module SettingsData {
                 buf += "toDB|";
             }
 
-            for (var i = 0; i < this.containers.length; i++) {
-                buf += this.containers[i].stringifyMe() + "|";
+            if (this.containers == null) {
+                buf += "null|";
+            } else {
+                for (var i = 0; i < this.containers.length; i++) {
+                    buf += this.containers[i].stringifyMe() + "|";
+                }
             }
             buf += "]";
             return buf;
@@ -103,14 +107,17 @@ module SettingsData {
                 return null;
             }
 
-            var contArray : SettingsContainer[] = [];
-            for (var i = 3; i < splitted.length - SettingsContainer.getCountOfSplitSegments() + 1;
-                 i += SettingsContainer.getCountOfSplitSegments()) {
-                var buf = SettingsContainer.parseMe(input, i);
-                if (buf == null) {
-                    return null;
+            var contArray : SettingsContainer[] = null;
+            if (splitted[3] != "null") {
+                contArray = [];
+                for (var i = 3; i < splitted.length - SettingsContainer.getCountOfSplitSegments() + 1;
+                     i += SettingsContainer.getCountOfSplitSegments()) {
+                    var buf = SettingsContainer.parseMe(input, i);
+                    if (buf == null) {
+                        return null;
+                    }
+                    contArray.push(buf);
                 }
-                contArray.push(buf);
             }
             return new SettingsData(contArray, io, direction);
         }

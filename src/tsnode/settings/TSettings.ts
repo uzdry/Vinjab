@@ -218,12 +218,12 @@ module TSettings {
         }
 
         forcePoll() {
-            postal.channel(TSConstants.st2dbChannel).publish(TSConstants.st2dbTopic,
-                new SettingsData.SettingsData(null, true, false));
+            postal.channel(TSConstants.st2dbChannel).publish(TSConstants.st2dbReadTopic,
+                new SettingsData.SettingsData(null, true, false).stringifyMe());
         }
 
         onReceive(data) {
-            var msg = <SettingsData.SettingsData>data;
+            var msg = SettingsData.SettingsData.parseMe(data);
             this.database = msg;
             if (true) {
                 this.receiveCount = true;
@@ -240,8 +240,8 @@ module TSettings {
         }
 
         onSend() {
-            postal.channel(TSConstants.st2dbChannel).publish(TSConstants.st2dbTopic,
-                new SettingsData.SettingsData(this.database.getContainers(), false, false));
+            postal.channel(TSConstants.st2dbChannel).publish(TSConstants.st2dbWriteTopic,
+                new SettingsData.SettingsData(this.database.getContainers(), false, false).stringifyMe());
         }
 
         getValueOf(topic : string) : SettingsData.SettingsContainer {
@@ -262,11 +262,12 @@ module TSettings {
         public constructor() {
 
             var pch = postal.channel(TSConstants.st2dbChannel);
-            pch.subscribe(TSConstants.st2dbTopic, this.postal_handleMessage.bind(this));
+            pch.subscribe(TSConstants.st2dbReadTopic, this.postal_handleMessage.bind(this));
+            pch.subscribe(TSConstants.st2dbWriteTopic, this.postal_handleMessage.bind(this));
         }
 
         public postal_handleMessage(data) : void {
-            var msg = <SettingsData.SettingsData>data;
+            var msg = SettingsData.SettingsData.parseMe(data);
             if (msg.isDirectionFromDB() == false) {
                 if (msg.isIORead()) {
 
@@ -276,7 +277,7 @@ module TSettings {
                     }
                     var newDatabase = new SettingsData.SettingsData(clones, true, true);
 
-                    postal.channel(TSConstants.db2stChannel).publish(TSConstants.db2stTopic, newDatabase);
+                    postal.channel(TSConstants.db2stChannel).publish(TSConstants.db2stTopic, newDatabase.stringifyMe());
                 } else {
                     var clones = [];
                     for (var i = 0; i < msg.getContainers().length; i++) {
@@ -301,14 +302,7 @@ module TSettings {
 
     }
 
-    export class TSConstants {
-        public static st2dbChannel = "settingsintern_st2db";
-        public static db2stChannel = "settingsintern_db2st";
 
-        public static st2dbTopic = "settings.intern_st2db";
-        public static db2stTopic = "settings.intern_db2st";
-
-    }
 
     export class RemoteDatabaseInitializer implements IXMLParserCallBack {
         private mysub = null;
@@ -323,12 +317,12 @@ module TSettings {
         public initialize() {
             var sm = new SettingsData.SettingsData(null, true, false);
             this.mysub = postal.channel(TSConstants.db2stChannel).subscribe(TSConstants.db2stTopic, this.dbCallBack.bind(this));
-            postal.channel(TSConstants.st2dbChannel).publish(TSConstants.st2dbTopic, sm);
+            postal.channel(TSConstants.st2dbChannel).publish(TSConstants.st2dbReadTopic, sm.stringifyMe());
         }
 
         public dbCallBack(data) {
             postal.unsubscribe(this.mysub);
-            var msg = <SettingsData.SettingsData>data;
+            var msg = SettingsData.SettingsData.parseMe(data);
             this.realDBState = msg;
             this.messageBuffer = new TSettings.ClientSideBuffer(this.container);
             if (msg.getContainers() == null || msg.getContainers().length != 15) {
@@ -378,9 +372,19 @@ module TSettings {
 
             var sm = new SettingsData.SettingsData(scs, false, false);
 
-            postal.channel(TSConstants.st2dbChannel).publish(TSConstants.st2dbTopic, sm);
+            postal.channel(TSConstants.st2dbChannel).publish(TSConstants.st2dbWriteTopic, sm.stringifyMe());
             TSettings.Startup.initialize(div2, this.messageBuffer);
         }
+    }
+
+    export class TSConstants {
+        public static st2dbChannel = "settingsintern_st2db";
+        public static db2stChannel = "settingsintern_db2st";
+
+        public static st2dbReadTopic= "settings.intern_st2dbRead";
+        public static st2dbWriteTopic = "settings.intern_st2dbWrite";
+        public static db2stTopic = "settings.intern_db2st";
+
     }
 }
 
