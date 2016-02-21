@@ -414,7 +414,7 @@ div2.style.padding = "20px";
 div1.appendChild(div2);
 
 
-var database = new TSettings.DummyDatabase();
+//var database = new TSettings.DummyDatabase();
 
 var rdbi = new TSettings.RemoteDatabaseInitializer(div2);
 rdbi.initialize();
