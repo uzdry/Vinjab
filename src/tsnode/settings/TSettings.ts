@@ -264,6 +264,8 @@ module TSettings {
     /**
      * A dummy database used only for test purposes to emulate the real database locally.
      */
+
+        /*
     export class DummyDatabase {
         private database : SettingsData.SettingsData = new SettingsData.SettingsData([], true, true);
 
@@ -296,7 +298,7 @@ module TSettings {
                 }
             }
         }
-    }
+    }*/
 
     /**
      * The static class that can be used to initialize this module.
