@@ -22,8 +22,8 @@ class ServerStarter {
      */
     constructor() {
 
-        var leveldown = require("leveldown");
-        leveldown.destroy("../testDB", function() { });
+        //var leveldown = require("leveldown");
+        //leveldown.destroy("./testDB", function() { });
 
         this.db = new DBBusDevice();
 
@@ -31,6 +31,7 @@ class ServerStarter {
 
         this.server = new Server();
 
+       // this.source = new BluetoothObd2();
         this.source = new BluetoothSim();
 
         this.aggregations.push(new FuelConsumption());
@@ -38,7 +39,7 @@ class ServerStarter {
         this.aggregations.push(new AverageComputation(Topic.SPEED));
         this.aggregations.push(new AverageComputation(Topic.FUEL_CONSUMPTION));
 
-        this.source.init();
+       this.source.init();
 
     }
 

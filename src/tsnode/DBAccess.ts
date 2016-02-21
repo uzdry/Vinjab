@@ -4,7 +4,7 @@ import levelup = require("levelup");
 import {BusDevice} from "./Bus";
 import {ValueAnswerMessage, Value, ReplayRequestMessage, ReplayValueMessage, DBRequestMessage, Message, ValueMessage,
     Topic, DashboardMessage, DashboardRspMessage} from "./messages";
-import {ReplayInfoMessage} from "./messages";
+import {ReplayInfoMessage, SettingsRequestMessage, SettingsResponseMessage} from "./messages";
 import {Utils} from "./Utils";
 import leveldown = require("leveldown");
 
@@ -24,6 +24,7 @@ class SensorValueEntry {
      * Initializes the entry with its topic and value
      * @param topic: The topic of the value's type
      * @param value: The value to be written to the database
+     * @param unit: The Value Identifier
      */
     constructor(topic: string, value:any, unit: string) {
         this.topic = topic;
@@ -137,7 +138,7 @@ class LevelDBAccess {
         this.db.get("INFO", function (err, value) {
             if(err) {
                 if(err.notFound) {
-                    this.DBInfo = new DBInfoEntry(10000, 0);
+                    this.DBInfo = new DBInfoEntry(10000000, 0);
                     this.db.put("INFO", JSON.stringify(this.DBInfo), function(err) {
                         if(err) console.log("Error in putting Entry: " + err);
                     });
@@ -159,11 +160,9 @@ class LevelDBAccess {
         this.replayInfo = new ReplayInfo();
         this.db.createReadStream().on('data', function(data) {
             var key = <string> data.key;
-            console.log("keys read: " + key);
             this.DBInfo.size++;
             if(key[0] == '{' && key[1] == '"') { //check if the string could be a JSON-String
                 var parsed = JSON.parse(key);
-                console.log("CREATION OF RI: " + key);
                 if (parsed.hasOwnProperty('time') && parsed.hasOwnProperty('driveNr')) {
                     if(this.replayInfo.finishTime[parsed.driveNr] == null ||
                         this.replayInfo.finishTime[parsed.driveNr] < parsed.time){
@@ -172,10 +171,9 @@ class LevelDBAccess {
                 }
             }
         }.bind(this)).on('end', function () {
-            while(this.replayInfo.finishTime[0] == null){
+            while(this.replayInfo.finishTime[0] == null && this.replayInfo.finishTime.length != 0){
                 this.replayInfo.finishTime.shift();
             }
-            console.log("RI: " + JSON.stringify(this.replayInfo.finishTime));
         }.bind(this));
         this.currentDriver = null;
     }
@@ -189,9 +187,6 @@ class LevelDBAccess {
         //initializes the key
         var key: ValueEntryKey = new ValueEntryKey(this.DBInfo.currentDrive,
             new Date().getTime() - this.driveBegin);
-            console.log(JSON.stringify(key));
-            console.log(new Date().getTime());
-            console.log(this.driveBegin);
         //puts the value to the db with its key
         this.db.put(JSON.stringify(key), JSON.stringify(new SensorValueEntry(topicID, value, unit)), {sync: true},
             function(err) {
@@ -199,7 +194,7 @@ class LevelDBAccess {
             });
         //increments the size variable and, if necessary, deletes entries from the db
         this.incrementSize();
-       // this.deleteOnMaxCapacity();
+        this.deleteOnMaxCapacity();
     }
 
     /**
@@ -231,9 +226,9 @@ class LevelDBAccess {
                 }
             }.bind(this)).on('end', function() { //function on the end of the stream, does the actual reducing
                 var newSize: number = this.DBInfo.maxCapacity * 0.9;
-                var maxToDelete: number = this.DBInfo.size - newSize
+                var maxToDelete: number = this.DBInfo.size - newSize;
                 var i: number = 0;
-                while(i < newSize){
+                while(i < maxToDelete){
                     //if a key is among the oldest keys, it is deleted:
                     this.deleteFromKey(listOfKeys[i]);
                     this.decrementSize();
@@ -352,6 +347,31 @@ class LevelDBAccess {
             callback(callbackParam);
         }.bind(this));
     }
+
+    /**
+     * puts a settings object to the db
+     * @param s the settings object
+     */
+    public putSettings(s: string) {
+        this.deleteFromKey("SETTINGS");
+        this.db.put("SETTINGS", s, function(err){
+            if(err) console.log(err);
+        });
+    }
+
+    /**
+     * gets a settings object from the db
+     * @param callback function recieving the settings object
+     */
+    public getSettings(callback) {
+        this.db.get("SETTINGS", function(err, value) {
+            if(err){
+                console.log(err);
+            } else {
+                callback(value)
+            }
+        }.bind(this));
+    }
 }
 
 /**
@@ -401,7 +421,7 @@ class DBBusDevice extends BusDevice {
         }
         //If the given message is a regular value message, it is written to the db
         else if (Utils.startsWith(m.topic.name, "value.") || m instanceof ValueMessage) {
-            var valuemes = <ValueMessage> m
+            var valuemes = <ValueMessage> m;
             this.dbAccess.putSensorValue(valuemes.topic.name, valuemes.value.value, valuemes.value.identifier);
         }
         //If the given message is a DashboardMessage, it is either written to the db or fetched from the db
@@ -426,11 +446,15 @@ class DBBusDevice extends BusDevice {
                     }.bind(this));
             }
         }
-        else if(m.topic.name == Topic.SETTINGS_MSG.name) {
-       //     var smsg = <SettingsMessage> m;
-
-
-
+        else if(m.topic.name == Topic.SETTINGS_REQ_MSG.name) {
+            var srm = <SettingsRequestMessage> m;
+            if(srm.readFromDB){
+                this.dbAccess.getSettings(function(settings){
+                    this.broker.handleMessage(new SettingsResponseMessage(settings));
+                }.bind(this));
+            } else {
+                this.dbAccess.putSettings(srm.settings);
+            }
         }
     }
 }
@@ -446,7 +470,7 @@ class Replay extends BusDevice {
     private vals: SensorValueEntry[];
     private times: number[];
     private callerID: string;
-    private repl;
+    private stop: boolean;
 
     /**
      * Initializes the Replay with a given ReplayInformation-object and the user ID of the user calling for that
@@ -460,18 +484,19 @@ class Replay extends BusDevice {
         this.cnt = 0;
         this.callerID = callerID;
         this.subscribe(Topic.REPLAY_REQ);
+        this.stop = false;
     }
 
     /**
      * The handleMessage-method. If a REPLAY_REQ message with a set STOP flag is received from the user
      * whose ID is held, the replay is stopped.
-     * @param m
+     * @param m the Message received
      */
     public handleMessage(m: Message) {
         if(m.topic.name == Topic.REPLAY_REQ.name) {
             var rreq = <ReplayRequestMessage> m;
             if (!rreq.startStop && rreq.callerID == this.callerID) {
-                clearInterval(this.repl);
+                this.stop = true;
             }
         }
     }
@@ -485,21 +510,22 @@ class Replay extends BusDevice {
     public replay(vals: SensorValueEntry[], times: number[]) {
         this.vals = vals;
         this.times = times;
-        this.repl = setInterval(this.send.bind(this), this.slp);
+        setTimeout(this.send.bind(this), this.slp);
     }
 
     /**
-     * Assisting method, sends a new SensorValueMessage to the Bus containing the next value. It is called in intervals
+     * ASends a new SensorValueMessage to the Bus containing the next value. It calls itself in intervals
      * according to the temporal difference between the timestamps of two sensor values.
      */
     private send() {
         this.cnt++;
         this.broker.handleMessage(new ReplayValueMessage(new ValueMessage(new Topic(this.vals[this.cnt].topic),
             new Value(this.vals[this.cnt].value, this.vals[this.cnt].unit)), this.callerID));
-        if(this.cnt + 1 == this.times.length) {
-            clearInterval(this.repl);
+        if(this.cnt + 1 == this.times.length || this.stop) {
+            return
         } else {
             this.slp = this.times[this.cnt + 1] - this.times[this.cnt];
+            setTimeout(this.send.bind(this), this.slp);
         }
     }
 }
