@@ -46,29 +46,20 @@ class Terminal {
 
         this.connection.on('message', this.incomingMsg.bind(this));
 
-        //this.forwardSettingsMsg();
-
+        postal.channel('settingsintern_st2db').subscribe("settings.intern_st2dbRead", this.consoleOutSettingsMessage.bind(this));
+        postal.channel('settingsintern_st2db').subscribe("settings.intern_st2dbWrite", this.consoleOutSettingsMessage.bind(this));
     }
 
-    private forwardSettingsMsg() {
-      /*  postal.subscribe({
-            channel: TSConstants.db2stChannel,
-            topic: TSConstants.db2stTopic,
-            callback: function(data) {
-                console.log(data);
-            }
-        });*/
 
-
+    public consoleOutSettingsMessage(data) {
+        console.log(data);
     }
-
 
     public incomingMsg(msg) {
         var message = JSON.parse(msg);
 
         //setTimeout(this.synchronousPublish.bind(this), 0, message);
         this.channelval.publish(message.topic.name, message);
-
     }
 
     public synchronousPublish(message) {

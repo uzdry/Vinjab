@@ -7,6 +7,16 @@
 /// <reference path="./PSGUI.ts"/>
 /// <reference path="../../../typings/postal/postal.d.ts"/>
 
+
+import {Topic} from "../messages";
+import {Message} from "../messages";
+import {DashboardRspMessage} from "../messages";
+import {DashboardMessage} from "../messages";
+import {DBRequestMessage} from "../messages";
+import {SettingsRequestMessage} from "../messages";
+import {SettingsResponseMessage} from "../messages";
+
+
 class ParkingSensorStarter {
 
     private rcvFlags : number = 0;
@@ -17,11 +27,12 @@ class ParkingSensorStarter {
     start() {
         var reqmsg1 = new SettingsData.SettingsData(null, true, false);
         this.mysub = postal.channel(PSConstants.db2psChannel).subscribe(PSConstants.db2psTopic, this.onMessageReceived.bind(this));
-        postal.channel(PSConstants.ps2dbChannel).publish(PSConstants.ps2dbTopic, reqmsg1.stringifyMe());
+        postal.channel(PSConstants.ps2dbChannel).publish(PSConstants.ps2dbTopic,
+            new SettingsRequestMessage(reqmsg1.stringifyMe(), true));
     }
 
     onMessageReceived(data) : void {
-        var msg = SettingsData.SettingsData.parseMe(data);
+        var msg = SettingsData.SettingsData.parseMe(data.settings);
 
         var tpc = "settings.parkingsensor.camera.posx";
         var buf = ParkingSensorStarter.getContainer(msg, tpc);
