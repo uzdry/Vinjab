@@ -27,11 +27,9 @@ class LineChartWidget extends Widget{
     /** HTML-String that is pushed into the HTML-File */
     htmlElement: string;
 
-    /** the current value of the widget*/
-    value: number|boolean;
-
-    /** Id of the document */
-    id: string;
+    /** the number of the current value */
+    counter: number = 0;
+    factor: number = 20;
 
     /** HTML Text */
     htmlText: HTMLCanvasElement;
@@ -54,26 +52,28 @@ class LineChartWidget extends Widget{
     };
 
 
-    updateValue(value:number|boolean) {
-        this.value = value;
-        this.init();
+    updateValue() {
+        var label = "";
+        if(this.counter%this.factor == 0) label = this.counter + "";
+        this.chart.addData([this.model.get("value")], label);
+
+        this.counter++;
+        if(this.counter >= 200) this.chart.removeData();
     }
 
     /** Init gets called after the widget has been added to the grid */
     init() {
         this.htmlText = <HTMLCanvasElement> document.getElementById(this.widgetID)
 
-        if (this.model.get("data") != null) {
-            this.startingData.labels = this.model.get("time");
-            this.startingData.datasets[0].data = this.model.get("data");
-            this.chart = new Chart(this.htmlText.getContext("2d")).Line(this.model.get("data"));
-        }else{
-            this.listenToOnce(this.model, "change:data", function(){
-                this.startingData.labels = this.model.get("time");
-                this.startingData.datasets[0].data = this.model.get("data");
-                this.chart = new Chart(this.htmlText.getContext("2d")).Line(this.model.get("data"));
-            });
-        }
+        var value: number = this.model.get("value");
+        if(!value) value = 0;
+
+        this.startingData.labels = [""];
+        this.counter++;
+
+        this.startingData.datasets[0].data = [value];
+        this.chart = new Chart(this.htmlText.getContext("2d")).Line(this.startingData, { pointDot : false});
+
     }
 
     constructor(options?){
@@ -82,21 +82,20 @@ class LineChartWidget extends Widget{
         /** Chart settings */
         Chart.defaults.global.responsive = true;
         Chart.defaults.global.maintainAspectRatio = false;
+        Chart.defaults.global.animation = false;
+        Chart.defaults.global.showTooltips = false;
 
         /** Create different IDs */
         this.widgetID = this.typeID + "-" + this.model.get("tagName") + "-" + LineChartWidget.widgetCounter;
         LineChartWidget.widgetCounter++;
 
         this.htmlElement = "<li><canvas align=\"center\" id=\"" + this.widgetID  + "\" > </canvas></li>";
-        this.value = options.value;
-        this.id = options.id;
 
-        /** */
     }
 
     /** Gets called shortly after the constructor */
     initialize(){
-        this.listenTo(this.model, 'change:data', this.render);
+        this.listenTo(this.model, 'change:value', this.updateValue.bind(this));
     }
 
     /** The render function that gets called when the value changes */
@@ -116,10 +115,16 @@ class LineChartWidget extends Widget{
 
         this.htmlText.width = size_x;
         this.htmlText.height = size_y;
-        this.chart.destroy();
-        this.chart = new Chart(this.htmlText.getContext("2d")).Line(this.startingData);
-        console.log(this.chart);
 
+        this.counter = 0;
+
+        this.chart.destroy();
+
+        this.init();
+
+
+        this.factor = (size_x / 10);
+        console.log("factor " + this.factor);
     }
 
     destroy(){

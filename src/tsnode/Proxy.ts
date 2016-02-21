@@ -47,7 +47,7 @@ class Proxy extends BusDevice {
         if(this.replayState){
 
             // Don't allow normal values
-            if(Utils.startsWith(message.topic.getName(), "value")) return;
+            if(Utils.startsWith(message.topic.name, "value")) return;
 
             // Only Replay values
             if(message.topic.getName() === "replay answer") {
