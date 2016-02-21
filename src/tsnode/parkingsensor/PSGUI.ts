@@ -2,19 +2,18 @@
  * @author David G.
  */
 
-
-///<reference path="ARFactory.ts"/>
+///<reference path="Visualization.ts"/>
 ///<reference path="Communicator.ts"/>
 ///<reference path="Geometry.ts"/>
-///<reference path="XMLParser.ts"/>
-///<reference path="./drawer/PolygonDrawer.ts"/>
+
+class DOMSVGFactory {
+    public static createEmptySVG(svg : Node) : Visualization.ISVG {
+        return new Visualization.DOMSVG(svg);
+    }
+}
 
 
-var mydomsvg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-
-var myisvg = ARFactory.Drawer.createEmptySVG(mydomsvg);
-
-module Debug {
+module PSGUI {
 
     export class CameraValuesBuffer {
         public cameraPositionX : number = 0;
@@ -33,37 +32,30 @@ module Debug {
     }
 
     export class CarParameters {
-        public static wheelBase : number = 4000;
-        public static track : number = 1400;
-        public static steeringRatio : number = 20;
-        public static steeringWheelAngle : number = 0;
+        public wheelBase : number = 4000;
+        public track : number = 1400;
+        public steeringRatio : number = 20;
+        public steeringWheelAngle : number = 0;
     }
 
+    export class PSGUI implements Communicator.PComListener {
 
-    export enum DebugGUIMode {
-        simpleCircle, tracks, kitLogo
-    }
-    export class DebugGUI implements Communicator.PComListener {
+        private cameraValuesBuffer : PSGUI.CameraValuesBuffer;
+        private carParameters : CarParameters;
+        private myisvg : Visualization.ISVG;
+        private mydomsvg : Element;
 
-        private cameraValuesBuffer : Debug.CameraValuesBuffer;
-        private mode : DebugGUIMode;
-
-        constructor(cameraValuesBuffer : Debug.CameraValuesBuffer) {
+        constructor(cameraValuesBuffer : PSGUI.CameraValuesBuffer, carParameters : CarParameters,
+                    myisvg : Visualization.ISVG, mydomsvg : Element) {
             this.cameraValuesBuffer = cameraValuesBuffer;
+            this.myisvg = myisvg;
+            this.mydomsvg = mydomsvg;
+            this.carParameters = carParameters;
         }
         public onMessageReceived(data) {
-            CarParameters.steeringWheelAngle = data.value.value;
+            this.carParameters.steeringWheelAngle = data.value.value;
             this.redrawTracks();
         }
-
-        public getCameraValuesBuffer() {
-            return this.cameraValuesBuffer;
-        }
-
-        public setMode(mode : DebugGUIMode) {
-            this.mode = mode;
-        }
-
 
         public redrawTracks() {
 
@@ -93,21 +85,21 @@ module Debug {
             var cstrokewidth = 10;
             var cformat = new Format.FormatContainer(cfill, cstroke, cstrokewidth, "");
 
-            var steeringWheelAngleRad = CarParameters.steeringWheelAngle / 180 * Math.PI;
+            var steeringWheelAngleRad = this.carParameters.steeringWheelAngle / 180 * Math.PI;
             if (steeringWheelAngleRad == 0) {
                 // No circle needs to be drawn, only two parallel lines.
 
-                world.addPolygon(new Primitive.Polygon([new Geometry.Vec3([CarParameters.track / 2, 0, 0]), new Geometry.Vec3([CarParameters.track / 2, 0, 5000000])], cformat));
-                world.addPolygon(new Primitive.Polygon([new Geometry.Vec3([-CarParameters.track / 2, 0, 0]), new Geometry.Vec3([-CarParameters.track / 2, 0, 5000000])], cformat));
+                world.addPolygon(new Primitive.Polygon([new Geometry.Vec3([this.carParameters.track / 2, 0, 0]), new Geometry.Vec3([this.carParameters.track / 2, 0, 5000000])], cformat));
+                world.addPolygon(new Primitive.Polygon([new Geometry.Vec3([-this.carParameters.track / 2, 0, 0]), new Geometry.Vec3([-this.carParameters.track / 2, 0, 5000000])], cformat));
             } else {
 
-                var frontMidWheelAngle = steeringWheelAngleRad / CarParameters.steeringRatio;
+                var frontMidWheelAngle = steeringWheelAngleRad / this.carParameters.steeringRatio;
 
-                var radiusMidRear = CarParameters.wheelBase / Math.atan(frontMidWheelAngle);
+                var radiusMidRear = this.carParameters.wheelBase / Math.atan(frontMidWheelAngle);
 
                 var cpos = new Geometry.Vec3([radiusMidRear, 0, 0]);
-                var circleOne = new Primitive.Circle(cpos, cnormal, radiusMidRear + CarParameters.track / 2, cformat);
-                var circleTwo = new Primitive.Circle(cpos, cnormal, radiusMidRear - CarParameters.track / 2, cformat);
+                var circleOne = new Primitive.Circle(cpos, cnormal, radiusMidRear + this.carParameters.track / 2, cformat);
+                var circleTwo = new Primitive.Circle(cpos, cnormal, radiusMidRear - this.carParameters.track / 2, cformat);
 
 
                 var polygonCount = 256;
@@ -117,9 +109,9 @@ module Debug {
             }
 
 
-            myisvg.clear();
-            camera.toImage(myisvg);
-            myisvg.refresh();
+            this.myisvg.clear();
+            camera.toImage(this.myisvg);
+            this.myisvg.refresh();
         }
 
         public drawDebugGUISteeringWheel() {
@@ -128,9 +120,6 @@ module Debug {
             ifrm.style.width = "" + this.cameraValuesBuffer.cameraResolutionHorizontal + "px";
             ifrm.style.height = "" + this.cameraValuesBuffer.cameraResolutionVertical + "px";
             document.getElementById("divPS").appendChild(ifrm);
-
-
-            this.mode = DebugGUIMode.tracks;
 
             var oldTable = document.getElementById("table_dbg_gui");
             while (oldTable != null) {
@@ -145,7 +134,7 @@ module Debug {
             var tr = document.createElement('tr');
             var td = document.createElement('td');
 
-            td.appendChild(mydomsvg);
+            td.appendChild(this.mydomsvg);
             td.colSpan = 4;
 
             tr.appendChild(td);
@@ -154,26 +143,23 @@ module Debug {
 
             table.appendChild(tbody);
             document.getElementById("divPS").appendChild(table);
-            table.style.marginTop = "-480px";
+            table.style.marginTop = "-" + this.cameraValuesBuffer.cameraResolutionVertical;
             this.redrawTracks();
         }
     }
 
     export class Starter {
-        static start(cameraValuesBuffer : Debug.CameraValuesBuffer) {
-            var div = document.createElement("div");
-            div.id = "ps_msgDIV";
-            div.innerHTML = "No messages received yet.";
-            document.getElementById("divPS").appendChild(div);
-            var dbgui = new Debug.DebugGUI(cameraValuesBuffer);
+        static start(cameraValuesBuffer : PSGUI.CameraValuesBuffer, carParameters : CarParameters) {
+
+            var mydomsvg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+
+            var myisvg = DOMSVGFactory.createEmptySVG(mydomsvg);
+
+            var dbgui = new PSGUI(cameraValuesBuffer, carParameters, myisvg, mydomsvg);
             dbgui.drawDebugGUISteeringWheel();
 
-            var pcom : Communicator.PCommunicator = new Communicator.PCommunicator("ps_msgDIV", dbgui);
+            var pcom : Communicator.PCommunicator = new Communicator.PCommunicator(dbgui);
             pcom.subscribe();
-
-            myisvg.refresh();
         }
     }
-
-
 }

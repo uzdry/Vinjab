@@ -5,6 +5,8 @@
 /// <reference path="./TSettings.ts"/>
 /// <reference path="./../messages.ts"/>
 
+
+import SettingsContainer = SettingsData.SettingsContainer;
 /**
  * A settings directory that can contain parameters or other directories.
  */
@@ -37,38 +39,27 @@ class SettingsDirectory implements SettingsNode{
         this.imageURL = imageURL;
     }
 
+    pollFromDBRecursively() {
+        if (this.getElements() != null) {
+            for (var i = 0; i < this.getElements().length; i++) {
+                this.getElements()[i].pollFromDBRecursively();
+            }
+        }
+    }
+
     /**
      * Sets the value of the directory. To be ignored.
      * @param value The new value of the directory.
      */
-    setActualValue(value : number) : void {
-    }
-
-    /**
-     * Notifies this object that its value has been saved in the database.
-     */
-    actualValueStored() : void {
-        if (this.elements != null) {
-            for (var i = 0; i < this.elements.length; i++) {
-                this.elements[i].actualValueStored();
-            }
-        }
+    setValue(value : number) : void {
     }
 
     /**
      * Gets the topic of this directory. Directories do not have a topic, so null is returned.
      * @returns {null} Null, directories do not have a topic.
      */
-    getTopic() : SettingsMessageClient.STopic {
+    getTopic() : string {
         return null;
-    }
-
-    /**
-     * Gets the actual value of the directory. To be ignored.
-     * @returns {number} The actual value of the directory.
-     */
-    getActualValue() {
-        return 0;
     }
 
     /**
@@ -140,6 +131,15 @@ class SettingsDirectory implements SettingsNode{
         return this.elements;
     }
 
+    getElementsRecursively(buffer : SettingsNode[]) {
+        if (this.getElements() != null && this.getElements().length > 0) {
+            for (var i = 0; i < this.getElements().length; i++) {
+                buffer.push(this.getElements()[i]);
+                this.getElements()[i].getElementsRecursively(buffer);
+            }
+        }
+    }
+
     /**
      * Gets the name of this directory that is to be displayed in the GUI.
      * @returns {string} The name of this directory.
@@ -190,11 +190,12 @@ class SettingsParameter implements SettingsNode {
     private parent : SettingsDirectory;
     private ruid : string;
     private imageURL : string;
-    private value : number;
-    private actualValue : number;
-    private topic : SettingsMessageClient.STopic;
-    private valueChangeListener : ValueChangeListener;
+    private settingsContainer : SettingsData.SettingsContainer;
+    private clientSideBuffer : TSettings.ClientSideBuffer;
     private container : Node;
+    private unit : string;
+    private view : HTMLInputElement = null;
+
 
     /**
      * Creates a settings parameter.
@@ -205,24 +206,21 @@ class SettingsParameter implements SettingsNode {
      * @param imageURL The URL of the image to be displayed in the GUI as this folder.
      * @param value The original value of this settings parameter.
      */
-    public constructor(ruid : string, name : string, description : string, imageURL : string, topic : SettingsMessageClient.STopic, valueChangeListener : ValueChangeListener, value : number,
-                       container : Node) {
+    public constructor(ruid : string, name : string, description : string, imageURL : string,
+                       topic : string, unit : string, defaultValue : SettingsContainer,
+                       clientSideBuffer : TSettings.ClientSideBuffer, container : Node) {
         this.name = name;
         this.description = description;
         this.ruid = ruid;
         this.imageURL = imageURL;
-        this.value = value;
-        this.actualValue = value;
-        this.topic = topic;
-        this.valueChangeListener = valueChangeListener;
+        this.settingsContainer = defaultValue;
+        this.clientSideBuffer = clientSideBuffer;
         this.container = container;
+        this.unit = unit;
     }
 
-    /**
-     * Notifies this object that its value has been saved in the database.
-     */
-    actualValueStored() {
-        this.value = this.actualValue;
+    getUnit() : string {
+        return this.unit;
     }
 
     /**
@@ -230,29 +228,29 @@ class SettingsParameter implements SettingsNode {
      * Does not change the original value of this parameter that is in the DB.
      * @param value The new actual value of this parameter.
      */
-    setActualValue(value : number) {
-        this.actualValue = value;
-        if (this.actualValue != this.value) {
-            this.valueChangeListener.append(this, this.container);
-        } else {
-            this.valueChangeListener.remove(this, this.container);
-        }
+    setValue(value : number) {
+        this.settingsContainer = new SettingsData.SettingsContainer(this.settingsContainer.getTopic(),
+            value, this.settingsContainer.getDescription());
+        this.clientSideBuffer.setValueOf(this.settingsContainer);
     }
 
-    /**
-     * Gets the actual value of this parameter.
-     * @returns {number} The actual value of this parameter.
-     */
-    getActualValue() {
-        return this.actualValue;
+    setView(view : HTMLInputElement) {
+        this.view = view;
+    }
+
+    pollFromDBRecursively() {
+        this.settingsContainer = this.clientSideBuffer.getValueOf(this.settingsContainer.getTopic());
+        if (this.view != null) {
+            this.view.value = "" + this.settingsContainer.getValue();
+        }
     }
 
     /**
      * Gets the value of this parameter that is currently stored in the DB.
      * @returns {number} The value of this parameter that is currently stored in the DB.
      */
-    getValue() {
-        return this.value;
+    getValue() : number {
+        return this.settingsContainer.getValue();
     }
 
     /**
@@ -263,8 +261,8 @@ class SettingsParameter implements SettingsNode {
         return this.imageURL;
     }
 
-    getTopic() : SettingsMessageClient.STopic {
-        return this.topic;
+    getTopic() : string {
+        return this.settingsContainer.getTopic();
     }
 
     /**
@@ -290,6 +288,10 @@ class SettingsParameter implements SettingsNode {
      */
     getElements() {
         return null;
+    }
+
+    getElementsRecursively(buffer : SettingsNode[]) : void {
+        return;
     }
 
     /**
@@ -335,20 +337,14 @@ class SettingsParameter implements SettingsNode {
 
 interface SettingsNode {
 
-    actualValueStored() : void;
+    pollFromDBRecursively();
 
     /**
      * Sets the actual value of this node (that is set in the GUI).
      * Does not change the original value of this node that is in the DB.
      * @param value The new actual value of this node.
      */
-    setActualValue(value : number);
-
-    /**
-     * Gets the actual value of this node.
-     * @returns {number} The actual value of this node.
-     */
-    getActualValue() : number;
+    setValue(value : number);
 
     /**
      * Gets the value of this node that is currently stored in the DB.
@@ -380,6 +376,8 @@ interface SettingsNode {
      */
     getElements() : SettingsNode[];
 
+    getElementsRecursively(buffer : SettingsNode[]) : void;
+
     /**
      * Checks whether this node is a directory.
      * @returns {boolean} Yes if this is a directory, false else.
@@ -398,7 +396,7 @@ interface SettingsNode {
      */
     getParent() : SettingsNode;
 
-    getTopic() : SettingsMessageClient.STopic;
+    getTopic() : string;
 
     /**
      * Gets the relatively unique ID of this node.
