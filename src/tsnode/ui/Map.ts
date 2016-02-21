@@ -37,7 +37,7 @@ class GoogleMapWidget extends Widget {
 
         this.htmlElement = '<li><div id=\"' + this.widgetID  + '\" style="width: 100%; height: 100%"><div id="map' + this.widgetID + '" style="height: 230px; width: 230px"></div></div></li>';
         /*
-        this.htmlElement = '<li id="' + this.widgetID + '">' +
+        this.htmlElement = '<li id="' + ID + '">' +
             '<div></div>' +
             '</li>';
         */
@@ -90,7 +90,6 @@ class GoogleMapWidget extends Widget {
         this.map = new google.maps.Map(document.getElementById("map" + this.widgetID), {
             center: new google.maps.LatLng(49.013655, 8.4043383),
             zoom: 14,
-            draggable: false
         });
 
         if (navigator.geolocation) {
@@ -116,7 +115,6 @@ class GoogleMapWidget extends Widget {
     }
 
     findGasStations() {
-        console.log("WOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO");
         var service = new google.maps.places.PlacesService(this.map);
         service.nearbySearch({
             location: this.currentLoc,
@@ -145,6 +143,26 @@ class GoogleMapWidget extends Widget {
             infowindow.setContent(place.name);
             infowindow.open(this.map, this);
         });
+    }
+
+    movable(m: boolean){
+        var mapOptions;
+        if (m) {
+            mapOptions = {
+                draggable: false,
+                scrollwheel: false,
+                disableDoubleClickZoom: true,
+                zoomControl: false
+            };
+        } else {
+            mapOptions = {
+                draggable: true,
+                scrollwheel: true,
+                disableDoubleClickZoom: false,
+                zoomControl: true
+            };
+        }
+        this.map.setOptions(mapOptions);
     }
 }
 

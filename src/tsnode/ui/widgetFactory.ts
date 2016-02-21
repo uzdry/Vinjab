@@ -66,7 +66,6 @@ class WidgetFactory{
      * @param widgetConfig The config thats to be used
      */
     addWidget(signal: string, widgetConfig: WidgetConfig){
-        console.log(widgetConfig.type_name);
 
         if (!this.widgetConfigurations[signal]) {
             this.widgetConfigurations[signal] = {};

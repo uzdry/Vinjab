@@ -95,6 +95,16 @@ abstract class Widget extends Backbone.View<DataModel> {
         this.stopListening(this.model);
     }
 
+    /**
+     * If the widget is supposed to be movable itself,
+     * not a part inside the widget, you can use this
+     * function to notify the widget of this event.
+     * @param m true if movable, false if not
+     */
+    movable(m: boolean){
+
+    }
+
 }
 
 /**

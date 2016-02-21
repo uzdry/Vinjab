@@ -31,15 +31,15 @@ class ServerStarter {
 
         this.server = new Server();
 
-       // this.source = new BluetoothObd2();
-        this.source = new BluetoothSim();
+        this.source = new BluetoothObd2();
+        //this.source = new BluetoothSim();
 
         this.aggregations.push(new FuelConsumption());
         this.aggregations.push(new Distance());
         this.aggregations.push(new AverageComputation(Topic.SPEED));
         this.aggregations.push(new AverageComputation(Topic.FUEL_CONSUMPTION));
 
-       this.source.init();
+       //this.source.init();
 
     }
 

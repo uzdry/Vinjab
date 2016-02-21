@@ -111,6 +111,22 @@ class Grid {
 
     }
 
+    movable(m: boolean){
+
+        if(!m){
+            this.gridster.disable_resize();
+            this.gridster.disable();
+        }else{
+            this.gridster.enable();
+            this.gridster.enable_resize();
+        }
+
+        for(var w in this.widgets){
+            this.widgets[w].movable(m);
+        }
+
+    }
+
     /**
      * Serializes whole grid
      * @returns {string} A stringified Array of WidgetSerConfig Objects

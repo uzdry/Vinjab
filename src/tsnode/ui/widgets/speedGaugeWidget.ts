@@ -137,6 +137,8 @@ class SpeedGaugeWidget extends Widget{
         this.config.height = size_y*1.1;
         this.config.width = size_x*1.1;
         this.gauge.updateConfig(this.config);
+        this.gauge.setValue(this.model.get("value"));
+
     }
 
     destroy(){

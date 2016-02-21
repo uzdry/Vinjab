@@ -256,16 +256,14 @@ class Dashboard{
      * Initialise changing the dashboard
      */
     initTabs(){
-        this.grid.gridster.disable();
-        this.grid.gridster.disable_resize();
+        this.grid.movable(false);
 
         $( "#bDashboard" ).click(function() {
             if($("#dEditMode").is(":visible")){
                 postal.channel("toServer").publish("" ,new DashboardMessage(this.user, this.grid.serialize(), false));
             }
-
-            this.grid.gridster.disable();
-            this.grid.gridster.disable_resize();
+            this.grid.movable(false);
+            this.deleteCheck.checked = false;
 
             $( "#dDashboard" ).show( "slow" );
             $( "#dSettings").hide("slow");
@@ -286,8 +284,7 @@ class Dashboard{
             $( "#dEditMode").show("slow");
             $( "#dParkingSensor").hide("slow");
             $( "#dReplayMode").hide("slow");
-            this.grid.gridster.enable();
-            this.grid.gridster.enable_resize();
+            this.grid.movable(true);
         }.bind(this));
         $( "#bParkingSensor").click(function() {
             $( "#dDashboard" ).hide( "slow" );
@@ -295,13 +292,16 @@ class Dashboard{
             $( "#dEditMode").hide("slow");
             $( "#dParkingSensor").show("slow");
             $( "#dReplayMode").hide("slow");
+            this.grid.movable(false);
         }.bind(this));
         $("#bReplayMode").click(function(){
+            this.deleteCheck.checked = false;
             $( "#dDashboard" ).show( "slow" );
             $( "#dSettings").hide("slow");
             $( "#dEditMode").hide("slow");
             $( "#dParkingSensor").hide("slow");
             $( "#dReplayMode").show("slow");
+            this.grid.movable(false);
         }.bind(this));
     }
 
