@@ -411,7 +411,7 @@ class DBBusDevice extends BusDevice {
     constructor() {
         super();
         this.dbAccess = new LevelDBAccess();
-        this.subscribe(Topic.SETTINGS_MSG);
+        this.subscribe(Topic.SETTINGS_REQ_MSG);
         this.subscribe(Topic.DBREQ_MSG);
         this.subscribe(Topic.DASHBOARD_MSG);
         this.subscribe(Topic.REPLAY_REQ);
