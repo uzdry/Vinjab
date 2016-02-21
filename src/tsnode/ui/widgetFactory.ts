@@ -170,6 +170,7 @@ class WidgetFactory{
                 highlights.push({start: startValue, end: endValue, color: colorRGB});
             }
 
+            this.addWidget(name, new TextWidgetConfig());
             for (var j = 0; j < widgetse.length; j++) {
                 /*  var h: string = highlightse[j].textContent;
                  var sepI: number = h.indexOf(";");
@@ -180,7 +181,6 @@ class WidgetFactory{
 
                 switch (h) {
                     case "gauge": this.addWidget(name, new SpeedGaugeWidgetConfig()); break;
-                    case "text widget": this.addWidget(name, new TextWidgetConfig()); break;
                     case "percent gauge": this.addWidget(name, new PercentGaugeWidgetConfig()); break;
                     case "line graph": this.addWidget(name, new LineChartWidgetConfig()); break;
                     case "map": this.addWidget(name, new GoogleMapWidgetConfig()); break;
