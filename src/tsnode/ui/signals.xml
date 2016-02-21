@@ -7,6 +7,13 @@
         <description>Geschwindigkeit des Autos</description>
         <minValue>0</minValue>
         <maxValue>220</maxValue>
+
+        <widgets>
+            <widget>gauge</widget>
+            <widget>text widget</widget>
+            <widget>line graph</widget>
+        </widgets>
+
         <ticks>
             <tick>0</tick>
             <tick>20</tick>
@@ -47,13 +54,27 @@
         <description>Luftmassenstrom</description>
         <minValue></minValue>
         <maxValue></maxValue>
-        <unit>gramm</unit>
+
+        <widgets>
+            <widget>gauge</widget>
+            <widget>text widget</widget>
+            <widget>line graph</widget>
+        </widgets>
+
+        <unit>gramm / sec</unit>
     </signal>
     <signal category="value.coolant temperature">
-        <name>Kühlertemp.</name>
+        <name>Kuehhlertemp.</name>
         <description>Temperatur des Kühlers</description>
         <minValue>0</minValue>
-        <maxValue>100</maxValue>
+        <maxValue>130</maxValue>
+
+        <widgets>
+            <widget>gauge</widget>
+            <widget>text widget</widget>
+            <widget>line graph</widget>
+        </widgets>
+
         <unit>°C</unit>
     </signal>
     <signal category="value.fuel pressure">
@@ -61,6 +82,13 @@
         <description>Treibstoffdruck in bar</description>
         <minValue>0</minValue>
         <maxValue>10</maxValue>
+
+        <widgets>
+            <widget>gauge</widget>
+            <widget>text widget</widget>
+            <widget>line graph</widget>
+        </widgets>
+
         <unit>bar</unit>
     </signal>
     <signal category="value.RPM">
@@ -91,6 +119,13 @@
                 <color>(255,0,0,0.3)</color>
             </highlight>
         </highlights>
+
+        <widgets>
+            <widget>gauge</widget>
+            <widget>text widget</widget>
+            <widget>line graph</widget>
+        </widgets>
+
         <unit>RPM</unit>
     </signal>
     <signal category="value.steering">
@@ -105,6 +140,13 @@
         <description>Temperatur der eingezogenen Luft</description>
         <minValue>0</minValue>
         <maxValue>60</maxValue>
+
+        <widgets>
+            <widget>gauge</widget>
+            <widget>text widget</widget>
+            <widget>line graph</widget>
+        </widgets>
+
         <unit>°C</unit>
     </signal>
     <signal category="value.engine runtime">
@@ -112,6 +154,12 @@
         <description>Zeit seit dem letzten Start des Motors</description>
         <minValue>0</minValue>
         <maxValue>3600</maxValue>
+
+        <widgets>
+            <widget>text widget</widget>
+            <widget>line graph</widget>
+        </widgets>
+
         <unit>Min</unit>
     </signal>
     <signal category="value.fuel">
@@ -119,7 +167,15 @@
         <description>Aktueller Tankfüllstand</description>
         <minValue>0</minValue>
         <maxValue>100</maxValue>
+
+        <widgets>
+            <widget>percent gauge</widget>
+            <widget>text widget</widget>
+            <widget>line graph</widget>
+        </widgets>
+
         <unit>%</unit>
+
         <picture></picture>
     </signal>
 <!--    <signal category="value.exhaust gas recirculation state">
@@ -155,6 +211,13 @@
         <description>Temperatur des Katalysators</description>
         <minValue>0</minValue>
         <maxValue>800</maxValue>
+
+        <widgets>
+            <widget>gauge</widget>
+            <widget>text widget</widget>
+            <widget>line graph</widget>
+        </widgets>
+
         <unit>°C</unit>
     </signal>
     <!--<signal category="value.throttle">
@@ -163,12 +226,19 @@
         <minValue>0</minValue>
         <maxValue>100</maxValue>
         <unit>%</unit>
-    </signal>
--->         <signal category="value.accelerator pedal position">
+    </signal>-->
+    <signal category="value.accelerator pedal position">
             <name>GaspedalPos</name>
             <description>Position des Gaspedals</description>
             <minValue>0</minValue>
             <maxValue>100</maxValue>
+
+        <widgets>
+            <widget>percent gauge</widget>
+            <widget>text widget</widget>
+            <widget>line graph</widget>
+        </widgets>
+
             <unit>%</unit>
         </signal>
    <signal category="value.temperature outside">
@@ -176,6 +246,13 @@
         <description>Temperatur außerhalb des Autos</description>
         <minValue>-20</minValue>
         <maxValue>60</maxValue>
+
+       <widgets>
+           <widget>gauge</widget>
+           <widget>text widget</widget>
+           <widget>line graph</widget>
+       </widgets>
+
         <unit>°C</unit>
     </signal>
     <signal category="value.engine torque">
@@ -183,6 +260,13 @@
         <description>Drehmoment des Motors</description>
         <minValue>0</minValue>
         <maxValue>200</maxValue>
+
+        <widgets>
+            <widget>gauge</widget>
+            <widget>text widget</widget>
+            <widget>line graph</widget>
+        </widgets>
+
         <unit>Nm</unit>
     </signal>
     <!--     <signal category="value.exhaust gas temperature">
@@ -211,6 +295,12 @@
         <description>Durschnittlicher Treibstoffverbrauch</description>
         <minValue>0</minValue>
         <maxValue>20</maxValue>
+
+    <widgets>
+        <widget>text widget</widget>
+        <widget>line graph</widget>
+    </widgets>
+
         <unit>l/100km</unit>
     </signal>
     <signal category="value.aggregated.fuel consumption">
@@ -218,6 +308,11 @@
         <description>Aktueller Treibstoffverbrauch</description>
         <minValue>0</minValue>
         <maxValue>20</maxValue>
+
+        <widgets>
+            <widget>text widget</widget>
+            <widget>line graph</widget>
+        </widgets>
         <unit>l/100km</unit>
     </signal>
     <signal category="value.aggregated.mileage">
@@ -225,6 +320,11 @@
         <description>Gefahrene Distanz seit Motorstart</description>
         <minValue>0</minValue>
         <maxValue>10000</maxValue>
+
+        <widgets>
+            <widget>text widget</widget>
+        </widgets>
+
         <unit>km</unit>
     </signal>
     <signal category="value.avg.speed">
@@ -232,6 +332,12 @@
         <description>Durchschnittliche Geschwindigkeit</description>
         <minValue>0</minValue>
         <maxValue>220</maxValue>
+
+        <widgets>
+            <widget>text widget</widget>
+            <widget>line graph</widget>
+        </widgets>
+
         <unit>km/h</unit>
     </signal>
     <signal category="value.aggregated.fuel per hour">
@@ -239,6 +345,11 @@
         <description>Verbrauchter Treibstoff in einer Stunde</description>
         <minValue>0</minValue>
         <maxValue>100</maxValue>
+
+        <widgets>
+            <widget>text widget</widget>
+            <widget>line graph</widget>
+        </widgets>
         <unit>l</unit>
     </signal>
 </signals>

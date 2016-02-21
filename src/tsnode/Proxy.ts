@@ -57,12 +57,13 @@ class Proxy extends BusDevice {
                 if (msg.caller === this.user && this.subscriptions[msg.topic.name]){
 
                     this.socket.emit("message", JSON.stringify(msg.valueMessage));
-                    console.log(JSON.stringify(msg.valueMessage));
-                    return;
+                    //console.log(JSON.stringify(msg.valueMessage));
+
 
                 }
 
             }
+            return;
         }
 
         this.socket.emit("message", JSON.stringify(message));
