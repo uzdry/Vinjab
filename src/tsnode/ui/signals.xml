@@ -112,7 +112,7 @@
         <description>Zeit seit dem letzten Start des Motors</description>
         <minValue>0</minValue>
         <maxValue>3600</maxValue>
-        <unit>Minuten</unit>
+        <unit>Min</unit>
     </signal>
     <signal category="value.fuel">
         <name>Tankfüllstand</name>
