@@ -130,7 +130,7 @@
         <name>Ansaugluft</name>
         <description>Temperatur der Ansaugluft</description>
         <minValue>0</minValue>
-        <maxValue>60</maxValue>
+        <maxValue>100</maxValue>
         <ticks>
             <major>4</major>
             <minor>2</minor>
