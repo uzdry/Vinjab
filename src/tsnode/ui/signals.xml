@@ -14,7 +14,10 @@
             <widget>line graph</widget>
         </widgets>
 
-        <ticks>12</ticks>
+        <ticks>
+            <major>12</major>
+            <minor>5</minor>
+        </ticks>
 
         <highlights>
             <highlight>
@@ -47,9 +50,10 @@
             <widget>text widget</widget>
             <widget>line graph</widget>
         </widgets>
-
-        <ticks>4</ticks>
-
+        <ticks>
+            <major>4</major>
+            <minor>2</minor>
+        </ticks>
         <unit>gramm/sec</unit>
     </signal>
     <signal category="value.coolant temperature">
@@ -64,7 +68,10 @@
             <widget>line graph</widget>
         </widgets>
 
-        <ticks>9</ticks>
+        <ticks>
+            <major>3</major>
+            <minor>2</minor>
+        </ticks>
 
         <unit>°C</unit>
     </signal>
@@ -88,15 +95,8 @@
         <minValue>0</minValue>
         <maxValue>8000</maxValue>
         <ticks>
-            <tick>0</tick>
-            <tick>1000</tick>
-            <tick>2000</tick>
-            <tick>3000</tick>
-            <tick>4000</tick>
-            <tick>5000</tick>
-            <tick>6000</tick>
-            <tick>7000</tick>
-            <tick>8000</tick>
+            <major>9</major>
+            <minor>15</minor>
         </ticks>
         <highlights>
             <highlight>
@@ -131,7 +131,10 @@
         <description>Temperatur der Ansaugluft</description>
         <minValue>0</minValue>
         <maxValue>60</maxValue>
-
+        <ticks>
+            <major>4</major>
+            <minor>2</minor>
+        </ticks>
         <widgets>
             <widget>gauge</widget>
             <widget>text widget</widget>
@@ -158,6 +161,11 @@
         <description>Aktueller Tankfüllstand</description>
         <minValue>0</minValue>
         <maxValue>100</maxValue>
+
+        <ticks>
+            <major>4</major>
+            <minor>2</minor>
+        </ticks>
 
         <widgets>
             <widget>percent gauge</widget>

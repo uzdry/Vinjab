@@ -127,8 +127,10 @@ class WidgetFactory{
             var minValue: number = parseInt(elements[i].getElementsByTagName("minValue")[0].textContent);
             var desc: string = elements[i].getElementsByTagName("description")[0].textContent;
             var unit: string = elements[i].getElementsByTagName("unit")[0].textContent;
-            var tickse = elements[i].getElementsByTagName("ticks");
+            var tickse = elements[i].getElementsByTagName("major");
+            var ticksmine = elements[i].getElementsByTagName("minor");
             var ticks = new Array<string>(); //ticks as string values
+            var ticksmin;
 
             var highlightse = elements[i].getElementsByTagName("highlight");
             var highlightsv;
@@ -138,15 +140,18 @@ class WidgetFactory{
             var widgets: Array<{}> = new Array<{}>();
 
 
-            console.log(tickse[0].textContent);
             if (tickse[0]) {
                 var n = parseInt(tickse[0].textContent);
-                var step = (maxValue - minValue) / (n- 1);
+                var step = (maxValue - minValue) / (n - 1);
                 for (var j = 0; j < n; j++) {
                     ticks.push((minValue + j * step) + "");
                 }
-
             }
+
+            if (ticksmine[0]) {
+                ticksmin = parseInt(ticksmine[0].textContent);
+            }
+
 
 
 
@@ -182,7 +187,7 @@ class WidgetFactory{
                     default: break;
                 }
             }
-            this.signalsDesc[tagName] = new SignalDescription(name, tagName, unit, maxValue, minValue, desc, ticks, highlights);
+            this.signalsDesc[tagName] = new SignalDescription(name, tagName, unit, maxValue, minValue, desc, ticks, ticksmin, highlights);
         }
         this.dashboard.updateSignalSelector(this.signalsDesc);
     }
@@ -202,10 +207,11 @@ class SignalDescription{
     minValue: number;
     description: string;
     ticks: string[];
+    ticksmin: number;
     highlights: {}[];
 
 
-    constructor(name:string, tagName: string, unit:string, maxValue:number, minValue:number, description:string, ticks:string[], highlights: {}[]) {
+    constructor(name:string, tagName: string, unit:string, maxValue:number, minValue:number, description:string, ticks:string[], ticksmin:number, highlights: {}[]) {
         this.tagName = tagName;
         this.name = name;
         this.unit = unit;
@@ -213,6 +219,7 @@ class SignalDescription{
         this.minValue = minValue;
         this.description = description;
         this.ticks = ticks;
+        this.ticksmin = ticksmin;
         this.highlights = highlights;
 
      //   console.log(highlights);

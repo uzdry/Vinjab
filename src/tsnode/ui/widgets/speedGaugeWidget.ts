@@ -82,6 +82,8 @@ class SpeedGaugeWidget extends Widget{
         if (this.model.get("ticks")) {
             this.config.majorTicks = this.model.get("ticks");
         }
+
+        this.config.minorTicks = this.model.get("ticksmin");
         //console.log(this.model.get("highlights"));
 
         var high = this.model.get("highlights");
