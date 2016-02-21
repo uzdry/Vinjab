@@ -3,6 +3,7 @@
  */
 
 /// <reference path="../../../typings/postal/postal.d.ts"/>
+
 module Communicator {
     export interface PComListener {
         onMessageReceived(data) : void;
@@ -18,20 +19,40 @@ module Communicator {
         }
 
         public subscribe() : void {
-            //var channelsub = postal.channel("reqsubs");
-            //var reqsub = channelsub.publish("request." + "value.steering", "value.steering");
+
+            setTimeout(function() {
+                var channelsub = postal.channel("reqsubs");
+                var reqsub = channelsub.publish("request." + "value.steering", "value.steering");
+            }, 0);
+
+            setTimeout(this.subscribeS.bind(this), 0);
+        }
+
+        subscribeS() {
 
             this.mychannel = postal.channel("values");
             this.mychannel.subscribe("value.steering", this.onMessageReceived.bind(this));
         }
 
+
+
         public onMessageReceived(data) : void {
+
+            var dat = data;
+
+            setTimeout(this.synchprod.bind(this), 0, dat);
+
+        }
+
+
+        synchprod(data) {
             var msgdiv = document.getElementById(this.divName);
             msgdiv.innerHTML = "SMessage received: " + data.value.value;
             if (this.pComListener != null) {
                 this.pComListener.onMessageReceived(data);
             }
         }
+
     }
 }
 

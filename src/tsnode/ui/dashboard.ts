@@ -324,8 +324,8 @@ class DDSlickOptions{
 
 var terminal = new Terminal();
 var dashboard: Dashboard = new Dashboard();
-dashboard.widgetFactory.addWidget(new SpeedGaugeWidgetConfig());
 dashboard.widgetFactory.addWidget(new TextWidgetConfig());
+dashboard.widgetFactory.addWidget(new SpeedGaugeWidgetConfig());
 dashboard.widgetFactory.addWidget(new PercentGaugeWidgetConfig());
 dashboard.widgetFactory.addWidget(new LineChartWidgetConfig());
 dashboard.widgetFactory.addWidget(new GoogleMapWidgetConfig());
