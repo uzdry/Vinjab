@@ -273,7 +273,7 @@ class SettingsResponseMessage extends Message {
         return this.settings;
     }
 
-    static parseMe(input : string) {
+    static parseMe(input : string) : SettingsResponseMessage {
         var splitted : string[] = input.split("|");
         if (splitted[0] != "SettingsMessage[") {
             return null;
