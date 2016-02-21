@@ -4,7 +4,6 @@
 /// <reference path="../../typings/socket.io-client/socket.io-client.d.ts"/>
 /// <reference path="../../typings/postal/postal.d.ts"/>
 import {Message, Value, ValueMessage, Topic} from "./messages";
-import {TSConstants} from "./settings/TSettings";
 /**
  * This class is the connection in the client side.
  */
@@ -58,10 +57,15 @@ class Terminal {
             }
         });*/
 
-        var schan = postal.channel(TSConstants.db2stChannel);
-        var sub = schan.subscribe(TSConstants.db2stTopic, function(data) {
+        var schan = postal.channel("settingsintern_st2db");
+        var sub = schan.subscribe("settings.intern_st2db", function(data) {
             console.log(data);
-        })
+        });
+
+        var schan2 = postal.channel("settingsintern_db2st");
+        var sub2 = schan2.subscribe("settings.intern_db2st", function(data) {
+            console.log(data);
+        });
     }
 
 

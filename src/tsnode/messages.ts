@@ -225,7 +225,6 @@ class Value {
     public getIdentifier(): string{
         return this.identifier;
     }
-
 }
 
 class SettingsRequestMessage extends Message {

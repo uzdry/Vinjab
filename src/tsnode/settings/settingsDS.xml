@@ -10,32 +10,40 @@
         <description>Fahrzeugspezifische Einstellungen</description>
         <imageURL>../../img/settings/car/car.png</imageURL>
         <npar>
-            <ruid>settings.wheelbase</ruid>
+            <ruid>wheelbase</ruid>
             <name>Radstand</name>
             <description>Abstand zwischen den Achsen des Fahrzeuges (gemessen in Millimetern).</description>
             <imageURL>../../img/settings/car/wheelbase.png</imageURL>
-            <topicName>settings.wheelbase</topicName>
+            <topicName>settings.car.wheelbase</topicName>
+            <defaultValue>4000</defaultValue>
+            <unit>mm</unit>
         </npar>
         <npar>
-            <ruid>settings.axletrack</ruid>
+            <ruid>axletrack</ruid>
             <name>Spurweite</name>
             <description>Abstand zwischen den beiden Radaufstandspunkten der hinteren Achse in der Ansicht von hinten (gemessen in Millimetern).</description>
             <imageURL>../../img/settings/car/axletrack.png</imageURL>
-            <topicName>settings.axletrack</topicName>
+            <topicName>settings.car.axletrack</topicName>
+            <defaultValue>1300</defaultValue>
+            <unit>mm</unit>
         </npar>
         <npar>
-            <ruid>settings.steeringratio</ruid>
+            <ruid>steeringratio</ruid>
             <name>Lenkverhältnis</name>
             <description>Das Verhältnis zwischen der Drehung des Lenkrads (in Grad) und die Drehung der Räder (in Grad).</description>
             <imageURL>../../img/settings/car/steeringratio.png</imageURL>
-            <topicName>settings.steeringratio</topicName>
+            <topicName>settings.car.steeringratio</topicName>
+            <defaultValue>20</defaultValue>
+            <unit>Verhältnis</unit>
         </npar>
         <npar>
-            <ruid>settings.fueltankwarning</ruid>
+            <ruid>fueltankwarning</ruid>
             <name>Tankreserve-Warnung</name>
-            <description>Gibt an, wann die Benachrichtigung, dass der Tank leer ist ausgelöst werden soll (in Litern).</description>
+            <description>Gibt an, wann die Benachrichtigung, dass der Tank leer ist ausgelöst werden soll (in Prozent).</description>
             <imageURL>../../img/settings/car/fueltankwarning.png</imageURL>
-            <topicName>settings.fueltankwarning</topicName>
+            <topicName>settings.car.fueltankwarning</topicName>
+            <defaultValue>8</defaultValue>
+            <unit>%</unit>
         </npar>
     </dir>
     <dir>
@@ -44,11 +52,13 @@
         <description>Datenbankspezifische Einstellungen</description>
         <imageURL>../../img/settings/database/database.png</imageURL>
         <npar>
-            <ruid>settings.dbcapacity</ruid>
+            <ruid>dbcapacity</ruid>
             <name>Maximale Datenbankgröße</name>
             <description>Die maximale Anzahl von Datensätzen, die in der Datenbank gespeichert werden dürfen.</description>
             <imageURL>../../img/settings/database/dbcapacity.png</imageURL>
-            <topicName>settings.dbcapacity</topicName>
+            <topicName>settings.database.dbcapacity</topicName>
+            <defaultValue>999</defaultValue>
+            <unit>Stück</unit>
         </npar>
     </dir>
     <dir>
@@ -67,6 +77,8 @@
                 <description>Position der Kamera entlang der x-Achse</description>
                 <imageURL>../../img/settings/parkingsensor/camera/posx.png</imageURL>
                 <topicName>settings.parkingsensor.camera.posx</topicName>
+                <defaultValue>0</defaultValue>
+                <unit>mm</unit>
             </npar>
             <npar>
                 <ruid>posy</ruid>
@@ -74,6 +86,8 @@
                 <description>Position der Kamera entlang der y-Achse</description>
                 <imageURL>../../img/settings/parkingsensor/camera/posy.png</imageURL>
                 <topicName>settings.parkingsensor.camera.posy</topicName>
+                <defaultValue>800</defaultValue>
+                <unit>mm</unit>
             </npar>
             <npar>
                 <ruid>posz</ruid>
@@ -81,6 +95,8 @@
                 <description>Position der Kamera entlang der z-Achse</description>
                 <imageURL>../../img/settings/parkingsensor/camera/posz.png</imageURL>
                 <topicName>settings.parkingsensor.camera.posz</topicName>
+                <defaultValue>0</defaultValue>
+                <unit>mm</unit>
             </npar>
             <npar>
                 <ruid>rotx</ruid>
@@ -88,6 +104,8 @@
                 <description>Rotation der Kamera um die x-Achse</description>
                 <imageURL>../../img/settings/parkingsensor/camera/rotx.png</imageURL>
                 <topicName>settings.parkingsensor.camera.rotx</topicName>
+                <defaultValue>20</defaultValue>
+                <unit>Grad</unit>
             </npar>
             <npar>
                 <ruid>roty</ruid>
@@ -95,6 +113,8 @@
                 <description>Rotation der Kamera um die y-Achse</description>
                 <imageURL>../../img/settings/parkingsensor/camera/roty.png</imageURL>
                 <topicName>settings.parkingsensor.camera.roty</topicName>
+                <defaultValue>0</defaultValue>
+                <unit>Grad</unit>
             </npar>
             <npar>
                 <ruid>rotz</ruid>
@@ -102,6 +122,8 @@
                 <description>Rotation der Kamera um die z-Achse</description>
                 <imageURL>../../img/settings/parkingsensor/camera/rotz.png</imageURL>
                 <topicName>settings.parkingsensor.camera.rotz</topicName>
+                <defaultValue>0</defaultValue>
+                <unit>Grad</unit>
             </npar>
             <npar>
                 <ruid>hres</ruid>
@@ -109,6 +131,8 @@
                 <description>Horizontale Auflösung der Kamera</description>
                 <imageURL>../../img/settings/parkingsensor/camera/hres.png</imageURL>
                 <topicName>settings.parkingsensor.camera.hres</topicName>
+                <defaultValue>640</defaultValue>
+                <unit>Pixel</unit>
             </npar>
             <npar>
                 <ruid>vres</ruid>
@@ -116,6 +140,8 @@
                 <description>Vertikale Auflösung der Kamera</description>
                 <imageURL>../../img/settings/parkingsensor/camera/vres.png</imageURL>
                 <topicName>settings.parkingsensor.camera.vres</topicName>
+                <defaultValue>480</defaultValue>
+                <unit>Pixel</unit>
             </npar>
             <npar>
                 <ruid>haov</ruid>
@@ -123,6 +149,8 @@
                 <description>Horizontaler Kamerabildwinkel (gemessen in Grad)</description>
                 <imageURL>../../img/settings/parkingsensor/camera/haov.png</imageURL>
                 <topicName>settings.parkingsensor.camera.haov</topicName>
+                <defaultValue>106</defaultValue>
+                <unit>Grad</unit>
             </npar>
             <npar>
                 <ruid>vaov</ruid>
@@ -130,6 +158,8 @@
                 <description>Vertikaler Kamerabildwinkel (gemessen in Grad)</description>
                 <imageURL>../../img/settings/parkingsensor/camera/vaov.png</imageURL>
                 <topicName>settings.parkingsensor.camera.vaov</topicName>
+                <defaultValue>90</defaultValue>
+                <unit>Grad</unit>
             </npar>
         </dir>
     </dir>
