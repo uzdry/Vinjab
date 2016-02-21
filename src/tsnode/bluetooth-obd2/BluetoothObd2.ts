@@ -32,7 +32,7 @@ class BluetoothObd2 extends BusDevice{
     '010D',
     '010F',
     '0110',
-    '010F',
+    '011F',
     '0111',
     '012F',
     '013C',

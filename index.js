@@ -13,3 +13,4 @@ var aggregatedFunctions = [new AggregatedFunctions_1.Distance(), new AggregatedF
 var server = new Server_1.Server();
 /** Start the bluetooth-obd receiver */
 var bluetooth = new BluetoothObd2_1.BluetoothObd2();
+//# sourceMappingURL=index.js.map
