@@ -17,11 +17,11 @@ class ParkingSensorStarter {
     start() {
         var reqmsg1 = new SettingsData.SettingsData(null, true, false);
         this.mysub = postal.channel(PSConstants.db2psChannel).subscribe(PSConstants.db2psTopic, this.onMessageReceived.bind(this));
-        postal.channel(PSConstants.ps2dbChannel).publish(PSConstants.ps2dbTopic, reqmsg1);
+        postal.channel(PSConstants.ps2dbChannel).publish(PSConstants.ps2dbTopic, reqmsg1.stringifyMe());
     }
 
     onMessageReceived(data) : void {
-        var msg = (<SettingsData.SettingsData>data);
+        var msg = SettingsData.SettingsData.parseMe(data);
 
         var tpc = "settings.parkingsensor.camera.posx";
         var buf = ParkingSensorStarter.getContainer(msg, tpc);
