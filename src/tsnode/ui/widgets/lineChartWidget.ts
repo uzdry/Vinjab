@@ -118,13 +118,14 @@ class LineChartWidget extends Widget{
 
         this.counter = 0;
 
+        this.startingData.datasets[0].data = this.chart.datasets[0].points;
+
         this.chart.destroy();
 
         this.init();
 
+        this.factor = Math.round(2 * (200 / size_x )) * 10;
 
-        this.factor = (size_x / 10);
-        console.log("factor " + this.factor);
     }
 
     destroy(){

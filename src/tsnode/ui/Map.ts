@@ -35,7 +35,7 @@ class GoogleMapWidget extends Widget {
         this.widgetID = this.typeID + "-" + this.model.get("tagName") + "-" + GoogleMapWidget.widgetCounter;
         GoogleMapWidget.widgetCounter++;
 
-        this.htmlElement = '<li id="' + this.widgetID + '"><div ></div></li>';
+        this.htmlElement = '<li><div id=\"' + this.widgetID  + '\" style="width: 100%; height: 100%"><div id="map' + this.widgetID + '" style="height: 230px; width: 230px"></div></div></li>';
         /*
         this.htmlElement = '<li id="' + this.widgetID + '">' +
             '<div></div>' +
@@ -75,6 +75,9 @@ class GoogleMapWidget extends Widget {
     }
 
     resize(size_x:number, size_y:number) {
+        var map = document.getElementById("map" + this.widgetID);
+        map.style.setProperty("width", (size_x * 1.1) + "px");
+        map.style.setProperty("height", (size_y * 1.1) + "px");
         google.maps.event.trigger(this.map, "resize");
     }
 
@@ -84,7 +87,7 @@ class GoogleMapWidget extends Widget {
     }
 
     initMap() {
-        this.map = new google.maps.Map(document.getElementById(this.widgetID), {
+        this.map = new google.maps.Map(document.getElementById("map" + this.widgetID), {
             center: new google.maps.LatLng(49.013655, 8.4043383),
             zoom: 14,
             draggable: false
