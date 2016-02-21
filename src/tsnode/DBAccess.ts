@@ -389,7 +389,14 @@ class LevelDBAccess {
     public getSettings(callback) {
         this.db.get("SETTINGS", function(err, value) {
             if(err){
-                console.log(err);
+                if(err.notFound) {
+                    this.db.put("SETTINGS", "", function(err) {
+                        if(err) console.log(err);
+                    }.bind(this));
+                    callback("");
+                } else {
+                    console.log(err);
+                }
             } else {
                 callback(value)
             }
@@ -411,7 +418,7 @@ class DBBusDevice extends BusDevice {
     constructor() {
         super();
         this.dbAccess = new LevelDBAccess();
-        this.subscribe(Topic.SETTINGS_MSG);
+        this.subscribe(Topic.SETTINGS_REQ_MSG);
         this.subscribe(Topic.DBREQ_MSG);
         this.subscribe(Topic.DASHBOARD_MSG);
         this.subscribe(Topic.REPLAY_REQ);

@@ -38,6 +38,7 @@ class Terminal {
         var subreq = this.channelsub.subscribe("request.#", this.subscribeFromServer.bind(this));
         var unsubreq = this.channelsub.subscribe("stop.#", this.unsubscribeFromServer.bind(this));
 
+
         this.toServerChannel = postal.channel("toServer");
         var subToServer = this.toServerChannel.subscribe("#", this.toServer.bind(this));
 
@@ -46,36 +47,27 @@ class Terminal {
 
         this.connection.on('message', this.incomingMsg.bind(this));
 
-        //this.forwardSettingsMsg();
-
+        postal.channel('settingsREQ').subscribe(Topic.SETTINGS_REQ_MSG.name, this.handleSettingsRequest.bind(this));
     }
 
-    private forwardSettingsMsg() {
-      /*  postal.subscribe({
-            channel: TSConstants.db2stChannel,
-            topic: TSConstants.db2stTopic,
-            callback: function(data) {
-                console.log(data);
-            }
-        });*/
 
-
+    public handleSettingsRequest(data) {
+        console.log(data);
+        var msg = JSON.stringify(data);
+        this.connection.emit('message', msg);
     }
-
 
     public incomingMsg(msg) {
         var message = JSON.parse(msg);
 
         //setTimeout(this.synchronousPublish.bind(this), 0, message);
         this.channelval.publish(message.topic.name, message);
-
     }
 
     public synchronousPublish(message) {
         this.channelval.publish(message.topic.name, message);
-
-
     }
+
     /**
      * send a message to the server that is to be put on the bus
      * @param data the data that is to be send

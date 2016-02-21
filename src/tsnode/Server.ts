@@ -10,6 +10,7 @@ import {BusDevice} from "./Bus";
 import {Utils} from "./Utils";
 import {DashboardMessage} from "./messages";
 import {ReplayRequestMessage} from "./messages";
+import {SettingsRequestMessage} from "./messages";
 
 
 class Server extends BusDevice{
@@ -69,6 +70,7 @@ class Server extends BusDevice{
                     message = new ReplayRequestMessage(message.driverNr, message.callerID, message.startStop);
                 } else if (Utils.startsWith(message.topic.name, 'settings')) {
                     console.log("OK, dann halt");
+                    message = new SettingsRequestMessage(message.topic.name, message.readFromDB);
 
                 } else {
                     return;

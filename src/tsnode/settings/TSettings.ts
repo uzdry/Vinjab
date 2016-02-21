@@ -5,6 +5,14 @@
 /// <reference path="./SettingsData.ts"/>
 /// <reference path="./CompositeStructure.ts"/>
 
+import {Topic} from "../messages";
+import {Message} from "../messages";
+import {DashboardRspMessage} from "../messages";
+import {DashboardMessage} from "../messages";
+import {DBRequestMessage} from "../messages";
+import {SettingsRequestMessage} from "../messages";
+import {SettingsResponseMessage} from "../messages";
+
 /**
  * @author: David G.
  */
@@ -219,11 +227,11 @@ module TSettings {
 
         forcePoll() {
             postal.channel(TSConstants.st2dbChannel).publish(TSConstants.st2dbReadTopic,
-                new SettingsData.SettingsData(null, true, false).stringifyMe());
+                new SettingsRequestMessage((new SettingsData.SettingsData(null, true, false)).stringifyMe(), true));
         }
 
         onReceive(data) {
-            var msg = SettingsData.SettingsData.parseMe(data);
+            var msg = SettingsData.SettingsData.parseMe(data.settings);
             this.database = msg;
             if (true) {
                 this.receiveCount = true;
@@ -241,7 +249,7 @@ module TSettings {
 
         onSend() {
             postal.channel(TSConstants.st2dbChannel).publish(TSConstants.st2dbWriteTopic,
-                new SettingsData.SettingsData(this.database.getContainers(), false, false).stringifyMe());
+                new SettingsRequestMessage(new SettingsData.SettingsData(this.database.getContainers(), false, false).stringifyMe(), false));
         }
 
         getValueOf(topic : string) : SettingsData.SettingsContainer {
@@ -256,6 +264,8 @@ module TSettings {
     /**
      * A dummy database used only for test purposes to emulate the real database locally.
      */
+
+        /*
     export class DummyDatabase {
         private database : SettingsData.SettingsData = new SettingsData.SettingsData([], true, true);
 
@@ -267,7 +277,7 @@ module TSettings {
         }
 
         public postal_handleMessage(data) : void {
-            var msg = SettingsData.SettingsData.parseMe(data);
+            var msg = SettingsData.SettingsData.parseMe(data.settings);
             if (msg.isDirectionFromDB() == false) {
                 if (msg.isIORead()) {
 
@@ -277,7 +287,8 @@ module TSettings {
                     }
                     var newDatabase = new SettingsData.SettingsData(clones, true, true);
 
-                    postal.channel(TSConstants.db2stChannel).publish(TSConstants.db2stTopic, newDatabase.stringifyMe());
+                    postal.channel(TSConstants.db2stChannel).publish(TSConstants.db2stTopic,
+                        new SettingsResponseMessage(newDatabase.stringifyMe()));
                 } else {
                     var clones = [];
                     for (var i = 0; i < msg.getContainers().length; i++) {
@@ -287,7 +298,7 @@ module TSettings {
                 }
             }
         }
-    }
+    }*/
 
     /**
      * The static class that can be used to initialize this module.
@@ -317,15 +328,17 @@ module TSettings {
         public initialize() {
             var sm = new SettingsData.SettingsData(null, true, false);
             this.mysub = postal.channel(TSConstants.db2stChannel).subscribe(TSConstants.db2stTopic, this.dbCallBack.bind(this));
-            postal.channel(TSConstants.st2dbChannel).publish(TSConstants.st2dbReadTopic, sm.stringifyMe());
+            postal.channel(TSConstants.st2dbChannel).publish(TSConstants.st2dbReadTopic,
+                new SettingsRequestMessage(sm.stringifyMe(), true));
         }
 
         public dbCallBack(data) {
             postal.unsubscribe(this.mysub);
-            var msg = SettingsData.SettingsData.parseMe(data);
-            this.realDBState = msg;
+            var msg = SettingsData.SettingsData.parseMe(data.settings);
             this.messageBuffer = new TSettings.ClientSideBuffer(this.container);
-            if (msg.getContainers() == null || msg.getContainers().length != 15) {
+
+            this.realDBState = msg;
+            if (msg == null || data.settings == "" || msg.getContainers() == null) {
                 this.onDBInvalid();
             } else {
                 TSettings.Startup.initialize(div2, this.messageBuffer);
@@ -372,18 +385,19 @@ module TSettings {
 
             var sm = new SettingsData.SettingsData(scs, false, false);
 
-            postal.channel(TSConstants.st2dbChannel).publish(TSConstants.st2dbWriteTopic, sm.stringifyMe());
+            postal.channel(TSConstants.st2dbChannel).publish(TSConstants.st2dbWriteTopic,
+                new SettingsRequestMessage(sm.stringifyMe(), false));
             TSettings.Startup.initialize(div2, this.messageBuffer);
         }
     }
 
     export class TSConstants {
-        public static st2dbChannel = "settingsintern_st2db";
-        public static db2stChannel = "settingsintern_db2st";
+        public static st2dbChannel = "settingsREQ";
+        public static db2stChannel = "values";
 
-        public static st2dbReadTopic= "settings.intern_st2dbRead";
-        public static st2dbWriteTopic = "settings.intern_st2dbWrite";
-        public static db2stTopic = "settings.intern_db2st";
+        public static st2dbReadTopic= Topic.SETTINGS_REQ_MSG.name;
+        public static st2dbWriteTopic = Topic.SETTINGS_REQ_MSG.name;
+        public static db2stTopic = Topic.SETTINGS_RSP_MSG.name;
 
     }
 }
@@ -401,7 +415,7 @@ div2.style.padding = "20px";
 div1.appendChild(div2);
 
 
-var database = new TSettings.DummyDatabase();
+//var database = new TSettings.DummyDatabase();
 
 var rdbi = new TSettings.RemoteDatabaseInitializer(div2);
 rdbi.initialize();
