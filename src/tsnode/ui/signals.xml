@@ -6,8 +6,7 @@
         <name>Tacho</name>
         <description>Geschwindigkeit des Autos</description>
         <minValue>0</minValue>
-        <maxValue>220</maxValue>
-
+        <maxValue>220</maxValue> <!-- comment-->
         <widgets>
             <widget>gauge</widget>
             <widget>text widget</widget>
