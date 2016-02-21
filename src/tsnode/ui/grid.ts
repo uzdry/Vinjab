@@ -132,6 +132,7 @@ class Grid {
             line += JSON.stringify(conf) + ",";
 
         }
+        if(line === ']') return "[]";
 
         line = line.slice(0, -1) + "]";
 
