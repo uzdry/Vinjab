@@ -5,7 +5,7 @@ class TextWidgetConfig implements WidgetConfig{
 
     "type_name" = "TextWidget";
 
-    "display_name" = "Text Widget";
+    "display_name" = "text widget";
 
 
     newInstance(options):Widget {

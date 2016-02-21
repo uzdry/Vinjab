@@ -5,7 +5,7 @@ class PercentGaugeWidgetConfig implements WidgetConfig{
 
     "type_name" = "PercentGauge";
 
-    "display_name" = "Percentage Gauge";
+    "display_name" = "percent gauge";
 
 
     newInstance(options):Widget {

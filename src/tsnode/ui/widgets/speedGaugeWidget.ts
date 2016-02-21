@@ -10,7 +10,7 @@ class SpeedGaugeWidgetConfig implements WidgetConfig{
 
     "type_name" = "SpeedGauge";
 
-    "display_name" = "Speed Gauge";
+    "display_name" = "gauge";
 
     newInstance(options):Widget {
         return new SpeedGaugeWidget(options);
