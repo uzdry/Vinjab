@@ -237,28 +237,6 @@ class SettingsRequestMessage extends Message {
         this.settings = settings;
         this.readFromDB = readFromDB;
     }
-
-    stringifyMe() : string {
-        return this.settings;
-    }
-
-    static parseMe(input : string) : SettingsRequestMessage {
-        var splitted : string[] = input.split("|");
-        if (splitted[0] != "SettingsMessage[") {
-            return null;
-        }
-        if (splitted[1] != "read" && splitted[1] != "write") {
-            return null;
-        }
-        if (splitted[2] != "toDB") {
-            return null;
-        }
-        var readFromDB = true;
-        if (splitted[1] == "write") {
-            readFromDB = false;
-        }
-        return new SettingsRequestMessage(input, readFromDB);
-    }
 }
 
 class SettingsResponseMessage extends Message {
@@ -269,17 +247,6 @@ class SettingsResponseMessage extends Message {
         this.settings = settings;
     }
 
-    stringifyMe() : string {
-        return this.settings;
-    }
-
-    static parseMe(input : string) : SettingsResponseMessage {
-        var splitted : string[] = input.split("|");
-        if (splitted[0] != "SettingsMessage[") {
-            return null;
-        }
-        return new SettingsResponseMessage(input);
-    }
 }
 
 export {Topic, Message, ValueMessage, ReplayInfoMessage, ValueAnswerMessage, DBRequestMessage, ReplayValueMessage,

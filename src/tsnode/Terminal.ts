@@ -53,7 +53,8 @@ class Terminal {
 
     public handleSettingsRequest(data) {
         console.log(data);
-        //this.connection.emit('message', data);
+        var msg = JSON.stringify(data);
+        this.connection.emit('message', msg);
     }
 
     public incomingMsg(msg) {
