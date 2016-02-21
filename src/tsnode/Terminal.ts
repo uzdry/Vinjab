@@ -20,8 +20,6 @@ class Terminal {
 
     private channelval;
 
-    private channelSettings;
-
     private toServerChannel;
 
     private messageFromServer;
@@ -45,11 +43,10 @@ class Terminal {
 
 
         this.channelval = postal.channel("values");
-        this.channelSettings = postal.channel("settingsintern_db2st");
 
         this.connection.on('message', this.incomingMsg.bind(this));
 
-        this.forwardSettingsMsg();
+        //this.forwardSettingsMsg();
 
     }
 
@@ -63,26 +60,11 @@ class Terminal {
         });*/
 
 
-
-        var schan = postal.channel("settingsintern_st2db");
-        var sub = schan.subscribe("settings.intern_st2dbRead", function(data) {
-            console.log(data);
-            console.log(new SettingsRequestMessage(<string>data, true));
-        });
-
-        var sub2 = schan.subscribe("settings.intern_st2dbWrite", function(data) {
-            console.log(data);
-            console.log(new SettingsRequestMessage(<string>data, false));
-        });
     }
 
 
     public incomingMsg(msg) {
         var message = JSON.parse(msg);
-
-        if (message.getTopic() == Topic.SETTINGS_RSP_MSG) {
-            this.channelSettings.publish(message.topic.name, (<SettingsResponseMessage>message).settings);
-        }
 
         //setTimeout(this.synchronousPublish.bind(this), 0, message);
         this.channelval.publish(message.topic.name, message);
