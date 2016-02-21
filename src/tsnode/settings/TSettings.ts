@@ -389,12 +389,12 @@ module TSettings {
     }
 
     export class TSConstants {
-        public static st2dbChannel = "settingsintern_st2db";
-        public static db2stChannel = "settingsintern_db2st";
+        public static st2dbChannel = "settingsREQ";
+        public static db2stChannel = "values";
 
-        public static st2dbReadTopic= "settings.intern_st2dbRead";
-        public static st2dbWriteTopic = "settings.intern_st2dbWrite";
-        public static db2stTopic = "settings.intern_db2st";
+        public static st2dbReadTopic= Topic.SETTINGS_REQ_MSG.name;
+        public static st2dbWriteTopic = Topic.SETTINGS_REQ_MSG.name;
+        public static db2stTopic = Topic.SETTINGS_RSP_MSG.name;
 
     }
 }

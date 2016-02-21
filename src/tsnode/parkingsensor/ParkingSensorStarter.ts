@@ -154,11 +154,11 @@ class ParkingSensorStarter {
 }
 
 class PSConstants {
-    public static ps2dbChannel = "settingsintern_st2db";
-    public static db2psChannel = "settingsintern_db2st";
+    public static ps2dbChannel = "settingsREQ";
+    public static db2psChannel = "values";
 
-    public static ps2dbTopic = "settings.intern_st2db";
-    public static db2psTopic = "settings.intern_db2st";
+    public static ps2dbTopic = "settings request message";
+    public static db2psTopic = "settings response message";
 
 }
 

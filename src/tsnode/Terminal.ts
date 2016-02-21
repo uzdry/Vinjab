@@ -38,6 +38,7 @@ class Terminal {
         var subreq = this.channelsub.subscribe("request.#", this.subscribeFromServer.bind(this));
         var unsubreq = this.channelsub.subscribe("stop.#", this.unsubscribeFromServer.bind(this));
 
+
         this.toServerChannel = postal.channel("toServer");
         var subToServer = this.toServerChannel.subscribe("#", this.toServer.bind(this));
 
@@ -46,13 +47,13 @@ class Terminal {
 
         this.connection.on('message', this.incomingMsg.bind(this));
 
-        postal.channel('settingsintern_st2db').subscribe("settings.intern_st2dbRead", this.consoleOutSettingsMessage.bind(this));
-        postal.channel('settingsintern_st2db').subscribe("settings.intern_st2dbWrite", this.consoleOutSettingsMessage.bind(this));
+        postal.channel('settingsREQ').subscribe(Topic.SETTINGS_REQ_MSG.name, this.handleSettingsRequest.bind(this));
     }
 
 
-    public consoleOutSettingsMessage(data) {
+    public handleSettingsRequest(data) {
         console.log(data);
+        //this.connection.emit('message', data);
     }
 
     public incomingMsg(msg) {
@@ -64,9 +65,8 @@ class Terminal {
 
     public synchronousPublish(message) {
         this.channelval.publish(message.topic.name, message);
-
-
     }
+
     /**
      * send a message to the server that is to be put on the bus
      * @param data the data that is to be send
