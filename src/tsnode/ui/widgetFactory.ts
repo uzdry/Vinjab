@@ -4,6 +4,7 @@
 ///<reference path="dataModel.ts" />
 
 import {Dashboard} from "./dashboard";
+import {GoogleMapWidgetConfig} from "./Map";
 
 class WidgetFactory{
 
@@ -176,6 +177,7 @@ class WidgetFactory{
                     case "text widget": this.addWidget(name, new TextWidgetConfig()); break;
                     case "percent gauge": this.addWidget(name, new PercentGaugeWidgetConfig()); break;
                     case "line graph": this.addWidget(name, new LineChartWidgetConfig()); break;
+                    case "map": this.addWidget(name, new GoogleMapWidgetConfig()); break;
                     default: break;
                 }
             }

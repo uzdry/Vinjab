@@ -52,8 +52,8 @@
     <signal category="value.mass air flow">
         <name>MAF</name>
         <description>Luftmassenstrom</description>
-        <minValue></minValue>
-        <maxValue></maxValue>
+        <minValue>0</minValue>
+        <maxValue>300</maxValue>
 
         <widgets>
             <widget>gauge</widget>
@@ -61,12 +61,19 @@
             <widget>line graph</widget>
         </widgets>
 
-        <unit>gramm / sec</unit>
+        <ticks>
+            <tick>0</tick>
+            <tick>100</tick>
+            <tick>200</tick>
+            <tick>300</tick>
+        </ticks>
+
+        <unit>gramm/sec</unit>
     </signal>
     <signal category="value.coolant temperature">
         <name>Kuehhlertemp.</name>
         <description>Temperatur des Kühlers</description>
-        <minValue>0</minValue>
+        <minValue>40</minValue>
         <maxValue>130</maxValue>
 
         <widgets>
@@ -74,6 +81,12 @@
             <widget>text widget</widget>
             <widget>line graph</widget>
         </widgets>
+
+        <ticks>
+            <tick>40</tick>
+            <tick>90</tick>
+            <tick>130</tick>
+        </ticks>
 
         <unit>°C</unit>
     </signal>
@@ -172,6 +185,7 @@
             <widget>percent gauge</widget>
             <widget>text widget</widget>
             <widget>line graph</widget>
+            <widget>map</widget>
         </widgets>
 
         <unit>%</unit>

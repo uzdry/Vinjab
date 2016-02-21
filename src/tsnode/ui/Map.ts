@@ -5,7 +5,7 @@ class GoogleMapWidgetConfig implements WidgetConfig{
 
     "type_name" = "SurroundingsMap";
 
-    "display_name" = "Map of Surroundings";
+    "display_name" = "map of surrounding";
 
     newInstance(options):Widget {
         return new GoogleMapWidget(options);
