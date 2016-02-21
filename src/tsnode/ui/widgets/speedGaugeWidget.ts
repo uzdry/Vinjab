@@ -77,6 +77,8 @@ class SpeedGaugeWidget extends Widget{
 
         this.config.maxValue = this.model.get("maxValue");
 
+        this.config.minValue = this.model.get("minValue");
+
         if (this.model.get("ticks")) {
             this.config.majorTicks = this.model.get("ticks");
         }

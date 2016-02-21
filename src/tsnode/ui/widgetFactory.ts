@@ -127,8 +127,7 @@ class WidgetFactory{
             var minValue: number = parseInt(elements[i].getElementsByTagName("minValue")[0].textContent);
             var desc: string = elements[i].getElementsByTagName("description")[0].textContent;
             var unit: string = elements[i].getElementsByTagName("unit")[0].textContent;
-            var tickse = elements[i].getElementsByTagName("ticks"); //element ticks
-            var ticksv;
+            var tickse = elements[i].getElementsByTagName("ticks");
             var ticks = new Array<string>(); //ticks as string values
 
             var highlightse = elements[i].getElementsByTagName("highlight");
@@ -139,10 +138,12 @@ class WidgetFactory{
             var widgets: Array<{}> = new Array<{}>();
 
 
+            console.log(tickse[0].textContent);
             if (tickse[0]) {
-                ticksv = tickse[0].getElementsByTagName("tick");
-                for (var j = 0; j < ticksv.length; j++) {
-                    ticks.push(ticksv[j].textContent);
+                var n = parseInt(tickse[0].textContent);
+                var step = (maxValue - minValue) / (n- 1);
+                for (var j = 0; j < n; j++) {
+                    ticks.push((minValue + j * step) + "");
                 }
 
             }
@@ -181,9 +182,6 @@ class WidgetFactory{
                     default: break;
                 }
             }
-
-
-
             this.signalsDesc[tagName] = new SignalDescription(name, tagName, unit, maxValue, minValue, desc, ticks, highlights);
         }
         this.dashboard.updateSignalSelector(this.signalsDesc);
