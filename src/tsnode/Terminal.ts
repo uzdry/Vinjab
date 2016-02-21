@@ -101,7 +101,8 @@ class Terminal {
     }
 
     public unsubscribeFromServer(data) {
-        this.connection.emit('unsubscribe', data);
+      //  console.log("unsub" + data.sku);
+        this.connection.emit('unsubscribe', data.sku);
     }
 
 }

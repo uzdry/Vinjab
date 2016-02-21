@@ -192,7 +192,8 @@ class Dashboard{
             data: signalsData,
             selectText: "Select the Signal to be shown",
             onSelected: function(data){
-                dashboard.updateWidgetSelector(dashboard.widgetFactory.getOptions());
+                console.log(data);
+                dashboard.updateWidgetSelector(dashboard.widgetFactory.getOptions(data.selectedData.text));
             }
         });
     }
@@ -323,11 +324,11 @@ class DDSlickOptions{
 
 var terminal = new Terminal();
 var dashboard: Dashboard = new Dashboard();
-dashboard.widgetFactory.addWidget(new SpeedGaugeWidgetConfig());
-dashboard.widgetFactory.addWidget(new TextWidgetConfig());
-dashboard.widgetFactory.addWidget(new PercentGaugeWidgetConfig());
-dashboard.widgetFactory.addWidget(new LineChartWidgetConfig());
-dashboard.widgetFactory.addWidget(new GoogleMapWidgetConfig());
+dashboard.widgetFactory.addWidget("default", new SpeedGaugeWidgetConfig());
+dashboard.widgetFactory.addWidget("default", new TextWidgetConfig());
+dashboard.widgetFactory.addWidget("default", new PercentGaugeWidgetConfig());
+dashboard.widgetFactory.addWidget("default", new LineChartWidgetConfig());
+dashboard.widgetFactory.addWidget("default", new GoogleMapWidgetConfig());
 
 
 export {DDSlickOptions, Dashboard}

@@ -107,6 +107,8 @@ class Broker {
         var i = this.subscribers[topic].indexOf(sub);
         this.subscribers[topic].splice(i,1);
 
+        console.log(this.subscribers[topic]);
+
 
 
     }

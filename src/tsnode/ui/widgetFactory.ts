@@ -4,6 +4,7 @@
 ///<reference path="dataModel.ts" />
 
 import {Dashboard} from "./dashboard";
+import {GoogleMapWidgetConfig} from "./Map";
 
 class WidgetFactory{
 
@@ -11,7 +12,7 @@ class WidgetFactory{
     private signalsDesc: {[id: string]: SignalDescription;} = {};
     private signalsReady: boolean = false;
     /** All available widgets */
-    private widgetConfigurations: { [id: string] : WidgetConfig; } = {};
+    private widgetConfigurations: {[signal: string]:  { [id: string] : WidgetConfig; };} = {};
     private widgetsReady: boolean = false;
 
     /** Used DataCollection */
@@ -31,6 +32,7 @@ class WidgetFactory{
     constructor(dataCollection: DataCollection, dashboard: Dashboard){
         this.dataCollection = dataCollection;
         this.dashboard = dashboard;
+        this.widgetConfigurations["default"] = {};
         this.getSignalsInit();
     }
 
@@ -43,7 +45,7 @@ class WidgetFactory{
      * @returns {Widget} The created Widget
      */
     createWidget(widgetTagName: string, signal: string, options?): Widget{
-        var widgetConfig = this.widgetConfigurations[widgetTagName];
+        var widgetConfig = this.widgetConfigurations["default"][widgetTagName];
         var signalConfig = this.signalsDesc[signal];
         var model: Model = this.dataCollection.getOrCreate(signalConfig);
 
@@ -63,17 +65,22 @@ class WidgetFactory{
      * to be used by several values
      * @param widgetConfig The config thats to be used
      */
-    addWidget(widgetConfig: WidgetConfig){
+    addWidget(signal: string, widgetConfig: WidgetConfig){
         console.log(widgetConfig.type_name);
-        this.widgetConfigurations[widgetConfig.type_name] = widgetConfig;
+
+        if (!this.widgetConfigurations[signal]) {
+            this.widgetConfigurations[signal] = {};
+        }
+
+        this.widgetConfigurations[signal][widgetConfig.type_name] = widgetConfig;
     }
 
     /**
      * Return all the available widget options
      * @returns {{}} A map of the options
      */
-    getOptions():{ [id: string] : WidgetConfig;}{
-        return this.widgetConfigurations;
+    getOptions(signal: string):{ [id: string] : WidgetConfig;}{
+        return this.widgetConfigurations[signal];
     }
 
     /**
@@ -128,6 +135,9 @@ class WidgetFactory{
             var highlightsv;
             var highlights: Array<{}> = new Array<{}>();
 
+            var widgetse = elements[i].getElementsByTagName("widget");
+            var widgets: Array<{}> = new Array<{}>();
+
 
             if (tickse[0]) {
                 ticksv = tickse[0].getElementsByTagName("tick");
@@ -152,6 +162,24 @@ class WidgetFactory{
                 var colorRGB = h.getElementsByTagName("color")[0].textContent;
 
                 highlights.push({start: startValue, end: endValue, color: colorRGB});
+            }
+
+            for (var j = 0; j < widgetse.length; j++) {
+                /*  var h: string = highlightse[j].textContent;
+                 var sepI: number = h.indexOf(";");
+                 var sepC : number = h.indexOf(":");
+                 highlights[j] = {start: parseInt(h.substring(0, sepI)), end: parseInt(h.substring(sepI + 1, sepC)), color: h.substring(sepC + 1, h.length).split(' ').join('')}*/
+
+                var h = widgetse[j].textContent;
+
+                switch (h) {
+                    case "gauge": this.addWidget(name, new SpeedGaugeWidgetConfig()); break;
+                    case "text widget": this.addWidget(name, new TextWidgetConfig()); break;
+                    case "percent gauge": this.addWidget(name, new PercentGaugeWidgetConfig()); break;
+                    case "line graph": this.addWidget(name, new LineChartWidgetConfig()); break;
+                    case "map": this.addWidget(name, new GoogleMapWidgetConfig()); break;
+                    default: break;
+                }
             }
 
 
