@@ -17,6 +17,8 @@
             <topicName>settings.car.wheelbase</topicName>
             <defaultValue>4000</defaultValue>
             <unit>mm</unit>
+            <minValue>1</minValue>
+            <maxValue>18000</maxValue>
         </npar>
         <npar>
             <ruid>axletrack</ruid>
@@ -26,6 +28,8 @@
             <topicName>settings.car.axletrack</topicName>
             <defaultValue>1300</defaultValue>
             <unit>mm</unit>
+            <minValue>1</minValue>
+            <maxValue>4000</maxValue>
         </npar>
         <npar>
             <ruid>steeringratio</ruid>
@@ -35,6 +39,8 @@
             <topicName>settings.car.steeringratio</topicName>
             <defaultValue>20</defaultValue>
             <unit>Verhältnis</unit>
+            <minValue>0.01</minValue>
+            <maxValue>1000</maxValue>
         </npar>
         <npar>
             <ruid>fueltankwarning</ruid>
@@ -44,7 +50,34 @@
             <topicName>settings.car.fueltankwarning</topicName>
             <defaultValue>8</defaultValue>
             <unit>%</unit>
+            <minValue>0</minValue>
+            <maxValue>100</maxValue>
         </npar>
+        <lpar>
+            <ruid>fueltype</ruid>
+            <name>Kraftstoffart</name>
+            <description>Kraftstoff, der zum Antrieb vom Fahrzeug verwendet wird.</description>
+            <imageURL>../../img/settings/car/fueltype.png</imageURL>
+            <topicName>settings.car.fueltype</topicName>
+            <defaultValue>0</defaultValue>
+            <unit> </unit>
+            <option>
+                <id>0</id>
+                <name>Super</name>
+            </option>
+            <option>
+                <id>1</id>
+                <name>Super E10</name>
+            </option>
+            <option>
+                <id>2</id>
+                <name>Super Plus</name>
+            </option>
+            <option>
+                <id>3</id>
+                <name>Diesel</name>
+            </option>
+        </lpar>
     </dir>
     <dir>
         <ruid>database</ruid>
@@ -59,6 +92,8 @@
             <topicName>settings.database.dbcapacity</topicName>
             <defaultValue>999</defaultValue>
             <unit>Stück</unit>
+            <minValue>1</minValue>
+            <maxValue>2000000000</maxValue>
         </npar>
     </dir>
     <dir>
@@ -79,6 +114,8 @@
                 <topicName>settings.parkingsensor.camera.posx</topicName>
                 <defaultValue>0</defaultValue>
                 <unit>mm</unit>
+                <minValue>-100000</minValue>
+                <maxValue>100000</maxValue>
             </npar>
             <npar>
                 <ruid>posy</ruid>
@@ -88,6 +125,8 @@
                 <topicName>settings.parkingsensor.camera.posy</topicName>
                 <defaultValue>800</defaultValue>
                 <unit>mm</unit>
+                <minValue>1</minValue>
+                <maxValue>100000</maxValue>
             </npar>
             <npar>
                 <ruid>posz</ruid>
@@ -97,6 +136,8 @@
                 <topicName>settings.parkingsensor.camera.posz</topicName>
                 <defaultValue>0</defaultValue>
                 <unit>mm</unit>
+                <minValue>-100000</minValue>
+                <maxValue>100000</maxValue>
             </npar>
             <npar>
                 <ruid>rotx</ruid>
@@ -105,6 +146,8 @@
                 <imageURL>../../img/settings/parkingsensor/camera/rotx.png</imageURL>
                 <topicName>settings.parkingsensor.camera.rotx</topicName>
                 <defaultValue>20</defaultValue>
+                <minValue>-180</minValue>
+                <maxValue>180</maxValue>
                 <unit>Grad</unit>
             </npar>
             <npar>
@@ -114,6 +157,8 @@
                 <imageURL>../../img/settings/parkingsensor/camera/roty.png</imageURL>
                 <topicName>settings.parkingsensor.camera.roty</topicName>
                 <defaultValue>0</defaultValue>
+                <minValue>-180</minValue>
+                <maxValue>180</maxValue>
                 <unit>Grad</unit>
             </npar>
             <npar>
@@ -124,6 +169,8 @@
                 <topicName>settings.parkingsensor.camera.rotz</topicName>
                 <defaultValue>0</defaultValue>
                 <unit>Grad</unit>
+                <minValue>-180</minValue>
+                <maxValue>180</maxValue>
             </npar>
             <npar>
                 <ruid>hres</ruid>
@@ -133,6 +180,8 @@
                 <topicName>settings.parkingsensor.camera.hres</topicName>
                 <defaultValue>640</defaultValue>
                 <unit>Pixel</unit>
+                <minValue>1</minValue>
+                <maxValue>4096</maxValue>
             </npar>
             <npar>
                 <ruid>vres</ruid>
@@ -142,6 +191,8 @@
                 <topicName>settings.parkingsensor.camera.vres</topicName>
                 <defaultValue>480</defaultValue>
                 <unit>Pixel</unit>
+                <minValue>1</minValue>
+                <maxValue>3072</maxValue>
             </npar>
             <npar>
                 <ruid>haov</ruid>
@@ -151,6 +202,8 @@
                 <topicName>settings.parkingsensor.camera.haov</topicName>
                 <defaultValue>106</defaultValue>
                 <unit>Grad</unit>
+                <minValue>1</minValue>
+                <maxValue>150</maxValue>
             </npar>
             <npar>
                 <ruid>vaov</ruid>
@@ -160,6 +213,8 @@
                 <topicName>settings.parkingsensor.camera.vaov</topicName>
                 <defaultValue>90</defaultValue>
                 <unit>Grad</unit>
+                <minValue>1</minValue>
+                <maxValue>150</maxValue>
             </npar>
         </dir>
     </dir>

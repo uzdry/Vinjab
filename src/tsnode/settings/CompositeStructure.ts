@@ -7,6 +7,11 @@
 
 
 import SettingsContainer = SettingsData.SettingsContainer;
+
+enum SettingsType {
+    directory, nparameter, lparameter
+}
+
 /**
  * A settings directory that can contain parameters or other directories.
  */
@@ -156,12 +161,8 @@ class SettingsDirectory implements SettingsNode{
         return this.description;
     }
 
-    /**
-     * Checks whether this node is a directory.
-     * @returns {boolean} True.
-     */
-    isDirectory() {
-        return true;
+    getType() : SettingsType {
+        return SettingsType.directory;
     }
 
     /**
@@ -181,10 +182,171 @@ class SettingsDirectory implements SettingsNode{
     }
 }
 
+class SettingsLParameterOption {
+
+    private id : number;
+    private option : string;
+
+    constructor (id : number, option : string) {
+        this.id = id;
+        this.option = option;
+    }
+
+    getID() : number {
+        return this.id;
+    }
+
+    getName() : string {
+        return this.option;
+    }
+}
+class SettingsLParameter implements SettingsNode {
+    private name : string;
+    private description : string;
+    private parent : SettingsDirectory;
+    private ruid : string;
+    private imageURL : string;
+    private settingsContainer : SettingsData.SettingsContainer;
+    private options : SettingsLParameterOption[];
+    private clientSideBuffer : TSettings.ClientSideBuffer;
+    private container : Node;
+    private unit : string;
+    private view : HTMLSelectElement = null;
+
+    public constructor(ruid : string, name : string, description : string, imageURL : string,
+                       unit : string, defaultValue : SettingsContainer, options : SettingsLParameterOption[],
+                       clientSideBuffer : TSettings.ClientSideBuffer, container : Node) {
+        this.name = name;
+        this.description = description;
+        this.ruid = ruid;
+        this.imageURL = imageURL;
+        this.settingsContainer = defaultValue;
+        this.options = options;
+        this.clientSideBuffer = clientSideBuffer;
+        this.container = container;
+        this.unit = unit;
+    }
+
+    getOptions() : SettingsLParameterOption[] {
+        return this.options;
+    }
+
+    getUnit() : string {
+        return this.unit;
+    }
+
+    /**
+     * Settings the actual value of this parameter (that is set in the GUI).
+     * Does not change the original value of this parameter that is in the DB.
+     * @param value The new actual value of this parameter.
+     */
+    setValue(value : number) {
+        this.settingsContainer = new SettingsData.SettingsContainer(this.settingsContainer.getTopic(),
+            value, this.settingsContainer.getDescription());
+        this.clientSideBuffer.setValueOf(this.settingsContainer);
+    }
+
+    setView(view : HTMLSelectElement) {
+        this.view = view;
+    }
+
+    pollFromDBRecursively() {
+        this.settingsContainer = this.clientSideBuffer.getValueOf(this.settingsContainer.getTopic());
+        if (this.view != null) {
+            this.view.selectedIndex = this.settingsContainer.getValue();
+        }
+    }
+
+    /**
+     * Gets the value of this parameter that is currently stored in the DB.
+     * @returns {number} The value of this parameter that is currently stored in the DB.
+     */
+    getValue() : number {
+        return this.settingsContainer.getValue();
+    }
+
+    /**
+     * Gets the URL of the image of this parameter that is to be displayed in the GUI.
+     * @returns {string} The URL of the image of this parameter.
+     */
+    getImageURL() {
+        return this.imageURL;
+    }
+
+    getTopic() : string {
+        return this.settingsContainer.getTopic();
+    }
+
+    /**
+     * Gets the full unique ID of this parameter.
+     * All the nodes (directories/parameters...) have a unique Uid.
+     * @returns {string} The unique ID of this parameter.
+     */
+    getFullUid() {
+        return this.parent.getFullUid() + '.' + this.ruid;
+    }
+
+    /**
+     * Gets the relatively unique ID of this parameter.
+     * @returns {string} The ruid of this parameter.
+     */
+    getRuid() {
+        return this.ruid;
+    }
+
+    /**
+     * Gets the elements of this node. Paramaters do not contain elements, so it returns null.
+     * @returns {null} Null.
+     */
+    getElements() {
+        return null;
+    }
+
+    getElementsRecursively(buffer : SettingsNode[]) : void {
+        return;
+    }
+
+    /**
+     * Gets the name of this parameter that is to be displayed in the GUI.
+     * @returns {string} The name of this parameter.
+     */
+    getName() {
+        return this.name;
+    }
+
+    /**
+     * Gets the description of this parameter that is to be displayed in the GUI.
+     * @returns {string} The description of this parameter.
+     */
+    getDescription() {
+        return this.description;
+    }
+
+    getType() : SettingsType {
+        return SettingsType.lparameter;
+    }
+
+    /**
+     * Sets the parent directory of this parameter.
+     * @param parent The new parent directory of this.
+     */
+    setParent(parent : SettingsDirectory) {
+        this.parent = parent;
+    }
+
+    /**
+     * Gets the parent directory of this.
+     * @returns {SettingsNode} The parent directory of this.
+     */
+    getParent() {
+        return this.parent;
+    }
+}
+
 /**
  * A settings parameter that can have multiple numeric values.
  */
-class SettingsParameter implements SettingsNode {
+class SettingsNParameter implements SettingsNode {
     private name : string;
     private description : string;
     private parent : SettingsDirectory;
@@ -194,6 +356,8 @@ class SettingsParameter implements SettingsNode {
     private clientSideBuffer : TSettings.ClientSideBuffer;
     private container : Node;
     private unit : string;
+    private minValue : number;
+    private maxValue : number;
     private view : HTMLInputElement = null;
 
 
@@ -207,7 +371,7 @@ class SettingsParameter implements SettingsNode {
      * @param value The original value of this settings parameter.
      */
     public constructor(ruid : string, name : string, description : string, imageURL : string,
-                       topic : string, unit : string, defaultValue : SettingsContainer,
+                       unit : string, defaultValue : SettingsContainer, minValue : string, maxValue : string,
                        clientSideBuffer : TSettings.ClientSideBuffer, container : Node) {
         this.name = name;
         this.description = description;
@@ -216,11 +380,26 @@ class SettingsParameter implements SettingsNode {
         this.settingsContainer = defaultValue;
         this.clientSideBuffer = clientSideBuffer;
         this.container = container;
+        this.minValue = parseFloat(minValue);
+        this.maxValue = parseFloat(maxValue);
+        if (this.settingsContainer.getValue() < this.getMinValue()) {
+            this.setValue(this.getMinValue());
+        } else if (this.settingsContainer.getValue() > this.getMaxValue()) {
+            this.setValue(this.getMaxValue());
+        }
         this.unit = unit;
     }
 
     getUnit() : string {
         return this.unit;
+    }
+
+    getMinValue() : number {
+        return this.minValue;
+    }
+
+    getMaxValue() : number {
+        return this.maxValue;
     }
 
     /**
@@ -310,12 +489,8 @@ class SettingsParameter implements SettingsNode {
         return this.description;
     }
 
-    /**
-     * Checks whether this node is a directory.
-     * @returns {boolean} False.
-     */
-    isDirectory() {
-        return false;
+    getType() : SettingsType {
+        return SettingsType.nparameter;
     }
 
     /**
@@ -378,11 +553,7 @@ interface SettingsNode {
 
     getElementsRecursively(buffer : SettingsNode[]) : void;
 
-    /**
-     * Checks whether this node is a directory.
-     * @returns {boolean} Yes if this is a directory, false else.
-     */
-    isDirectory() : boolean;
+    getType() : SettingsType;
 
     /**
      * Sets the parent directory of this node.
