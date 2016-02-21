@@ -6,8 +6,7 @@
         <name>Tacho</name>
         <description>Geschwindigkeit des Autos</description>
         <minValue>0</minValue>
-        <maxValue>220</maxValue>
-
+        <maxValue>220</maxValue> <!-- comment-->
         <widgets>
             <widget>gauge</widget>
             <widget>text widget</widget>
@@ -15,18 +14,8 @@
         </widgets>
 
         <ticks>
-            <tick>0</tick>
-            <tick>20</tick>
-            <tick>40</tick>
-            <tick>60</tick>
-            <tick>80</tick>
-            <tick>100</tick>
-            <tick>120</tick>
-            <tick>140</tick>
-            <tick>160</tick>
-            <tick>180</tick>
-            <tick>200</tick>
-            <tick>220</tick>
+            <major>12</major>
+            <minor>5</minor>
         </ticks>
 
         <highlights>
@@ -60,20 +49,16 @@
             <widget>text widget</widget>
             <widget>line graph</widget>
         </widgets>
-
         <ticks>
-            <tick>0</tick>
-            <tick>100</tick>
-            <tick>200</tick>
-            <tick>300</tick>
+            <major>4</major>
+            <minor>2</minor>
         </ticks>
-
         <unit>gramm/sec</unit>
     </signal>
     <signal category="value.coolant temperature">
-        <name>Kuehhlertemp.</name>
+        <name>Kühlwasser</name>
         <description>Temperatur des Kühlers</description>
-        <minValue>40</minValue>
+        <minValue>50</minValue>
         <maxValue>130</maxValue>
 
         <widgets>
@@ -83,9 +68,8 @@
         </widgets>
 
         <ticks>
-            <tick>40</tick>
-            <tick>90</tick>
-            <tick>130</tick>
+            <major>3</major>
+            <minor>2</minor>
         </ticks>
 
         <unit>°C</unit>
@@ -110,15 +94,8 @@
         <minValue>0</minValue>
         <maxValue>8000</maxValue>
         <ticks>
-            <tick>0</tick>
-            <tick>1000</tick>
-            <tick>2000</tick>
-            <tick>3000</tick>
-            <tick>4000</tick>
-            <tick>5000</tick>
-            <tick>6000</tick>
-            <tick>7000</tick>
-            <tick>8000</tick>
+            <major>9</major>
+            <minor>15</minor>
         </ticks>
         <highlights>
             <highlight>
@@ -149,11 +126,14 @@
         <unit>degree</unit>
     </signal>
     <signal category="value.intake air temperature">
-        <name>Lufttemp.</name>
-        <description>Temperatur der eingezogenen Luft</description>
+        <name>Ansaugluft</name>
+        <description>Temperatur der Ansaugluft</description>
         <minValue>0</minValue>
-        <maxValue>60</maxValue>
-
+        <maxValue>100</maxValue>
+        <ticks>
+            <major>4</major>
+            <minor>2</minor>
+        </ticks>
         <widgets>
             <widget>gauge</widget>
             <widget>text widget</widget>
@@ -164,7 +144,7 @@
     </signal>
     <signal category="value.engine runtime">
         <name>Motorlaufzeit</name>
-        <description>Zeit seit dem letzten Start des Motors</description>
+        <description>Zeit seit dem letzten Motorstart</description>
         <minValue>0</minValue>
         <maxValue>3600</maxValue>
 
@@ -180,6 +160,11 @@
         <description>Aktueller Tankfüllstand</description>
         <minValue>0</minValue>
         <maxValue>100</maxValue>
+
+        <ticks>
+            <major>4</major>
+            <minor>2</minor>
+        </ticks>
 
         <widgets>
             <widget>percent gauge</widget>

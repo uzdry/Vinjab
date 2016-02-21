@@ -278,12 +278,6 @@ class TableFactory {
                 actualRowNode.setValue(this.selectedIndex);
             };
 
-            /*input.value = '' + actualRowNode.getValue();
-            (<SettingsNParameter>actualRowNode).setView(input);
-            input.onchange = function() {
-                actualRowNode.setValue(this.value);
-                //changeListener.valueChanged(fullUid, this.value, actualRowNode.getValue());
-            };*/
             form.appendChild(select);
             td.appendChild(form);
             td.style.width = this.styleConstants.valueInputColumnWidth;

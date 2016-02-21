@@ -48,24 +48,33 @@ class BusDevice {
 
 }
 
+/**
+ * A Simple Broker tackeling subscriptions of topics and distributing messages accordingly
+ */
 class Broker {
 
 
-    private static instance:Broker;
+    private static instance:Broker = new Broker();
   //  private subs: Map<string, Set<BusDevice>>;
 
-    private subscribers: { [topic:string]:Array<BusDevice>; };
+    private subscribers: { [topic:string]:Array<BusDevice>; } = {};
 
+    /**
+     * For internal calls only
+     */
     constructor() {
      //   this.subs = new Map<string, Set<BusDevice>>();
-        this.subscribers = {};
-
+        if (Broker.instance) {
+            throw new Error("Error: Instantiation failed: Use SingletonDemo.get() instead of new.");
+        }
+        Broker.instance = this;
     }
 
+    /**
+     * This class should only be initialized once;
+     * @returns {Broker} instance of a broker;
+     */
     public static get():Broker {
-        if (Broker.instance == null || typeof Broker.instance == undefined) {
-            Broker.instance = new Broker();
-        }
         return Broker.instance;
     }
 
@@ -107,7 +116,6 @@ class Broker {
         var i = this.subscribers[topic].indexOf(sub);
         this.subscribers[topic].splice(i,1);
 
-        console.log(this.subscribers[topic]);
 
 
 

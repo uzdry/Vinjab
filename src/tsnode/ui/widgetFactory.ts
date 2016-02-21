@@ -127,9 +127,10 @@ class WidgetFactory{
             var minValue: number = parseInt(elements[i].getElementsByTagName("minValue")[0].textContent);
             var desc: string = elements[i].getElementsByTagName("description")[0].textContent;
             var unit: string = elements[i].getElementsByTagName("unit")[0].textContent;
-            var tickse = elements[i].getElementsByTagName("ticks"); //element ticks
-            var ticksv;
+            var tickse = elements[i].getElementsByTagName("major");
+            var ticksmine = elements[i].getElementsByTagName("minor");
             var ticks = new Array<string>(); //ticks as string values
+            var ticksmin;
 
             var highlightse = elements[i].getElementsByTagName("highlight");
             var highlightsv;
@@ -140,12 +141,17 @@ class WidgetFactory{
 
 
             if (tickse[0]) {
-                ticksv = tickse[0].getElementsByTagName("tick");
-                for (var j = 0; j < ticksv.length; j++) {
-                    ticks.push(ticksv[j].textContent);
+                var n = parseInt(tickse[0].textContent);
+                var step = (maxValue - minValue) / (n - 1);
+                for (var j = 0; j < n; j++) {
+                    ticks.push((minValue + j * step) + "");
                 }
-
             }
+
+            if (ticksmine[0]) {
+                ticksmin = parseInt(ticksmine[0].textContent);
+            }
+
 
 
 
@@ -164,6 +170,7 @@ class WidgetFactory{
                 highlights.push({start: startValue, end: endValue, color: colorRGB});
             }
 
+            this.addWidget(name, new TextWidgetConfig());
             for (var j = 0; j < widgetse.length; j++) {
                 /*  var h: string = highlightse[j].textContent;
                  var sepI: number = h.indexOf(";");
@@ -174,17 +181,13 @@ class WidgetFactory{
 
                 switch (h) {
                     case "gauge": this.addWidget(name, new SpeedGaugeWidgetConfig()); break;
-                    case "text widget": this.addWidget(name, new TextWidgetConfig()); break;
                     case "percent gauge": this.addWidget(name, new PercentGaugeWidgetConfig()); break;
                     case "line graph": this.addWidget(name, new LineChartWidgetConfig()); break;
                     case "map": this.addWidget(name, new GoogleMapWidgetConfig()); break;
                     default: break;
                 }
             }
-
-
-
-            this.signalsDesc[tagName] = new SignalDescription(name, tagName, unit, maxValue, minValue, desc, ticks, highlights);
+            this.signalsDesc[tagName] = new SignalDescription(name, tagName, unit, maxValue, minValue, desc, ticks, ticksmin, highlights);
         }
         this.dashboard.updateSignalSelector(this.signalsDesc);
     }
@@ -204,10 +207,11 @@ class SignalDescription{
     minValue: number;
     description: string;
     ticks: string[];
+    ticksmin: number;
     highlights: {}[];
 
 
-    constructor(name:string, tagName: string, unit:string, maxValue:number, minValue:number, description:string, ticks:string[], highlights: {}[]) {
+    constructor(name:string, tagName: string, unit:string, maxValue:number, minValue:number, description:string, ticks:string[], ticksmin:number, highlights: {}[]) {
         this.tagName = tagName;
         this.name = name;
         this.unit = unit;
@@ -215,6 +219,7 @@ class SignalDescription{
         this.minValue = minValue;
         this.description = description;
         this.ticks = ticks;
+        this.ticksmin = ticksmin;
         this.highlights = highlights;
 
      //   console.log(highlights);
