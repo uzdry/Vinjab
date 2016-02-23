@@ -5,11 +5,12 @@
 
 //import {ValueMessage} from "../messages";
 //import {DBRequestMessage} from "../messages";
-import {Topic} from "../messages";
 class DataModel extends Backbone.Model{
 
     /** The subscription as object so that it can be accessed lateron */
     subscription: ISubscriptionDefinition<any>;
+
+    listeningWidgetsCNT = 0;
 
     /**
      * A Datamodel that contains the values received from the Server
@@ -71,5 +72,10 @@ class DataModel extends Backbone.Model{
             }
         });
         super.destroy();
+    }
+
+
+    public hasSubscribers() {
+
     }
 }

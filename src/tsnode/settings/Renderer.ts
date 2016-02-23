@@ -2,7 +2,6 @@
  * @author David G.
  */
 
-/// <reference path="./TextDebugger.ts"/>
 /// <reference path="./TSettings.ts"/>
 
 class StyleConstants {
@@ -60,7 +59,7 @@ class StyleConstants {
  */
 class TableFactory {
 
-    private valueChangeListener : ValueChangeListener;
+    private tableAlreadyCreated = false;
     private table : HTMLTableElement;
     private tableBody : HTMLElement;
 
@@ -70,14 +69,15 @@ class TableFactory {
     private backButton : HTMLTableCellElement;
     private styleConstants : StyleConstants = new StyleConstants;
 
+    private clientSideBuffer : TSettings.ClientSideBuffer;
     /**
      * Creates a new TableFactory.
      * @param container The HTML DOM object that should contain the table (not yet implemented).
      * @param valueChangeListener The object that logs the changes to be written back to the database (to be removed soon...).
      */
-    constructor (container : Node, valueChangeListener : ValueChangeListener) {
+    constructor (container : Node, clientSideBuffer : TSettings.ClientSideBuffer) {
         this.container = container;
-        this.valueChangeListener = valueChangeListener;
+        this.clientSideBuffer = clientSideBuffer;
     }
 
     setHoverColors(td : HTMLTableCellElement) : void {
@@ -119,8 +119,6 @@ class TableFactory {
 
         tr.style.height = this.styleConstants.tableRowHeight;
 
-        var valueChangeListener = this.valueChangeListener;
-
         if (rowId == 0) {
             this.backButton = null;
             if (actualDir.getParent() != actualDir) {
@@ -140,10 +138,12 @@ class TableFactory {
                 this.backButton.style.width = this.styleConstants.backButtonWidth;
                 this.backButton.style.backgroundColor = this.styleConstants.backButtonEnabledColor;
                 var container = this.container;
+
+                var tf = this;
                 this.backButton.onclick = function () {
                     var table = document.getElementById('settings_table');
                     container.removeChild(table);
-                    var t = new TableFactory(container, valueChangeListener);
+                    var t = new TableFactory(container, tf.clientSideBuffer);
                     t.createTable(actualDir.getParent());
                 };
                 var img = document.createElement('img');
@@ -168,11 +168,12 @@ class TableFactory {
         img.style.height = this.styleConstants.imageHeight;
         td.appendChild(img);
 
-        if (actualRowNode.isDirectory() && actualRowNode.getElements().length > 0) {
+        if (actualRowNode.getType() == SettingsType.directory && actualRowNode.getElements().length > 0) {
+            var tf = this;
             td.onclick = function () {
                 var table = document.getElementById('settings_table');
                 container.removeChild(table);
-                var t = new TableFactory(container, valueChangeListener);
+                var t = new TableFactory(container, tf.clientSideBuffer);
                 t.createTable(actualRowNode);
             };
         }
@@ -199,11 +200,9 @@ class TableFactory {
         innerTD = document.createElement('td');
 
         var ending = "";
-        if (actualRowNode.isDirectory()) {
+        if (actualRowNode.getType() == SettingsType.directory) {
             ending = ".*";
         }
-        //innerTD.innerHTML = "Debug | Topic Name → " + actualRowNode.getFullUid() + ending;
-
         innerTR.appendChild(innerTD);
         innerTBody.appendChild(innerTR);
 
@@ -211,14 +210,15 @@ class TableFactory {
 
         td.appendChild(innerTable);
 
-        if (actualRowNode.isDirectory()) {
+        if (actualRowNode.getType() == SettingsType.directory) {
             if (actualRowNode.getElements().length > 0) {
                 td.style.backgroundColor = this.styleConstants.nonEmptyFolderTextColumnBgColor;
                 var container = this.container;
+                var tf = this;
                 td.onclick = function () {
                     var table = document.getElementById('settings_table');
                     container.removeChild(table);
-                    var t = new TableFactory(container, valueChangeListener);
+                    var t = new TableFactory(container, tf.clientSideBuffer);
                     t.createTable(actualRowNode);
                 };
 
@@ -235,23 +235,7 @@ class TableFactory {
 
         td = document.createElement('td');
 
-        var fullUid = actualRowNode.getFullUid();
-
-        if (actualRowNode.isDirectory()) {
-            /*if (actualRowNode.getElements().length > 0) {
-                td.style.backgroundColor = this.styleConstants.nonEmptyFolderInputColumnBgColor;
-                var container = this.container;
-                td.onclick = function () {
-                    var table = document.getElementById('settings_table');
-                    container.removeChild(table);
-                    var t = new TableFactory(container, valueChangeListener);
-                    t.createTable(actualRowNode);
-                };
-            } else {
-                td.style.backgroundColor = this.styleConstants.emptyFolderInputColumnBgColor;
-            }*/
-        }
-        else {
+        if (actualRowNode.getType() == SettingsType.nparameter) {
             td.style.backgroundColor = this.styleConstants.valueInputColumnBgColor;
             var form = document.createElement('form');
             var input = document.createElement('input');
@@ -259,12 +243,42 @@ class TableFactory {
             input.style.height = this.styleConstants.valueNumericUpDownHeight;
             input.style.fontSize = this.styleConstants.valueNumericUpDownFontSize;
             input.style.width = this.styleConstants.valueNumericUpDownWidth;
-            input.value = '' + actualRowNode.getActualValue();
+            input.value = '' + actualRowNode.getValue();
+            var npar = (<SettingsNParameter>actualRowNode);
+            input.min = "" + npar.getMinValue();
+            input.max = "" + npar.getMaxValue();
+            (<SettingsNParameter>actualRowNode).setView(input);
             input.onchange = function() {
-                actualRowNode.setActualValue(this.value);
+                actualRowNode.setValue(this.value);
                 //changeListener.valueChanged(fullUid, this.value, actualRowNode.getValue());
             };
             form.appendChild(input);
+            td.appendChild(form);
+            td.style.width = this.styleConstants.valueInputColumnWidth;
+            tr.appendChild(td);
+        } else if (actualRowNode.getType() == SettingsType.lparameter) {
+            td.style.backgroundColor = this.styleConstants.valueInputColumnBgColor;
+            var form = document.createElement('form');
+            var select = document.createElement('select');
+
+            //input.type = 'number';
+            select.style.height = this.styleConstants.valueNumericUpDownHeight;
+            select.style.fontSize = this.styleConstants.valueNumericUpDownFontSize;
+            select.style.width = this.styleConstants.valueNumericUpDownWidth;
+            var lpar = (<SettingsLParameter>actualRowNode);
+            for (var i = 0; i < lpar.getOptions().length; i++) {
+                var opt = document.createElement("option");
+                opt.text = lpar.getOptions()[i].getName();
+                select.options.add(opt, lpar.getOptions()[i].getID());
+            }
+            select.selectedIndex = lpar.getValue();
+            lpar.setView(select);
+
+            select.onchange = function() {
+                actualRowNode.setValue(this.selectedIndex);
+            };
+
+            form.appendChild(select);
             td.appendChild(form);
             td.style.width = this.styleConstants.valueInputColumnWidth;
             tr.appendChild(td);
@@ -286,11 +300,13 @@ class TableFactory {
     createTable(actualSettingsNode : SettingsNode) {
         while (true) {
             var oldTable = document.getElementById('settings_table');
-            if (oldTable == undefined || oldTable == null) {
+            try {
+                this.container.removeChild(oldTable);
+            } catch (e) {
                 break;
             }
-            this.container.removeChild(oldTable);
         }
+        this.tableAlreadyCreated = true;
         this.table = document.createElement('table');
         this.table.id = 'settings_table';
         this.table.style.width = this.styleConstants.tableWidth;
@@ -326,17 +342,11 @@ class TableFactory {
             root = root.getParent();
         }
 
-        var valueChangeListener = this.valueChangeListener;
 
         var container = this.container;
+        var csb = this.clientSideBuffer;
         okbutton.onclick = function () {
-            var postal_message = valueChangeListener.postal_getSettingsWriteMessages();
-            root.actualValueStored();
-            var pch = postal.channel(TSConstants.st2dbChannel);
-            for (var i = 0; i < postal_message.length; i++) {
-                pch.publish(TSConstants.st2dbTopic, postal_message[i]);
-            }
-            TextDebugger.refreshData(null, container);
+            csb.onSend();
         };
 
         var tr = document.createElement('tr');
@@ -348,6 +358,44 @@ class TableFactory {
         td.style.alignItems = this.styleConstants.OKButtonCellAlign;
         td.style.backgroundColor = this.styleConstants.OKButtonCellBgColor;
         this.tableBody.appendChild(tr);
+
+
+        // Add load button //
+        var loadbutton : HTMLButtonElement;
+        loadbutton = document.createElement('button');
+        loadbutton.style.position = this.styleConstants.OKButtonPosition;
+        loadbutton.style.width = this.styleConstants.OKButtonWidth;
+        loadbutton.style.marginLeft = this.styleConstants.OKButtonMarginLeft;
+        loadbutton.style.height = this.styleConstants.OKButtonHeight;
+        loadbutton.style.fontSize = this.styleConstants.OKButtonFontSize;
+        loadbutton.appendChild(document.createTextNode('Load configuration!'));
+        loadbutton.style.cursor = "pointer";
+
+        var root = actualSettingsNode;
+        while (true) {
+            if (root == root.getParent()) {
+                break;
+            }
+            root = root.getParent();
+        }
+
+
+        var container = this.container;
+        var csb = this.clientSideBuffer;
+        loadbutton.onclick = function () {
+            csb.forcePoll();
+        };
+
+        var tr = document.createElement('tr');
+        var td = document.createElement('td');
+        td.colSpan = 4;
+        td.height = this.styleConstants.OKButtonRowHeight;
+        td.appendChild(loadbutton);
+        tr.appendChild(td);
+        td.style.alignItems = this.styleConstants.OKButtonCellAlign;
+        td.style.backgroundColor = this.styleConstants.OKButtonCellBgColor;
+        this.tableBody.appendChild(tr);
+
 
 
         this.table.appendChild(this.tableBody);

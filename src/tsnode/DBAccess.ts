@@ -1,4 +1,5 @@
 /// <reference path="../../typings/levelup/levelup.d.ts" />
+/// <reference path="../../typings/json-stable-stringify/json-stable-stringify.d.ts" />
 
 import levelup = require("levelup");
 import {BusDevice} from "./Bus";
@@ -7,6 +8,7 @@ import {ValueAnswerMessage, Value, ReplayRequestMessage, ReplayValueMessage, DBR
 import {ReplayInfoMessage, SettingsRequestMessage, SettingsResponseMessage} from "./messages";
 import {Utils} from "./Utils";
 import leveldown = require("leveldown");
+import stringify = require("json-stable-stringify");
 
 // The entry types that are to be written to the database:
 
@@ -76,8 +78,8 @@ class DBInfoEntry {
  * Instances of this class are serialized via JSON-stringify and written to the database.
  */
 class ValueEntryKey {
+    driveNr: string;
     time: number;
-    driveNr: number;
 
     /**
      * Initializes the entry key with a given drive# and Date object, which is then converted to ms.
@@ -87,7 +89,17 @@ class ValueEntryKey {
      */
     constructor(dnr:number, t: number) {
         this.time = t;
-        this.driveNr = dnr;
+        this.driveNr = this.stringpad(dnr);
+    }
+
+    private stringpad(n: number): string {
+        var s: string = "" + n;
+        var lzs = 10 - s.length;
+        while(lzs != 0) {
+            s = "0" + s;
+            lzs--;
+        }
+        return s;
     }
 }
 
@@ -97,12 +109,13 @@ class ValueEntryKey {
  */
 class ReplayInfo {
     finishTime: number[];
-
+    driveNr: number[];
     /**
      * Initializes an empty array that is to be filled for each drive individually
      */
     constructor() {
         this.finishTime = [];
+        this.driveNr = [];
     }
 }
 
@@ -117,6 +130,7 @@ class LevelDBAccess {
     private db;
     replayInfo: ReplayInfo;
     private driveBegin: number;
+    private deleteInProcess: boolean;
 
     /**
      * Initializes the LevelDBAccess.
@@ -125,6 +139,7 @@ class LevelDBAccess {
         // sets the begin of the current drive to the current Date in ms
         this.driveBegin = new Date().getTime();
 
+        this.deleteInProcess = false;
         // initializes or opens the LevelUP-instance on a specified path
         this.db = levelup('./testDB', function(err, db){
             if(err) console.log("Error in opening the Database: " + err);
@@ -139,7 +154,7 @@ class LevelDBAccess {
             if(err) {
                 if(err.notFound) {
                     this.DBInfo = new DBInfoEntry(10000000, 0);
-                    this.db.put("INFO", JSON.stringify(this.DBInfo), function(err) {
+                    this.db.put("INFO", stringify(this.DBInfo), function(err) {
                         if(err) console.log("Error in putting Entry: " + err);
                     });
                 } else {
@@ -147,7 +162,7 @@ class LevelDBAccess {
                 }
             } else {
                 this.DBInfo = new DBInfoEntry(JSON.parse(value).maxCapacity, JSON.parse(value).currentDrive + 1);
-                this.db.put("INFO", JSON.stringify(this.DBInfo), function(err) {
+                this.db.put("INFO", stringify(this.DBInfo), function(err) {
                     if(err) console.log("Error in putting Entry: " + err);
                 });
             }
@@ -164,16 +179,19 @@ class LevelDBAccess {
             if(key[0] == '{' && key[1] == '"') { //check if the string could be a JSON-String
                 var parsed = JSON.parse(key);
                 if (parsed.hasOwnProperty('time') && parsed.hasOwnProperty('driveNr')) {
-                    if(this.replayInfo.finishTime[parsed.driveNr] == null ||
-                        this.replayInfo.finishTime[parsed.driveNr] < parsed.time){
-                        this.replayInfo.finishTime[parsed.driveNr] = parsed.time;
+                    if(typeof this.replayInfo.finishTime[parseInt(parsed.driveNr)] == "undefined" ||
+                        this.replayInfo.finishTime[parseInt(parsed.driveNr)] < parsed.time){
+                        this.replayInfo.finishTime[parseInt(parsed.driveNr)] = parsed.time;
+                        this.replayInfo.driveNr[parseInt(parsed.driveNr)] = parseInt(parsed.driveNr);
                     }
                 }
             }
         }.bind(this)).on('end', function () {
-            while(this.replayInfo.finishTime[0] == null && this.replayInfo.finishTime.length != 0){
+            console.log(stringify(this.replayInfo));
+            /*while(this.replayInfo.finishTime[0] == null && this.replayInfo.finishTime.length != 0){
                 this.replayInfo.finishTime.shift();
-            }
+                this.replayInfo.driveNr.shift();
+            }*/
         }.bind(this));
         this.currentDriver = null;
     }
@@ -188,13 +206,16 @@ class LevelDBAccess {
         var key: ValueEntryKey = new ValueEntryKey(this.DBInfo.currentDrive,
             new Date().getTime() - this.driveBegin);
         //puts the value to the db with its key
-        this.db.put(JSON.stringify(key), JSON.stringify(new SensorValueEntry(topicID, value, unit)), {sync: true},
+        this.db.put(stringify(key), stringify(new SensorValueEntry(topicID, value, unit)), {sync: true},
             function(err) {
                 if (err) console.log("Error in putting Entry:" + err);
             });
         //increments the size variable and, if necessary, deletes entries from the db
         this.incrementSize();
-        this.deleteOnMaxCapacity();
+        if(!this.deleteInProcess) {
+            this.deleteInProcess = true;
+            this.deleteOnMaxCapacity();
+        }
     }
 
     /**
@@ -204,7 +225,7 @@ class LevelDBAccess {
      */
     putUserInfo(user: string, config: string) {
         this.deleteFromKey(user);
-        this.db.put(user, JSON.stringify(new UserInfoEntry(config)), {sync: true}, function(err) {
+        this.db.put(user, stringify(new UserInfoEntry(config)), {sync: true}, function(err) {
             if(err) console.log(err);
         });
     }
@@ -215,9 +236,10 @@ class LevelDBAccess {
     private deleteOnMaxCapacity() {
         if(this.DBInfo.size > this.DBInfo.maxCapacity) {
             var listOfKeys: any[] = [];
+            var lte = new ValueEntryKey(this.replayInfo.driveNr[0], this.replayInfo.finishTime[0]);
 
             //function on every item of the stream; adds all value keys to an array
-            this.db.createKeyStream().on('data', function(data){
+            this.db.createKeyStream({lte: lte}).on('data', function(data){
                 var key = data;
                 if(key[0] == '{' && key[1] == '"') { //check if the string could be a JSON-String
                     if(JSON.parse(data).hasOwnProperty('time') && JSON.parse(data).hasOwnProperty('driveNr')) {
@@ -234,6 +256,7 @@ class LevelDBAccess {
                     this.decrementSize();
                     i++;
                 }
+                this.deleteInProcess = false;
             }.bind(this));
         }
     }
@@ -259,7 +282,7 @@ class LevelDBAccess {
     private incrementSize() {
         this.DBInfo.size++;
         this.deleteFromKey("INFO");
-        this.db.put("INFO", JSON.stringify(this.DBInfo), {sync: true}, function(err){
+        this.db.put("INFO", stringify(this.DBInfo), {sync: true}, function(err){
             if(err){
                 console.log("Error in putting updated size to the Database: " + err)
             }
@@ -272,7 +295,7 @@ class LevelDBAccess {
     private decrementSize() {
         this.DBInfo.size--;
         this.deleteFromKey("INFO");
-        this.db.put("INFO", JSON.stringify(this.DBInfo), {sync: true}, function(err){
+        this.db.put("INFO", stringify(this.DBInfo), {sync: true}, function(err){
             if(err){
                 console.log("Error in putting updated size to the Database: " + err)
             }
@@ -292,11 +315,11 @@ class LevelDBAccess {
         var listOfKeys: ValueEntryKey[] = [];
         var listOfEntries: SensorValueEntry[] = [];
         if(drivenr >= 0) {
-            var lte = JSON.stringify(new ValueEntryKey(drivenr, endDate));
-            var gte = JSON.stringify(new ValueEntryKey(drivenr, beginDate));
+            var lte = stringify(new ValueEntryKey(drivenr, endDate));
+            var gte = stringify(new ValueEntryKey(drivenr, beginDate));
         } else if(drivenr == -1) {
-            var lte = JSON.stringify(new ValueEntryKey(this.DBInfo.currentDrive, endDate));
-            var gte = JSON.stringify(new ValueEntryKey(this.DBInfo.currentDrive, beginDate));
+            var lte = stringify(new ValueEntryKey(this.DBInfo.currentDrive, endDate));
+            var gte = stringify(new ValueEntryKey(this.DBInfo.currentDrive, beginDate));
         }
         this.db.createReadStream({gte: gte, lte: lte}).on('data', function (data) {
             var key = data.key;
@@ -306,7 +329,7 @@ class LevelDBAccess {
                     var sve = new SensorValueEntry(JSON.parse(data.value).topic, JSON.parse(data.value).value,
                                 JSON.parse(data.value).unit);
                     if (sve.topic == topicID || topicID == "value.*") {
-                        listOfKeys[listOfKeys.length] = new ValueEntryKey(parsed.driveNr, parsed.time);
+                        listOfKeys[listOfKeys.length] = new ValueEntryKey(parseInt(parsed.driveNr), parsed.time);
                         listOfEntries[listOfEntries.length] = sve;
                     }
                 }
@@ -366,7 +389,14 @@ class LevelDBAccess {
     public getSettings(callback) {
         this.db.get("SETTINGS", function(err, value) {
             if(err){
-                console.log(err);
+                if(err.notFound) {
+                    this.db.put("SETTINGS", "", function(err) {
+                        if(err) console.log(err);
+                    }.bind(this));
+                    callback("");
+                } else {
+                    console.log(err);
+                }
             } else {
                 callback(value)
             }
@@ -388,7 +418,7 @@ class DBBusDevice extends BusDevice {
     constructor() {
         super();
         this.dbAccess = new LevelDBAccess();
-        this.subscribe(Topic.SETTINGS_MSG);
+        this.subscribe(Topic.SETTINGS_REQ_MSG);
         this.subscribe(Topic.DBREQ_MSG);
         this.subscribe(Topic.DASHBOARD_MSG);
         this.subscribe(Topic.REPLAY_REQ);

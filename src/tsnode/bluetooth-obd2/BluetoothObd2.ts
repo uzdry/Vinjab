@@ -32,7 +32,7 @@ class BluetoothObd2 extends BusDevice{
     '010D',
     '010F',
     '0110',
-    '010F',
+    '011F',
     '0111',
     '012F',
     '013C',
@@ -96,12 +96,12 @@ class BluetoothObd2 extends BusDevice{
                 case '0D': value = new ValueMessage(Topic.SPEED, new Value(data.value, "km/h"));        break;
                 case '0F': value = new ValueMessage(Topic.INTAKE_TEMP, new Value(data.value, "C"));     break;
                 case '10': value = new ValueMessage(Topic.MAF, new Value(data.value, "grams/sec"));     break;
-                case '11': value = new ValueMessage(Topic.THROTTLE, new Value(data.value, "%"));        break;
+                case '11': value = new ValueMessage(Topic.THROTTLE, new Value(data.value, "percent"));        break;
                 case '1F': value = new ValueMessage(Topic.ENGINE_RUNTIME, new Value(data.value, "s"));  break;
-                case '2F': value = new ValueMessage(Topic.FUEL, new Value(data.value, "%"));            break;
+                case '2F': value = new ValueMessage(Topic.FUEL, new Value(data.value, "percent"));            break;
                 case '3C': value = new ValueMessage(Topic.CAT_TEMP, new Value(data.value, "C"));        break;
                 case '46': value = new ValueMessage(Topic.TEMP_OUT, new Value(data.value, "C"));        break;
-                case '49': value = new ValueMessage(Topic.ACCELERATOR, new Value(data.value, "%"));     break;
+                case '49': value = new ValueMessage(Topic.ACCELERATOR, new Value(data.value, "percent"));     break;
                 case '63': value = new ValueMessage(Topic.TORQUE, new Value(data.value, "NM"));         break;
                 case '67': value = new ValueMessage(Topic.COOLANT_TEMP, new Value(data.value, "C"));    break;
                 case '6B': value = new ValueMessage(Topic.EGT, new Value(data.value, "C"));             break;

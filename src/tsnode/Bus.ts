@@ -4,7 +4,9 @@
 import * as Msg from "./messages"
 
 
-//A BusDevice has access to the Bus
+/*
+Template class for a Device that has pub/sub acces to the bus
+ */
 class BusDevice {
     broker:Broker;
     id:number;
@@ -15,28 +17,48 @@ class BusDevice {
         this.broker = Broker.get();
     }
 
+    /**
+     * Handle Message on reception
+     * @param m Message
+     */
     public handleMessage(m:Msg.Message):void {
         this.abstractHandle();
     }
 
+    /**
+     * Template for abstraction
+     */
     private abstractHandle():void {
         throw new Error('This method is abstract and must be overridden');
     }
 
+    /**
+     * set subscription to Topic to to topuc
+     * @param t
+     */
     public subscribe(t: Msg.Topic) {
         this.broker.subscribe(t.name, this);
     }
 
+    /**
+     * set Subscription to alle "value." type topics
+     * @param topics
+     */
     public subscribeAll(topics: Msg.Topic[]): void {
         for (var i in topics) {
             this.broker.subscribe(topics[i].name, this);
         }
     }
 
+
     public unsubscribeAll() {
         this.broker.unsubscribeAll(this);
     }
 
+    /**
+     * kill subscription to given Topic
+     * @param t
+     */
     public unsubscribe(t:Msg.Topic) {
         this.broker.unsubscribe(t.name, this);
     }
@@ -48,24 +70,33 @@ class BusDevice {
 
 }
 
+/**
+ * A Simple Broker tackeling subscriptions of topics and distributing messages accordingly
+ */
 class Broker {
 
 
-    private static instance:Broker;
+    private static instance:Broker = new Broker();
   //  private subs: Map<string, Set<BusDevice>>;
 
-    private subscribers: { [topic:string]:Array<BusDevice>; };
+    private subscribers: { [topic:string]:Array<BusDevice>; } = {};
 
+    /**
+     * For internal calls only
+     */
     constructor() {
      //   this.subs = new Map<string, Set<BusDevice>>();
-        this.subscribers = {};
-
+        if (Broker.instance) {
+            throw new Error("Error: Instantiation failed: Use SingletonDemo.get() instead of new.");
+        }
+        Broker.instance = this;
     }
 
+    /**
+     * This class should only be initialized once;
+     * @returns {Broker} instance of a broker;
+     */
     public static get():Broker {
-        if (Broker.instance == null || typeof Broker.instance == undefined) {
-            Broker.instance = new Broker();
-        }
         return Broker.instance;
     }
 
@@ -82,6 +113,10 @@ class Broker {
         this.subscribers[topic].push(sub);
     }
 
+    /**
+     * delete subscriber from all Topics
+     * @param sub
+     */
     public unsubscribeAll(sub: BusDevice) {
         for (var i = 0; i < Msg.Topic.VALUES.length; i++) {
             if (this.subscribers[Msg.Topic.VALUES[i].name]) {
@@ -94,9 +129,12 @@ class Broker {
         }
     }
 
+    /**
+     * kill subscription of sub to specified Topic
+     * @param topic
+     * @param sub
+     */
     public unsubscribe(topic:string, sub:BusDevice):void {
-
-    //    this.subscribers.get(topic).delete(sub);
 
         var subsOfTopic = this.subscribers[topic];
 
@@ -109,20 +147,14 @@ class Broker {
 
 
 
+
     }
 
+    /**
+     * distribute Message to subscriber
+     * @param m Message to distribute
+     */
     private distribute(m:Msg.Message) {
-       /* if (this.subscribers.get(m.topic.name) == null) {
-            return;
-        }
-
-        var iter = this.subscribers.get(m.topic.name).entries();
-
-        var x;
-        while((x = iter.next().value) != null) {
-            x[0].handleMessage(m);
-        }*/
-
         if (!this.subscribers[m.topic.name]) {
             return;
         }

@@ -4,6 +4,7 @@
 ///<reference path="dataModel.ts" />
 
 import {Dashboard} from "./dashboard";
+import {GoogleMapWidgetConfig} from "./Map";
 
 class WidgetFactory{
 
@@ -11,7 +12,7 @@ class WidgetFactory{
     private signalsDesc: {[id: string]: SignalDescription;} = {};
     private signalsReady: boolean = false;
     /** All available widgets */
-    private widgetConfigurations: { [id: string] : WidgetConfig; } = {};
+    private widgetConfigurations: {[signal: string]:  { [id: string] : WidgetConfig; };} = {};
     private widgetsReady: boolean = false;
 
     /** Used DataCollection */
@@ -31,6 +32,7 @@ class WidgetFactory{
     constructor(dataCollection: DataCollection, dashboard: Dashboard){
         this.dataCollection = dataCollection;
         this.dashboard = dashboard;
+        this.widgetConfigurations["default"] = {};
         this.getSignalsInit();
     }
 
@@ -43,7 +45,7 @@ class WidgetFactory{
      * @returns {Widget} The created Widget
      */
     createWidget(widgetTagName: string, signal: string, options?): Widget{
-        var widgetConfig = this.widgetConfigurations[widgetTagName];
+        var widgetConfig = this.widgetConfigurations["default"][widgetTagName];
         var signalConfig = this.signalsDesc[signal];
         var model: Model = this.dataCollection.getOrCreate(signalConfig);
 
@@ -63,17 +65,21 @@ class WidgetFactory{
      * to be used by several values
      * @param widgetConfig The config thats to be used
      */
-    addWidget(widgetConfig: WidgetConfig){
-        console.log(widgetConfig.type_name);
-        this.widgetConfigurations[widgetConfig.type_name] = widgetConfig;
+    addWidget(signal: string, widgetConfig: WidgetConfig){
+
+        if (!this.widgetConfigurations[signal]) {
+            this.widgetConfigurations[signal] = {};
+        }
+
+        this.widgetConfigurations[signal][widgetConfig.type_name] = widgetConfig;
     }
 
     /**
      * Return all the available widget options
      * @returns {{}} A map of the options
      */
-    getOptions():{ [id: string] : WidgetConfig;}{
-        return this.widgetConfigurations;
+    getOptions(signal: string):{ [id: string] : WidgetConfig;}{
+        return this.widgetConfigurations[signal];
     }
 
     /**
@@ -120,22 +126,31 @@ class WidgetFactory{
             var minValue: number = parseInt(elements[i].getElementsByTagName("minValue")[0].textContent);
             var desc: string = elements[i].getElementsByTagName("description")[0].textContent;
             var unit: string = elements[i].getElementsByTagName("unit")[0].textContent;
-            var tickse = elements[i].getElementsByTagName("ticks"); //element ticks
-            var ticksv;
+            var tickse = elements[i].getElementsByTagName("major");
+            var ticksmine = elements[i].getElementsByTagName("minor");
             var ticks = new Array<string>(); //ticks as string values
+            var ticksmin;
 
             var highlightse = elements[i].getElementsByTagName("highlight");
             var highlightsv;
             var highlights: Array<{}> = new Array<{}>();
 
+            var widgetse = elements[i].getElementsByTagName("widget");
+            var widgets: Array<{}> = new Array<{}>();
+
 
             if (tickse[0]) {
-                ticksv = tickse[0].getElementsByTagName("tick");
-                for (var j = 0; j < ticksv.length; j++) {
-                    ticks.push(ticksv[j].textContent);
+                var n = parseInt(tickse[0].textContent);
+                var step = (maxValue - minValue) / (n - 1);
+                for (var j = 0; j < n; j++) {
+                    ticks.push((minValue + j * step) + "");
                 }
-
             }
+
+            if (ticksmine[0]) {
+                ticksmin = parseInt(ticksmine[0].textContent);
+            }
+
 
 
 
@@ -154,9 +169,24 @@ class WidgetFactory{
                 highlights.push({start: startValue, end: endValue, color: colorRGB});
             }
 
+            this.addWidget(name, new TextWidgetConfig());
+            for (var j = 0; j < widgetse.length; j++) {
+                /*  var h: string = highlightse[j].textContent;
+                 var sepI: number = h.indexOf(";");
+                 var sepC : number = h.indexOf(":");
+                 highlights[j] = {start: parseInt(h.substring(0, sepI)), end: parseInt(h.substring(sepI + 1, sepC)), color: h.substring(sepC + 1, h.length).split(' ').join('')}*/
 
+                var h = widgetse[j].textContent;
 
-            this.signalsDesc[tagName] = new SignalDescription(name, tagName, unit, maxValue, minValue, desc, ticks, highlights);
+                switch (h) {
+                    case "gauge": this.addWidget(name, new SpeedGaugeWidgetConfig()); break;
+                    case "percent gauge": this.addWidget(name, new PercentGaugeWidgetConfig()); break;
+                    case "line graph": this.addWidget(name, new LineChartWidgetConfig()); break;
+                    case "map": this.addWidget(name, new GoogleMapWidgetConfig()); break;
+                    default: break;
+                }
+            }
+            this.signalsDesc[tagName] = new SignalDescription(name, tagName, unit, maxValue, minValue, desc, ticks, ticksmin, highlights);
         }
         this.dashboard.updateSignalSelector(this.signalsDesc);
     }
@@ -176,10 +206,11 @@ class SignalDescription{
     minValue: number;
     description: string;
     ticks: string[];
+    ticksmin: number;
     highlights: {}[];
 
 
-    constructor(name:string, tagName: string, unit:string, maxValue:number, minValue:number, description:string, ticks:string[], highlights: {}[]) {
+    constructor(name:string, tagName: string, unit:string, maxValue:number, minValue:number, description:string, ticks:string[], ticksmin:number, highlights: {}[]) {
         this.tagName = tagName;
         this.name = name;
         this.unit = unit;
@@ -187,6 +218,7 @@ class SignalDescription{
         this.minValue = minValue;
         this.description = description;
         this.ticks = ticks;
+        this.ticksmin = ticksmin;
         this.highlights = highlights;
 
      //   console.log(highlights);

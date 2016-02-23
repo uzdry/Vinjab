@@ -225,7 +225,6 @@ class Value {
     public getIdentifier(): string{
         return this.identifier;
     }
-
 }
 
 class SettingsRequestMessage extends Message {
@@ -247,6 +246,7 @@ class SettingsResponseMessage extends Message {
         super(Topic.SETTINGS_RSP_MSG);
         this.settings = settings;
     }
+
 }
 
 export {Topic, Message, ValueMessage, ReplayInfoMessage, ValueAnswerMessage, DBRequestMessage, ReplayValueMessage,

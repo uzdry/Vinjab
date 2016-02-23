@@ -426,7 +426,7 @@ function getCacher( topic, pubCache, cacheKey, done, envelope ) {
 				if (cache) {
                     cache = pubCache[ cacheKey ] = ( pubCache[ cacheKey ] || [] );
                     cache.push( subDef );
-                }
+              }
 			}
 			subDef.cacheKeys.push( cacheKey );
 			if ( done ) {

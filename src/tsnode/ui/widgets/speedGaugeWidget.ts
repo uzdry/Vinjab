@@ -10,7 +10,7 @@ class SpeedGaugeWidgetConfig implements WidgetConfig{
 
     "type_name" = "SpeedGauge";
 
-    "display_name" = "Speed Gauge";
+    "display_name" = "gauge";
 
     newInstance(options):Widget {
         return new SpeedGaugeWidget(options);
@@ -77,9 +77,13 @@ class SpeedGaugeWidget extends Widget{
 
         this.config.maxValue = this.model.get("maxValue");
 
+        this.config.minValue = this.model.get("minValue");
+
         if (this.model.get("ticks")) {
             this.config.majorTicks = this.model.get("ticks");
         }
+
+        this.config.minorTicks = this.model.get("ticksmin");
         //console.log(this.model.get("highlights"));
 
         var high = this.model.get("highlights");
@@ -133,6 +137,8 @@ class SpeedGaugeWidget extends Widget{
         this.config.height = size_y*1.1;
         this.config.width = size_x*1.1;
         this.gauge.updateConfig(this.config);
+        this.gauge.setValue(this.model.get("value"));
+
     }
 
     destroy(){
