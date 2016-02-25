@@ -65,7 +65,6 @@ class BusDevice {
     public unsubscribe(t:Msg.Topic) {
         this.broker.unsubscribe(t.name, this);
     }
-
 }
 
 /**
@@ -153,8 +152,8 @@ class Broker {
 
     }
 
-    getSubscribers(topic: string)  {
-
+    getSubscribers(topic: string): Array<BusDevice>  {
+        return this.subscribers[topic];
     }
 
     /**

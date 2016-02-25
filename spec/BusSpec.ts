@@ -8,6 +8,32 @@ import {AverageComputation} from "../src/tsnode/AggregatedFunctions"
 describe("pubsub" ,function() {
 
 
+    it("subscribe unsubscribe", function() {
+        var subscriber = new SimpleSubscriber();
+        subscriber.subscribe(Topic.SPEED);
+        expect(subscriber.broker.getSubscribers(Topic.SPEED.name)).toEqual([subscriber]);
+        subscriber.unsubscribe(Topic.SPEED);
+        expect(subscriber.broker.getSubscribers(Topic.SPEED.name)).toEqual([]);
+    });
+
+    it("subscribe unsubscribe all", function() {
+        var subscriber = new SimpleSubscriber();
+        subscriber.subscribeAll(Topic.VALUES);
+
+        for (var i in Topic.VALUES) {
+            expect(subscriber.broker.getSubscribers(Topic.VALUES[i].name)).toEqual([subscriber]);
+        }
+
+        subscriber.unsubscribeAll();
+
+        for (var i in Topic.VALUES) {
+            expect(subscriber.broker.getSubscribers(Topic.VALUES[i].name)).toEqual([]);
+        }
+
+        subscriber.unsubscribeAll();
+
+    });
+
     it("publish messages", function() {
         var publisher = new Source(Topic.SPEED, 1);
         var subscriber = new SimpleSubscriber();
@@ -31,7 +57,6 @@ describe("pubsub" ,function() {
         publisher.publish(value);
         var vm;
         vm = <ValueMessage>(subscriber.message);
-        console.log(vm.value.value);
         expect(vm.value.value).toEqual(23);
     });
 
