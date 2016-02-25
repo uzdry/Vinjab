@@ -339,7 +339,7 @@
 
         <unit>km/h</unit>
     </signal>
-    <signal category="value.aggregated.fuel per hour">
+ <!--   <signal category="value.aggregated.fuel per hour">
         <name>Treibstoff</name>
         <description>Verbrauchter Treibstoff in einer Stunde</description>
         <minValue>0</minValue>
@@ -350,5 +350,5 @@
             <widget>line graph</widget>
         </widgets>
         <unit>l</unit>
-    </signal>
+    </signal>-->
 </signals>

@@ -27,6 +27,8 @@ class TextWidget extends Widget{
     /** the current value of the widget*/
     value: number;
 
+    unit: string;
+
     /** Id of the document */
     id: string;
 
@@ -40,10 +42,17 @@ class TextWidget extends Widget{
 
 
     init() {
-        if(!this.value) this.value = 0;
+        var unit;
+
+        if(!this.value) {
+            this.value = 0;
+            unit = "d";
+        } else {
+            unit = this.model.get("unit");
+        }
         this.htmlText = <HTMLParagraphElement>document.getElementById(this.widgetID);
         this.htmlText.innerHTML = "<span id='name" + this.widgetID + "'>" + this.model.get("name") + "</span><br>" +
-            "<span id='value"+ this.widgetID + "'>" + this.value.toFixed(2) + " " + this.model.get("unit") + "</span>";
+            "<span id='value"+ this.widgetID + "'>" + this.value.toFixed(2) + " " + unit + "</span>";
     }
 
     constructor(options?){
@@ -66,11 +75,12 @@ class TextWidget extends Widget{
     /** The render function that gets called when the value changes */
     render():TextWidget {
         this.value = this.model.get("value");
+        this.unit = this.model.get("unit");
 
         if (this.value) {
 
-        this.htmlText.innerHTML = "<span id='name" + this.widgetID + "'>" + this.model.get("name") + "</span><br>" +
-            "<span id='value"+ this.widgetID + "'>" + this.value.toFixed(2) + " " + this.model.get("unit") + "</span>";
+            this.htmlText.innerHTML = "<span id='name" + this.widgetID + "'>" + this.model.get("name") + "</span><br>" +
+            "<span id='value"+ this.widgetID + "'>" + this.value.toFixed(2) + " " + this.unit + "</span>";
         }
         return this;
     }

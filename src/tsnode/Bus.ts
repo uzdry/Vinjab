@@ -8,8 +8,11 @@ import * as Msg from "./messages"
 Template class for a Device that has pub/sub acces to the bus
  */
 class BusDevice {
+    // handles subscriptions and handles Messages
     broker:Broker;
+    // unique ID of BusDevice
     id:number;
+    //counts number of BusDevices instanciated
     static cnt:number = 0;
 
     constructor() {
@@ -33,7 +36,7 @@ class BusDevice {
     }
 
     /**
-     * set subscription to Topic to to topuc
+     * add this BusDevice to the List of Subscriptions for specified Topic
      * @param t
      */
     public subscribe(t: Msg.Topic) {
@@ -62,11 +65,6 @@ class BusDevice {
     public unsubscribe(t:Msg.Topic) {
         this.broker.unsubscribe(t.name, this);
     }
-
-    public getID():number {
-        return this.id;
-    }
-
 
 }
 
@@ -100,15 +98,23 @@ class Broker {
         return Broker.instance;
     }
 
+    /**
+     * This method handles a Message a BusDevice pushes onto the Bus by distributing the message
+     * to all subscriber to the suscribers of its Topic
+     * @param m
+     */
     public handleMessage(m: Msg.Message) {
         this.distribute(m);
     }
 
-
+    /**
+     * adds specified BusDecice to the list of subscribers of specified Topic
+     * @param topic
+     * @param sub
+     */
     public subscribe(topic:string, sub:BusDevice):void {
         if (!this.subscribers[topic]) {
             this.subscribers[topic] = new Array<BusDevice>();
-       //     console.log('Set created: ' + topic + " " + sub.constructor.name);
         }
         this.subscribers[topic].push(sub);
     }
@@ -145,8 +151,9 @@ class Broker {
         var i = this.subscribers[topic].indexOf(sub);
         this.subscribers[topic].splice(i,1);
 
+    }
 
-
+    getSubscribers(topic: string)  {
 
     }
 

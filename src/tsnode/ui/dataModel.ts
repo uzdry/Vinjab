@@ -12,6 +12,10 @@ class DataModel extends Backbone.Model{
 
     listeningWidgetsCNT = 0;
 
+    value: number;
+
+    unit: string;
+
     /**
      * A Datamodel that contains the values received from the Server
      * @param options Options according to the BackboneJS specifications
@@ -38,15 +42,15 @@ class DataModel extends Backbone.Model{
             });
         }, 0);
 
-        setTimeout(function() {
-            postal.subscribe({
-                channel: "values",
-                topic: tag,
-                callback: function(data) {
-                    model.set({value: data.value.value});
-                }
-            });
-        }, 0);
+        postal.subscribe({
+            channel: "values",
+            topic: tag,
+            callback: function(data) {
+                model.set({unit: data.value.identifier});
+                model.set({value: data.value.value});
+
+            }
+        });
 
 
     }
@@ -57,7 +61,7 @@ class DataModel extends Backbone.Model{
      * @param envelope The envelope according to the BackboneJS specification
      */
     update(data, envelope){
-        this.set({value: data.value.value});
+        this.set({value: data.value});
     }
 
     public destroy() {

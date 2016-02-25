@@ -9,7 +9,7 @@ describe("pubsub" ,function() {
 
 
     it("publish messages", function() {
-        var publisher = new Source(Topic.SPEED, 2);
+        var publisher = new Source(Topic.SPEED, 1);
         var subscriber = new SimpleSubscriber();
         subscriber.subscribe(Topic.SPEED);
         var value = new Value(22, "km/h");
@@ -19,21 +19,20 @@ describe("pubsub" ,function() {
     });
 
     it("average aggregation", function() {
-      /*  var publisher = new Source(Topic.SPEED, 2);
+        var publisher = new Source(Topic.SPEED, 2);
         var subscriber = new SimpleSubscriber();
         subscriber.subscribe(Topic.AVG_SPEED);
         var aggregation = new AverageComputation(Topic.SPEED);
+        sleep(2);
         var value = new Value(22, "km/h");
         publisher.publish(value);
-        sleep(2000);
+        sleep(2);
         var value = new Value(24, "km/h");
         publisher.publish(value);
-        sleep(2000);
-        publisher.publish(value);
         var vm;
-        sleep(500);
         vm = <ValueMessage>(subscriber.message);
-        expect(vm.value.value).toEqual(23);*/
+        console.log(vm.value.value);
+        expect(vm.value.value).toEqual(23);
     });
 
 });

@@ -1,6 +1,6 @@
 import {Server} from "./Server";
 import {Broker} from "./Bus";
-import {Aggregation, Distance, FuelConsumption, AverageComputation} from "./AggregatedFunctions";
+import {Aggregation, Distance, FuelConsumption, FuelDisplay, AverageComputation} from "./AggregatedFunctions";
 import {Topic} from "./messages";
 import {BluetoothSim} from "./BluetoothSim";
 import {DBBusDevice} from "./DBAccess";
@@ -22,8 +22,8 @@ class ServerStarter {
      */
     constructor() {
 
-        //var leveldown = require("leveldown");
-        //leveldown.destroy("./testDB", function() { });
+       // var leveldown = require("leveldown");
+       // leveldown.destroy("./testDB", function() { });
 
         this.db = new DBBusDevice();
 
@@ -31,15 +31,16 @@ class ServerStarter {
 
         this.server = new Server();
 
-        this.source = new BluetoothObd2();
-        //this.source = new BluetoothSim();
+        //this.source = new BluetoothObd2();
+        this.source = new BluetoothSim();
 
         this.aggregations.push(new FuelConsumption());
         this.aggregations.push(new Distance());
         this.aggregations.push(new AverageComputation(Topic.SPEED));
         this.aggregations.push(new AverageComputation(Topic.FUEL_CONSUMPTION));
+        this.aggregations.push(new FuelDisplay());
 
-       //this.source.init();
+       this.source.init();
 
     }
 

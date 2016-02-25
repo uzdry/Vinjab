@@ -3,6 +3,8 @@
  */
 
 ///<reference path="./../../src/tsnode/parkingsensor/Format.ts"/>
+///<reference path="../typings/jasmine/jasmine.d.ts"/>
+
 
 describe("Format", function () {
     it("Tests the string parser constructor of RGB with a valid input", function () {

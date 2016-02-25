@@ -34,6 +34,7 @@ class Topic {
     static FUEL_CONSUMPTION =   new Topic("value.aggregated.fuel consumption");
     static MILEAGE =            new Topic("value.aggregated.mileage");
     static FUEL_CONSUMPTION_H = new Topic("value.aggregated.fuel per hour");
+    static FUEL_CONSUMPTION_PHK =   new Topic("value.aggregated.fuel per distance");
 
     static AVG_FUEL =           new Topic("value.avg.aggregated.fuel consumption");
     static AVG_SPEED =          new Topic("value.avg.speed");
