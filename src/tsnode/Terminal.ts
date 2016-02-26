@@ -27,6 +27,7 @@ class Terminal {
 
     /**
      * public constructor
+     * initializes connection to server and postal subscriptions
      */
     constructor() {
 
@@ -51,20 +52,21 @@ class Terminal {
     }
 
 
-    public handleSettingsRequest(data) {
+
+    private handleSettingsRequest(data) {
         console.log(data);
         var msg = JSON.stringify(data);
         this.connection.emit('message', msg);
     }
 
-    public incomingMsg(msg) {
+    private incomingMsg(msg) {
         var message = JSON.parse(msg);
 
         //setTimeout(this.synchronousPublish.bind(this), 0, message);
         this.channelval.publish(message.topic.name, message);
     }
 
-    public synchronousPublish(message) {
+    private synchronousPublish(message) {
         this.channelval.publish(message.topic.name, message);
     }
 
@@ -72,7 +74,7 @@ class Terminal {
      * send a message to the server that is to be put on the bus
      * @param data the data that is to be send
      */
-    public toServer(data){
+    private toServer(data){
         var msgstr = JSON.stringify(data);
         this.connection.emit('message', msgstr);
     }
@@ -81,12 +83,12 @@ class Terminal {
      * send a message to the server.
      * @param message the message, which will be sent.
      */
-    public subscribeFromServer(data) {
+    private subscribeFromServer(data) {
         //console.log(data);
         this.connection.emit('subscribe', data.sku);
     }
 
-    public unsubscribeFromServer(data) {
+    private unsubscribeFromServer(data) {
       //  console.log("unsub" + data.sku);
         this.connection.emit('unsubscribe', data.sku);
     }

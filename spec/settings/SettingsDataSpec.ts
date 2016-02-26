@@ -249,4 +249,4 @@ describe("SettingsData", function () {
         var sm6 = SettingsData.SettingsData.parseMe(str6);
         expect(sm6).toEqual(null);
     });
-}
+});

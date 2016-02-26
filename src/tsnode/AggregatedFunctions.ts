@@ -3,16 +3,14 @@ import {BusDevice} from "./Bus";
 import {TlsOptions} from "tls";
 
 
-class Aggregation extends BusDevice {
-    protected currentValue: number;
-    constructor() {
-        super();
-        this.currentValue = 0;
-    }
+interface Aggregation  {
+
 }
 
-class Distance extends Aggregation {
-    private currentDistanceInMeters: number;
+class Distance extends BusDevice implements Aggregation{
+ //   private currentDistanceInMeters: number;
+
+    private currentValue: number;
 
     private startTime: number;
 
@@ -45,8 +43,9 @@ class Distance extends Aggregation {
 /**
  * implements the calculation of the average value of goven topic.
  */
-class AverageComputation extends Aggregation {
+class AverageComputation extends BusDevice implements Aggregation {
     avgOf: Topic;
+    target: Topic;
 
     private startTime: number;
 
@@ -60,40 +59,38 @@ class AverageComputation extends Aggregation {
         this.avg = 0;
         this.startTime = Date.now();
         this.lastTimeInMS = this.startTime;
+
+        var i = t.name.indexOf(".");
+        var l = t.name.length;
+
+        this.target = new Topic(t.name.substring(0, i) + ".avg" + t.name.substring(i, l));
+
         this.subscribe(t);
     }
 
     public handleMessage(m: Message): void {
         if (m instanceof ValueMessage) {
-            if (m.topic.equals(this.avgOf)) {
-                var currentTime = Date.now();
-                if (!(m.value.value < Number.MAX_VALUE)) {
-                    return;
-                }
-                var currentValue = m.value.value;
-
-                var denom = (currentTime - this.startTime);
-
-                if (denom == 0)  {
-                    return;
-                }
-
-                this.avg = ((this.lastTimeInMS - this.startTime) * this.avg + (currentTime - this.lastTimeInMS) * currentValue) / denom;
-
-                this.lastTimeInMS = currentTime;
-
-
-                var i = m.topic.name.indexOf(".");
-                var l = m.topic.name.length;
-                // pushes avg on bus. uses appropriate Topic name
-              //  console.log(m.topic.name.substring(0, i) + ".avg" + m.topic.name.substring(i, l) + this.avg);
-                this.broker.handleMessage(new ValueMessage(new Topic(m.topic.name.substring(0, i) + ".avg" + m.topic.name.substring(i, l)), new Value(this.avg, m.value.identifier)));
+            var currentTime = Date.now();
+            if (!(m.value.value < Number.MAX_VALUE)) {
+                return;
             }
+            var currentValue = m.value.value;
+
+            var denom = (currentTime - this.startTime);
+
+            if (denom == 0)  {
+               return;
+            }
+            //time weighted average https://www.noisemeters.com/help/osha/twa.asp
+            this.avg = ((this.lastTimeInMS - this.startTime) * this.avg + (currentTime - this.lastTimeInMS) * currentValue) / denom;
+
+            this.lastTimeInMS = currentTime;
+            this.broker.handleMessage(new ValueMessage(this.target, new Value(this.avg, m.value.identifier)));
         }
     }
 }
 
-class FuelConsumption extends Aggregation {
+class FuelConsumption extends BusDevice implements Aggregation {
 
     lph: number;
     speed: number;
@@ -134,7 +131,7 @@ class FuelConsumption extends Aggregation {
     }
 }
 
-class FuelDisplay extends Aggregation {
+class FuelDisplay extends BusDevice implements Aggregation {
 
     fuelph: Value
 
@@ -168,7 +165,7 @@ class FuelDisplay extends Aggregation {
 
 }
 
-class AverageFuelConsumption extends Aggregation {
+class AverageFuelConsumption extends BusDevice implements Aggregation {
     startTime;
     avgFuel;
     avgfuelph: Topic;
