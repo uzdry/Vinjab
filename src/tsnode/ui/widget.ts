@@ -17,13 +17,6 @@ abstract class Widget extends Backbone.View<DataModel> {
     /** HTML Grid wrapper */
     htmlWrapper: JQuery;
 
-    /**
-     * Update the shown value.
-     * This function is mainly called by the assigned model
-     * @param value
-     */
-    abstract updateValue(value: number|boolean);
-
     /** initialise the widget */
     abstract init();
 

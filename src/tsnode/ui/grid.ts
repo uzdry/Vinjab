@@ -122,6 +122,7 @@ class Grid {
         }
 
         for(var w in this.widgets){
+            if(! this.widgets.hasOwnProperty(w))
             this.widgets[w].movable(m);
         }
 
@@ -136,6 +137,7 @@ class Grid {
         var line: string = "[";
 
         for(var v in this.widgetsJQuery){
+            if(! this.widgetsJQuery.hasOwnProperty(v)) continue;
 
             var conf : WidgetSerConfig = new WidgetSerConfig;
             conf.row = parseInt(this.widgetsJQuery[v].attr("data-row"));
@@ -163,6 +165,8 @@ class Grid {
         var widgets: WidgetSerConfig[] = <WidgetSerConfig[]> JSON.parse(s);
 
         for(var w in widgets){
+            if(! widgets.hasOwnProperty(w)) continue;
+
             // Create new Widget
             var widget: Widget = this.widgetFactory.createWidget(widgets[w].name, widgets[w].valueID);
 
@@ -177,6 +181,17 @@ class Grid {
             widget.init();
 
         }
+    }
+
+    /**
+     * Destroy function of
+     */
+    destroy(){
+        for(var i in this.widgets){
+            if(! this.widgets.hasOwnProperty(i)) continue;
+            this.widgets[i].destroy();
+        }
+        this.gridster = null;
     }
 
 }

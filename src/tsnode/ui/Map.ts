@@ -165,5 +165,3 @@ class GoogleMapWidget extends Widget {
         this.map.setOptions(mapOptions);
     }
 }
-
-export {GoogleMapWidgetConfig}

@@ -70,11 +70,6 @@ class PercentGaugeWidget extends Widget{
         return this;
     }
 
-    /** Function to update the Widget */
-    updateValue(value: number){
-        this.gauge.setValue(value);
-    }
-
     /** Initialise the Gauge */
     init(){
         this.gauge = new Gauge(this.config);

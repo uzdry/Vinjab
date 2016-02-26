@@ -23,35 +23,33 @@ class DataModel extends Backbone.Model{
     constructor(options?){
         super(options);
 
-
-        //this.subscription = channel.subscribe(this.get("tagName"), this.update.bind(this));
-
         var tag = this.get("tagName");
 
         var model = this;
 
 
-        setTimeout(function() {
-            postal.publish({
-                channel: "reqsubs",
-                topic: "request." + tag,
-                data: {
-                    sku: tag,
-                    qty: 21 + Date.now()
+        if( tag ) {
+            setTimeout(function () {
+                postal.publish({
+                    channel: "reqsubs",
+                    topic: "request." + tag,
+                    data: {
+                        sku: tag,
+                        qty: 21 + Date.now()
+                    }
+                });
+            }, 0);
+
+            postal.subscribe({
+                channel: "values",
+                topic: tag,
+                callback: function (data) {
+                    model.set({unit: data.value.identifier});
+                    model.set({value: data.value.value});
+
                 }
             });
-        }, 0);
-
-        postal.subscribe({
-            channel: "values",
-            topic: tag,
-            callback: function(data) {
-                model.set({unit: data.value.identifier});
-                model.set({value: data.value.value});
-
-            }
-        });
-
+        }
 
     }
 

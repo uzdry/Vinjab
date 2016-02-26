@@ -51,19 +51,9 @@ class LineChartWidget extends Widget{
         ]
     };
 
-
-    updateValue() {
-        var label = "";
-        if(this.counter%this.factor == 0) label = this.counter + "";
-        this.chart.addData([this.model.get("value")], label);
-
-        this.counter++;
-        if(this.counter >= 200) this.chart.removeData();
-    }
-
     /** Init gets called after the widget has been added to the grid */
     init() {
-        this.htmlText = <HTMLCanvasElement> document.getElementById(this.widgetID)
+        this.htmlText = <HTMLCanvasElement> document.getElementById(this.widgetID);
 
         var value: number = this.model.get("value");
         if(!value) value = 0;
@@ -89,23 +79,24 @@ class LineChartWidget extends Widget{
         this.widgetID = this.typeID + "-" + this.model.get("tagName") + "-" + LineChartWidget.widgetCounter;
         LineChartWidget.widgetCounter++;
 
-        this.htmlElement = "<li><canvas align=\"center\" id=\"" + this.widgetID  + "\" > </canvas></li>";
+        this.htmlElement = "<li><canvas id=\"" + this.widgetID  + "\" > </canvas></li>";
 
     }
 
     /** Gets called shortly after the constructor */
     initialize(){
-        this.listenTo(this.model, 'change:value', this.updateValue.bind(this));
+        this.listenTo(this.model, 'change:value', this.render);
     }
 
     /** The render function that gets called when the value changes */
     render():LineChartWidget{
 
-        if(this.chart == null){
-            return this;
-        }
+        var label = "";
+        if(this.counter%this.factor == 0) label = this.counter + "";
+        this.chart.addData([this.model.get("value")], label);
 
-        this.chart.addData(this.model.get("time"), this.model.get("value"));
+        this.counter++;
+        if(this.counter >= 200) this.chart.removeData();
 
         return this;
     }

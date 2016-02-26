@@ -63,7 +63,15 @@ class SpeedGaugeWidget extends Widget{
 
         super(options);
 
-        this.widgetID = this.typeID + "-" + this.model.get("tagName") + "-" + SpeedGaugeWidget.widgetCounter;
+        var title = this.model.get("name");
+        var unit = this.model.get("unit");
+        var maxValue = this.model.get("maxValue");
+        var minValue = this.model.get("minValue");
+        var ticks = this.model.get("ticks");
+        var ticksmin = this.model.get("ticksmin");
+        var high = this.model.get("highlights");
+
+        this.widgetID = this.typeID + "-" + title + "-" + SpeedGaugeWidget.widgetCounter;
         SpeedGaugeWidget.widgetCounter++;
 
         //Save the HTMLElements
@@ -71,41 +79,17 @@ class SpeedGaugeWidget extends Widget{
 
         this.config.renderTo = this.widgetID;
 
-        this.config.title = this.model.get("name");
+        if(title)    this.config.title = title;
+        if(unit)     this.config.units = unit;
+        if(maxValue) this.config.maxValue = maxValue;
+        if(minValue) this.config.minValue = minValue;
+        if(ticks)    this.config.majorTicks = ticks;
+        if(ticksmin) this.config.minorTicks = ticksmin;
 
-        this.config.units = this.model.get("unit");
-
-        this.config.maxValue = this.model.get("maxValue");
-
-        this.config.minValue = this.model.get("minValue");
-
-        if (this.model.get("ticks")) {
-            this.config.majorTicks = this.model.get("ticks");
-        }
-
-        this.config.minorTicks = this.model.get("ticksmin");
-        //console.log(this.model.get("highlights"));
-
-        var high = this.model.get("highlights");
-
-
-       // this.config.highlights.resize(0);
-
-        for (var i = 0; i < high.length; i++) {
+        for (var i in high) {
+            if(! high.hasOwnProperty(i)) continue;
             this.config.highlights.push({from: high[i].start, to: high[i].end, color: 'rgba' + high[i].color});
         }
-
-
-
-
-        /*if (this.config.title == "Drehzahl") {
-            this.config.majorTicks = ['0', '1000', '2000', '3000', '4000', '5000', '6000', '7000', '8000'];
-            this.config.highlights = [
-                {from: 0, to: 5000, color: 'rgba(0,   255, 0, .15)'},
-                {from: 5000, to: 8000, color: 'rgba(255, 0, 0, .15)'},
-            ];
-        }*/
-
 
     }
 
@@ -119,11 +103,6 @@ class SpeedGaugeWidget extends Widget{
         var value:number = this.model.get("value");
         this.gauge.setValue(value);
         return this;
-    }
-
-    /** Function to update the Widget */
-    updateValue(value: number){
-        this.gauge.setValue(value);
     }
 
     /** Initialise the Gauge */
@@ -143,7 +122,6 @@ class SpeedGaugeWidget extends Widget{
 
     destroy(){
         super.destroy();
-        delete this.gauge;
         delete this;
     }
 

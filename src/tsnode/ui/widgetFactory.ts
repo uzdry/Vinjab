@@ -4,7 +4,6 @@
 ///<reference path="dataModel.ts" />
 
 import {Dashboard} from "./dashboard";
-import {GoogleMapWidgetConfig} from "./Map";
 
 class WidgetFactory{
 
@@ -13,7 +12,6 @@ class WidgetFactory{
     private signalsReady: boolean = false;
     /** All available widgets */
     private widgetConfigurations: {[signal: string]:  { [id: string] : WidgetConfig; };} = {};
-    private widgetsReady: boolean = false;
 
     /** Used DataCollection */
     private dataCollection: DataCollection;
@@ -41,20 +39,19 @@ class WidgetFactory{
      * Creates and returns a widget
      * @param widgetTagName The name of the widget-type
      * @param signal The name of the signal, usually value.something
-     * @param options Further options, for example for the BackboneJS.View class
      * @returns {Widget} The created Widget
      */
-    createWidget(widgetTagName: string, signal: string, options?): Widget{
+    createWidget(widgetTagName: string, signal: string): Widget{
         var widgetConfig = this.widgetConfigurations["default"][widgetTagName];
         var signalConfig = this.signalsDesc[signal];
         var model: Model = this.dataCollection.getOrCreate(signalConfig);
 
-        model.set({name: signalConfig.name, description: signalConfig.description,
+        if(signalConfig)
+            model.set({name: signalConfig.name, description: signalConfig.description,
             maxValue: signalConfig.maxValue, minValue: signalConfig.minValue, ticks:signalConfig.ticks});
 
         if(widgetConfig != null){
-            var widget: Widget = widgetConfig.newInstance({model: model});
-            return widget;
+            return widgetConfig.newInstance({model: model});
         }
 
         return null;
@@ -64,6 +61,7 @@ class WidgetFactory{
      * Doesn't add a widget perse, but the option of a widget,
      * to be used by several values
      * @param widgetConfig The config thats to be used
+     * @param signal The signal the widget is supposed to be assigned
      */
     addWidget(signal: string, widgetConfig: WidgetConfig){
 
@@ -128,16 +126,13 @@ class WidgetFactory{
             var unit: string = elements[i].getElementsByTagName("unit")[0].textContent;
             var tickse = elements[i].getElementsByTagName("major");
             var ticksmine = elements[i].getElementsByTagName("minor");
-            var ticks = new Array<string>(); //ticks as string values
+            var ticks: string[] = []; //ticks as string values
             var ticksmin;
 
             var highlightse = elements[i].getElementsByTagName("highlight");
-            var highlightsv;
-            var highlights: Array<{}> = new Array<{}>();
+            var highlights: Array<{}> = [];
 
             var widgetse = elements[i].getElementsByTagName("widget");
-            var widgets: Array<{}> = new Array<{}>();
-
 
             if (tickse[0]) {
                 var n = parseInt(tickse[0].textContent);
@@ -188,7 +183,8 @@ class WidgetFactory{
             }
             this.signalsDesc[tagName] = new SignalDescription(name, tagName, unit, maxValue, minValue, desc, ticks, ticksmin, highlights);
         }
-        this.dashboard.updateSignalSelector(this.signalsDesc);
+
+        if(this.dashboard) this.dashboard.updateSignalSelector(this.signalsDesc);
     }
 
 

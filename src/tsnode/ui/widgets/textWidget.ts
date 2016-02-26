@@ -35,12 +35,6 @@ class TextWidget extends Widget{
     /** HTML Text */
     htmlText: HTMLParagraphElement;
 
-    updateValue(value:number) {
-        this.value = value;
-        this.init();
-    }
-
-
     init() {
         var unit;
 
