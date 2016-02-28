@@ -27,6 +27,7 @@ Nach dem Klonen von diesem Git-Repo:
 * Über install.sh installieren
 * nach der Installation über start.sh starten
 * seien sie sicher, dass sie die vollen Rechte an dem Ordner besitzen.
+
 ... Möglicherweise ist: "chown -R -username- ./VINJAB" nötig
 
 
