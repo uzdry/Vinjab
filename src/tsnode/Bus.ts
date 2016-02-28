@@ -1,12 +1,13 @@
 
 ///<reference path="../../typings/node/node.d.ts"/>
 ///<reference path="messages.ts" />
-var fs = require('fs');
-eval(fs.readFileSync('messages.js')+'');
+
 
 /*
 Template class for a Device that has pub/sub acces to the bus
  */
+import {Message} from "./messages";
+import {Topic} from "./messages";
 class BusDevice {
     // handles subscriptions and handles Messages
     broker:Broker;

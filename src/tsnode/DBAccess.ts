@@ -1,14 +1,26 @@
 /// <reference path="../../typings/levelup/levelup.d.ts" />
 /// <reference path="../../typings/json-stable-stringify/json-stable-stringify.d.ts" />
 /// <reference path="messages.ts" />
-var fs = require('fs');
-eval(fs.readFileSync('messages.js')+'');
+import {Topic} from "./messages";
+
 
 import levelup = require("levelup");
 import {BusDevice} from "./Bus";
 import {Utils} from "./Utils";
 import leveldown = require("leveldown");
 import stringify = require("json-stable-stringify");
+import {ValueAnswerMessage} from "./messages";
+import {Message} from "./messages";
+import {DBRequestMessage} from "./messages";
+import {ValueMessage} from "./messages";
+import {DashboardMessage} from "./messages";
+import {DashboardRspMessage} from "./messages";
+import {ReplayInfoMessage} from "./messages";
+import {ReplayRequestMessage} from "./messages";
+import {SettingsRequestMessage} from "./messages";
+import {SettingsResponseMessage} from "./messages";
+import {ReplayValueMessage} from "./messages";
+import {Value} from "./messages";
 
 // The entry types that are to be written to the database:
 

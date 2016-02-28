@@ -1,7 +1,9 @@
-var fs = require('fs');
-eval(fs.readFileSync('messages.js')+'');
 import {BusDevice} from "./Bus";
 import {TlsOptions} from "tls";
+import {Topic} from "./messages";
+import {Message} from "./messages";
+import {ValueMessage} from "./messages";
+import {Value} from "./messages";
 
 
 interface Aggregation  {

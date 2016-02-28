@@ -8,8 +8,12 @@
 import {Proxy} from "./Proxy";
 import {BusDevice} from "./Bus";
 import {Utils} from "./Utils";
-var fs = require('fs');
-eval(fs.readFileSync('messages.js')+'');
+import {ValueMessage} from "./messages";
+import {Topic} from "./messages";
+import {DashboardMessage} from "./messages";
+import {ReplayRequestMessage} from "./messages";
+import {SettingsRequestMessage} from "./messages";
+
 
 
 class Server extends BusDevice{

@@ -8,15 +8,15 @@ module.exports = function(config)
 
         files: [
             'bower_components/lodash/lodash.js',
-            'bower_components/jquery/jquery.min.js',
             'bower_components/conduitjs/lib/conduit.min.js',
             'src/lib/postal.js',
             'src/lib/underscore-min.js',
             'src/lib/backbone-min.js',
             'node_modules/jquery/dist/jquery.js',
             'node_modules/gridster/dist/jquery.gridster.js',
+            'src/lib/jquery.ddslick.js',
             'node_modules/socket.io-client/socket.io.js',
-            'src/tsnode/messages.js',
+            'src/tsnode/messages.b.js',
             'src/tsnode/ui/dataModel.js',
             'src/tsnode/ui/dataCollection.js',
             'src/tsnode/ui/widget.js',

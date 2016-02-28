@@ -104,7 +104,7 @@ class WidgetFactory{
             }
         }.bind(this);
 
-        xhttp.open("GET", "/src/tsnode/ui/signals.xml", true);
+        xhttp.open("GET", "base/src/tsnode/ui/signals.xml", true);
         xhttp.send();
 
     }

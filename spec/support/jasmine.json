@@ -1,11 +1,15 @@
 {
   "spec_dir": "../",
-  "spec_files": [
-    "**/BusSpec.js"
-  ],
-  "helpers": [
-    "../src/tsnode/**/*.js"
-  ],
+    "helpers": [
+        "../src/tsnode/**/*.js"
+    ],
+    "spec_files": [
+      "**/BusSpec.js",
+      "**/Grid-test.js",
+      "**/Widget-test.js"
+
+    ],
+
   "stopSpecOnExpectationFailure": false,
   "random": false
 }

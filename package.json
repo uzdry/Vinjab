@@ -21,6 +21,7 @@
     "gulp-replace": "^0.5.3",
     "istanbul": "^0.4.2",
     "jasmine": "^2.4.1",
+    "jasmine-jquery": "^2.1.1",
     "jquery": "1.11.3",
     "jshint-stylish": "^1.0.1",
     "karma": "^0.13.21",

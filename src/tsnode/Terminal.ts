@@ -3,7 +3,7 @@
  */
 /// <reference path="../../typings/socket.io-client/socket.io-client.d.ts"/>
 /// <reference path="../../typings/postal/postal.d.ts"/>
-/// <reference path="messages.ts" />
+/// <reference path="messages.d.ts" />
 
 /**
  * This class is the connection in the client side.

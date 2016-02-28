@@ -1,5 +1,4 @@
-var fs = require('fs');
-eval(fs.readFileSync('messages.js')+'');
+import {Topic} from "./messages"
 import {Server} from "./Server";
 import {Broker} from "./Bus";
 import {Aggregation, Distance, FuelConsumption, FuelDisplay, AverageComputation} from "./AggregatedFunctions";

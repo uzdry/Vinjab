@@ -1,6 +1,9 @@
 import {BusDevice} from "./Bus"
-var fs = require('fs');
-eval(fs.readFileSync('messages.js')+'');
+import {Message} from "./messages";
+import {ValueMessage} from "./messages";
+import {Topic} from "./messages";
+import {Value} from "./messages";
+
 
 class BluetoothSim extends BusDevice {
     rpm: number
@@ -34,15 +37,15 @@ class BluetoothSim extends BusDevice {
 
     private publish() {
 
-        if (this.acc) {
-            this.broker.handleMessage(new ValueMessage(Topic.RPM, new Value(this.rpm+=5, "rpm")));
-            if (this.rpm > 7000) {
-                this.acc = false;
-            }
-        } else {
-            this.broker.handleMessage(new ValueMessage(Topic.RPM, new Value(this.rpm-=5, "rpm")));
+        if (!this.acc) {
+            this.broker.handleMessage(new ValueMessage(Topic.RPM, new Value(this.rpm -= 5, "rpm")));
             if (this.rpm < 1000) {
                 this.acc = true;
+            }
+        } else {
+            this.broker.handleMessage(new ValueMessage(Topic.RPM, new Value(this.rpm += 5, "rpm")));
+            if (this.rpm > 7000) {
+                this.acc = false;
             }
         }
 
