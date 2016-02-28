@@ -1,11 +1,11 @@
 /// <reference path="../../typings/levelup/levelup.d.ts" />
 /// <reference path="../../typings/json-stable-stringify/json-stable-stringify.d.ts" />
+/// <reference path="messages.ts" />
+var fs = require('fs');
+eval(fs.readFileSync('messages.js')+'');
 
 import levelup = require("levelup");
 import {BusDevice} from "./Bus";
-import {ValueAnswerMessage, Value, ReplayRequestMessage, ReplayValueMessage, DBRequestMessage, Message, ValueMessage,
-    Topic, DashboardMessage, DashboardRspMessage} from "./messages";
-import {ReplayInfoMessage, SettingsRequestMessage, SettingsResponseMessage} from "./messages";
 import {Utils} from "./Utils";
 import leveldown = require("leveldown");
 import stringify = require("json-stable-stringify");

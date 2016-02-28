@@ -1,4 +1,5 @@
-import {DBRequestMessage, ValueAnswerMessage, ValueMessage, Value, Topic, Message} from "./messages";
+var fs = require('fs');
+eval(fs.readFileSync('messages.js')+'');
 import {BusDevice} from "./Bus";
 import {TlsOptions} from "tls";
 

@@ -4,14 +4,8 @@
 /// <reference path="./../parkingsensor/Communicator.ts"/>
 /// <reference path="./SettingsData.ts"/>
 /// <reference path="./CompositeStructure.ts"/>
+/// <reference path="../messages.ts" />
 
-import {Topic} from "../messages";
-import {Message} from "../messages";
-import {DashboardRspMessage} from "../messages";
-import {DashboardMessage} from "../messages";
-import {DBRequestMessage} from "../messages";
-import {SettingsRequestMessage} from "../messages";
-import {SettingsResponseMessage} from "../messages";
 
 /**
  * @author: David G.

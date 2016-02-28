@@ -1,11 +1,9 @@
 /// <reference path="../typings/jasmine/jasmine.d.ts" />
 /// <reference path="../typings/jasmine-jquery/jasmine-jquery.d.ts" />
 /// <reference path="../../src/tsnode/ui/grid.ts" />
+/// <reference path="../../src/tsnode/messages.ts" />
+/// <reference path="../../src/tsnode/ui/widgetFactory.ts" />
 
-
-import {Grid} from "../../src/tsnode/ui/grid";
-import {ValueMessage, Topic, Value} from "../../src/tsnode/messages";
-import {WidgetFactory} from "../../src/tsnode/ui/widgetFactory";
 
 /** ======================================================
  * Tests for general working initialisation of all Widgets
@@ -80,17 +78,21 @@ describe("Test some of the datacollection and ", () => {
     // Basic fixture of the gridster
     var fixture:string = '<div id="fixture"><div class="gridster"><ul></ul></div></div>';
     // The Basic grid object
-    var grid;
+    var grid = null;
 
     var collection;
     var model;
+    var number;
 
     // Initiate a basic grid
     beforeAll(()=>{
+        document.body.insertAdjacentHTML('afterbegin', fixture);
+
         collection = new DataCollection();
         model = collection.getOrCreate({"tagName": "value.schrott"});
-        document.body.insertAdjacentHTML('afterbegin', fixture);
+
         grid = new Grid(null);
+
     });
 
     // Destroy the basic grid
@@ -99,18 +101,30 @@ describe("Test some of the datacollection and ", () => {
         document.body.removeChild(document.getElementById('fixture'));
     });
 
+    beforeEach(() => {
+        for(var i = 0; i < 10; i++) {
+            number = Math.random() * i * 10;
+
+            postal.channel("values").publish("value.schrott", new ValueMessage(new Topic("value.schrott"), new
+                Value(number, "")));
+        }
+    });
+
+    afterEach(() => {
+        number = Math.random() * 50;
+
+        postal.channel("values").publish("value.schrott", new ValueMessage(new Topic("value.schrott"), new
+            Value(number, "")));
+    });
+
     /**
      * Add a LineChart,
      */
     it("Add LineChart widget", () => {
+        expect(grid).not.toBeNull();
 
         var widget: LineChartWidget = new LineChartWidget({model: model});
         grid.addWidget(widget);
-
-        var number = Math.random() * 10;
-
-        postal.channel("values").publish("value.schrott", new ValueMessage(new Topic("value.schrott"), new
-            Value(number, "")));
 
         expect(widget.model.get("value")).toBe(number);
 
@@ -121,11 +135,6 @@ describe("Test some of the datacollection and ", () => {
         var widget: PercentGaugeWidget = new PercentGaugeWidget({model: model});
         grid.addWidget(widget);
 
-        var number = Math.random() * 10;
-
-        postal.channel("values").publish("value.schrott", new ValueMessage(new Topic("value.schrott"), new
-            Value(number, "")));
-
         expect(widget.gauge.getValue()).toBe(number);
 
     });
@@ -134,11 +143,6 @@ describe("Test some of the datacollection and ", () => {
 
         var widget: SpeedGaugeWidget = new SpeedGaugeWidget({model: model});
         grid.addWidget(widget);
-
-        var number = Math.random() * 10;
-
-        postal.channel("values").publish("value.schrott", new ValueMessage(new Topic("value.schrott"), new
-            Value(number, "")));
 
         expect(widget.gauge.getValue()).toBe(number);
 
@@ -149,11 +153,6 @@ describe("Test some of the datacollection and ", () => {
         var widget: Widget = new TextWidget({model: model});
         grid.addWidget(widget);
 
-        var number = Math.random() * 10;
-
-        postal.channel("values").publish("value.schrott", new ValueMessage(new Topic("value.schrott"), new
-            Value(number, "")));
-
         expect(widget.model.get("value")).toBe(number);
 
     });
@@ -161,11 +160,6 @@ describe("Test some of the datacollection and ", () => {
     it("Add Map Widget", ()=>{
         var widget: Widget = new GoogleMapWidget({model: model});
         grid.addWidget(widget);
-
-        var number = Math.random() * 10;
-
-        postal.channel("values").publish("value.schrott", new ValueMessage(new Topic("value.schrott"), new
-            Value(number, "")));
 
         expect(widget.model.get("value")).toBe(number);
     });
@@ -179,7 +173,7 @@ describe("Test some of the datacollection and ", () => {
  * This obviously doesn't take into account, that the UI
  * has some undefined behaviour by itself
  ========================================================*/
-describe("Test some of the datacollection and ", () => {
+describe("Test for errors while resizing widgets ", () => {
 
     // Basic fixture of the gridster
     var fixture:string = '<div id="fixture"><div class="gridster"><ul></ul></div></div>';
@@ -199,7 +193,7 @@ describe("Test some of the datacollection and ", () => {
 
     // Destroy the basic grid
     afterAll(()=>{
-        //grid.destroy();
+        grid.destroy();
         document.body.removeChild(document.getElementById('fixture'));
     });
 
@@ -211,11 +205,7 @@ describe("Test some of the datacollection and ", () => {
         var widget: LineChartWidget = new LineChartWidget({model: model});
         grid.addWidget(widget);
 
-        var number = Math.random() * 10;
-
         widget.resize(Math.random() * 100, Math.random() * 200);
-
-        expect(widget.model.get("value")).toBe(number);
 
     });
 
@@ -265,35 +255,44 @@ describe("Test the widgets using a widgetFactory", ()=>{
     var fixture:string = '<div id="fixture"><div class="gridster"><ul></ul></div></div>';
 
     beforeAll(() => {
-        document.body.insertAdjacentHTML('afterbegin', fixture);
-        grid = new Grid(null);
         collection = new DataCollection();
         factory = new WidgetFactory(collection, null);
+        grid = new Grid(null);
+
+        factory.addWidget("default", new SpeedGaugeWidgetConfig());
+        factory.addWidget("default", new TextWidgetConfig());
+        factory.addWidget("default", new PercentGaugeWidgetConfig());
+        factory.addWidget("default", new LineChartWidgetConfig());
+        factory.addWidget("default", new GoogleMapWidgetConfig());
+
+        // Inject necessary code
+        document.body.insertAdjacentHTML('afterbegin', fixture);
+        jasmine.getFixtures().fixturesPath = "base/"
+        var f = readFixtures("src/tsnode/ui/signals.xml");
+        expect(f).not.toBeNull();
+
     });
 
     it("Add LineChart to Factory and reteive it", () => {
-        factory.addWidget(new LineChartWidgetConfig());
-        expect(factory.createWidget("LineChartWidget", "value.random")).not.toBe(null);
+        setTimeout(()=>{
+            expect(factory.createWidget("LineChartWidget", "value.speed")).not.toBe(null);
+        }, 100);
     });
 
     it("Add PercentGauge to Factory and reteive it", () => {
-        factory.addWidget(new PercentGaugeWidgetConfig());
-        expect(factory.createWidget("PercentGauge", "value.random")).not.toBe(null);
+        expect(factory.createWidget("PercentGauge", "value.speed")).not.toBe(null);
     });
 
     it("Add SpeedGaugeWidget to Factory", () => {
-        factory.addWidget(new SpeedGaugeWidgetConfig());
-        expect(factory.createWidget("SpeedGauge", "value.random")).not.toBe(null);
+        expect(factory.createWidget("SpeedGauge", "value.speed")).not.toBe(null);
     });
 
     it("Add LineChartWidget to Factory", () => {
-        factory.addWidget(new TextWidgetConfig());
-        expect(factory.createWidget("TextWidget", "value.random")).not.toBe(null);
+        expect(factory.createWidget("TextWidget", "value.speed")).not.toBe(null);
     });
 
     it("Add MapWidget to Factory", () => {
-        factory.addWidget(new GoogleMapWidgetConfig());
-        expect(factory.createWidget("SurroundingsMap", "value.random")).not.toBe(null);
+        expect(factory.createWidget("SurroundingsMap", "value.speed")).not.toBe(null);
     });
 
 });

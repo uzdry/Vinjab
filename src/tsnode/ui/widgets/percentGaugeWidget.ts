@@ -74,7 +74,7 @@ class PercentGaugeWidget extends Widget{
     init(){
         this.gauge = new Gauge(this.config);
         this.gauge.draw();
-
+        if(this.model.get("value")) this.gauge.setValue(this.model.get("value"));
     }
 
     resize(size_x: number, size_y:number){

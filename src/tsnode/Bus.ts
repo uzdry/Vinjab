@@ -1,8 +1,8 @@
 
 ///<reference path="../../typings/node/node.d.ts"/>
-
-import * as Msg from "./messages"
-
+///<reference path="messages.ts" />
+var fs = require('fs');
+eval(fs.readFileSync('messages.js')+'');
 
 /*
 Template class for a Device that has pub/sub acces to the bus
@@ -24,7 +24,7 @@ class BusDevice {
      * Handle Message on reception
      * @param m Message
      */
-    public handleMessage(m:Msg.Message):void {
+    public handleMessage(m:Message):void {
         this.abstractHandle();
     }
 
@@ -39,7 +39,7 @@ class BusDevice {
      * add this BusDevice to the List of Subscriptions for specified Topic
      * @param t
      */
-    public subscribe(t: Msg.Topic) {
+    public subscribe(t: Topic) {
         this.broker.subscribe(t.name, this);
     }
 
@@ -47,7 +47,7 @@ class BusDevice {
      * set Subscription to alle "value." type topics
      * @param topics
      */
-    public subscribeAll(topics: Msg.Topic[]): void {
+    public subscribeAll(topics: Topic[]): void {
         for (var i in topics) {
             this.broker.subscribe(topics[i].name, this);
         }
@@ -62,7 +62,7 @@ class BusDevice {
      * kill subscription to given Topic
      * @param t
      */
-    public unsubscribe(t:Msg.Topic) {
+    public unsubscribe(t:Topic) {
         this.broker.unsubscribe(t.name, this);
     }
 }
@@ -102,7 +102,7 @@ class Broker {
      * to all subscriber to the suscribers of its Topic
      * @param m
      */
-    public handleMessage(m: Msg.Message) {
+    public handleMessage(m: Message) {
         this.distribute(m);
     }
 
@@ -123,11 +123,11 @@ class Broker {
      * @param sub
      */
     public unsubscribeAll(sub: BusDevice) {
-        for (var i = 0; i < Msg.Topic.VALUES.length; i++) {
-            if (this.subscribers[Msg.Topic.VALUES[i].name]) {
-                for (var j = 0; j < this.subscribers[Msg.Topic.VALUES[i].name].length; j++) {
-                    if (this.subscribers[Msg.Topic.VALUES[i].name][j] == sub) {
-                        this.unsubscribe(Msg.Topic.VALUES[i].name, sub);
+        for (var i = 0; i < Topic.VALUES.length; i++) {
+            if (this.subscribers[Topic.VALUES[i].name]) {
+                for (var j = 0; j < this.subscribers[Topic.VALUES[i].name].length; j++) {
+                    if (this.subscribers[Topic.VALUES[i].name][j] == sub) {
+                        this.unsubscribe(Topic.VALUES[i].name, sub);
                     }
                 }
             }
@@ -160,7 +160,7 @@ class Broker {
      * distribute Message to subscriber
      * @param m Message to distribute
      */
-    private distribute(m:Msg.Message) {
+    private distribute(m:Message) {
         if (!this.subscribers[m.topic.name]) {
             return;
         }

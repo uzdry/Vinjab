@@ -1,7 +1,8 @@
+var fs = require('fs');
+eval(fs.readFileSync('messages.js')+'');
 import {Server} from "./Server";
 import {Broker} from "./Bus";
 import {Aggregation, Distance, FuelConsumption, FuelDisplay, AverageComputation} from "./AggregatedFunctions";
-import {Topic} from "./messages";
 import {BluetoothSim} from "./BluetoothSim";
 import {DBBusDevice} from "./DBAccess";
 import {BluetoothObd2} from "./bluetooth-obd2/BluetoothObd2"

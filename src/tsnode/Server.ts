@@ -3,14 +3,13 @@
  */
 
 /// <reference path="../../typings/socket.io/socket.io.d.ts"/>
+/// <reference path="messages.ts"/>
 
-import {ValueAnswerMessage, DBRequestMessage, Message, ValueMessage, Topic} from "./messages";
 import {Proxy} from "./Proxy";
 import {BusDevice} from "./Bus";
 import {Utils} from "./Utils";
-import {DashboardMessage} from "./messages";
-import {ReplayRequestMessage} from "./messages";
-import {SettingsRequestMessage} from "./messages";
+var fs = require('fs');
+eval(fs.readFileSync('messages.js')+'');
 
 
 class Server extends BusDevice{

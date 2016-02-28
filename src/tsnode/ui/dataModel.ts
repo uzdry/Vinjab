@@ -64,7 +64,6 @@ class DataModel extends Backbone.Model{
 
     public destroy() {
         var tag = this.get("tagName");
-        console.log(tag +  'destroyed');
         postal.publish({
             channel: "reqsubs",
             topic: "stop." + tag,

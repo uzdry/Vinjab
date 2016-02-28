@@ -1,10 +1,10 @@
+/// <reference path="../../typings/socket.io/socket.io.d.ts"/>
+
 import {BusDevice} from "./Bus";
-import {ValueAnswerMessage, DBRequestMessage, Message, ValueMessage, Topic} from "./messages";
 import {Server} from "./Server";
 import {Utils} from "./Utils";
-import {ReplayValueMessage} from "./messages";
-
-/// <reference path="../../typings/socket.io/socket.io.d.ts"/>
+var fs = require('fs');
+eval(fs.readFileSync('messages.js')+'');
 
 class Proxy extends BusDevice {
 

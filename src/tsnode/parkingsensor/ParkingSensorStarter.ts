@@ -6,15 +6,7 @@
 /// <reference path="./../settings/SettingsData.ts"/>
 /// <reference path="./PSGUI.ts"/>
 /// <reference path="../../../typings/postal/postal.d.ts"/>
-
-
-import {Topic} from "../messages";
-import {Message} from "../messages";
-import {DashboardRspMessage} from "../messages";
-import {DashboardMessage} from "../messages";
-import {DBRequestMessage} from "../messages";
-import {SettingsRequestMessage} from "../messages";
-import {SettingsResponseMessage} from "../messages";
+/// <reference path="../messages.ts" />
 
 
 class ParkingSensorStarter {

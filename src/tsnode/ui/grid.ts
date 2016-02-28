@@ -4,8 +4,6 @@
 /// <reference path="widgetFactory.ts" />
 /// <reference path="dashboard.ts" />
 
-import {WidgetFactory} from "./widgetFactory";
-import {Dashboard} from "./dashboard";
 
 class Grid {
 
@@ -103,7 +101,6 @@ class Grid {
 
             widget.init();
 
-            //console.log(this.serialize());
 
             return widget;
         }
@@ -150,7 +147,7 @@ class Grid {
             line += JSON.stringify(conf) + ",";
 
         }
-        if(line === ']') return "[]";
+        if(line === '[') return "[]";
 
         line = line.slice(0, -1) + "]";
 
@@ -196,6 +193,5 @@ class Grid {
 
 }
 
-export {Grid}
 
 

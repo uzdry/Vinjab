@@ -1,5 +1,6 @@
 import {BusDevice} from "./Bus"
-import {Topic, Value, Message, ValueMessage} from "./messages"
+var fs = require('fs');
+eval(fs.readFileSync('messages.js')+'');
 
 class BluetoothSim extends BusDevice {
     rpm: number

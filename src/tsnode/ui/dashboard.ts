@@ -8,13 +8,8 @@
 ///<reference path="../Terminal.ts"/>
 ///<reference path="widgets/lineChartWidget.ts"/>
 ///<reference path="./Map.ts"/>
+///<reference path="../messages.ts" />
 
-
-import {Terminal} from "../Terminal"
-import {DashboardMessage} from "../messages";
-import {WidgetFactory, SignalDescription} from "./widgetFactory";
-import {Grid} from "./grid";
-import {ReplayRequestMessage} from "../messages";
 
 class Dashboard{
     /** MVC Stuff */
@@ -24,11 +19,9 @@ class Dashboard{
     widgetFactory: WidgetFactory;
     grid: Grid;
 
-    selector:HTMLSelectElement = <HTMLSelectElement>document.getElementById("WidgetSelect");
-    idSelector:HTMLSelectElement = <HTMLSelectElement>document.getElementById("valueSelect");
-    button:HTMLButtonElement = <HTMLButtonElement>document.getElementById("addButton");
-    deleteCheck: HTMLInputElement = <HTMLInputElement>document.getElementById("cDeleteMode");
-    startButton:HTMLButtonElement = <HTMLButtonElement>document.getElementById("bStartReplay");
+    button:HTMLButtonElement;
+    deleteCheck: HTMLInputElement;
+    startButton:HTMLButtonElement;
 
     options:string[];
 
@@ -38,6 +31,10 @@ class Dashboard{
     replayState: boolean = false;
 
     constructor(){
+
+        this.button = <HTMLButtonElement>document.getElementById("addButton");
+        this.deleteCheck = <HTMLInputElement>document.getElementById("cDeleteMode");
+        this.startButton = <HTMLButtonElement>document.getElementById("bStartReplay");
 
         this.dataCollection = new DataCollection();
         this.widgetFactory = new WidgetFactory(this.dataCollection, this);
@@ -90,6 +87,7 @@ class Dashboard{
 
         postal.channel("values").subscribe("dashboard settings from database", function(data, envelope){
             if(!(data.user === this.user)) return;
+            console.log(JSON.stringify(data));
             this.grid.fromSerialized(data.config);
             postal.channel("reqsubs").publish("stop.dashboard settings from database", "dashboard settings from database");
         }.bind(this));
@@ -201,7 +199,7 @@ class Dashboard{
      * Updates the widget selectors
      * @param widgets All widgets that are supposed to be shown, not only the new ones
      */
-    static updateWidgetSelector(widgets: {[id: string]: WidgetConfig;}){
+    updateWidgetSelector(widgets: {[id: string]: WidgetConfig;}){
         var widgetData: Array<DDSlickOptions> = [];
 
         for(var i in widgets){
@@ -230,7 +228,7 @@ class Dashboard{
      * Updates all drives in the ReplayModus
      * @param drives Array with Objets that contain the length of the drive
      */
-    static updateDrivesSelector(drives: number[]){
+    updateDrivesSelector(drives: number[]){
         var drivesOption: Array<DDSlickOptions> = [];
 
         for(var i in drives){
@@ -331,6 +329,5 @@ dashboard.widgetFactory.addWidget("default", new LineChartWidgetConfig());
 dashboard.widgetFactory.addWidget("default", new GoogleMapWidgetConfig());
 
 
-export {DDSlickOptions, Dashboard}
 //==========================
 

@@ -24,7 +24,7 @@ class GoogleMapWidget extends Widget {
     map:google.maps.Map;
 
     currentLoc: google.maps.LatLng;
-    currentlyLowOnFuel: boolean;
+    currentlyLowOnFuel: boolean = false;
 
     /** String that is being introduced to the grid */
     htmlElement:string;
@@ -112,6 +112,8 @@ class GoogleMapWidget extends Widget {
             // Browser doesn't support Geolocation
             this.handleLocationError(false, this.map.getCenter());
         }
+
+        this.updateValue();
     }
 
     findGasStations() {

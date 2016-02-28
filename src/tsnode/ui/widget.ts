@@ -84,7 +84,6 @@ abstract class Widget extends Backbone.View<DataModel> {
      * Is used to destroy the Widget
      */
     destroy(){
-        console.log("destroy widget");
         this.stopListening(this.model);
     }
 

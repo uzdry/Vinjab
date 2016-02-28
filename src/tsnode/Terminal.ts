@@ -3,9 +3,8 @@
  */
 /// <reference path="../../typings/socket.io-client/socket.io-client.d.ts"/>
 /// <reference path="../../typings/postal/postal.d.ts"/>
-import {Message, Value, ValueMessage, Topic} from "./messages";
-import {SettingsRequestMessage} from "./messages";
-import {SettingsResponseMessage} from "./messages";
+/// <reference path="messages.ts" />
+
 /**
  * This class is the connection in the client side.
  */
@@ -95,6 +94,5 @@ class Terminal {
 
 }
 
-export {Terminal}
 
 

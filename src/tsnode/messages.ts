@@ -249,6 +249,3 @@ class SettingsResponseMessage extends Message {
     }
 
 }
-
-export {Topic, Message, ValueMessage, ReplayInfoMessage, ValueAnswerMessage, DBRequestMessage, ReplayValueMessage,
-    ReplayRequestMessage, Value, DashboardMessage, DashboardRspMessage, SettingsRequestMessage, SettingsResponseMessage};

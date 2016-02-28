@@ -2,24 +2,21 @@
 ///<reference path="widget.ts" />
 ///<reference path="dashboard.ts" />
 ///<reference path="dataModel.ts" />
-
-import {Dashboard} from "./dashboard";
+///<reference path="dashboard.ts" />
 
 class WidgetFactory{
 
     /** All available signals */
-    private signalsDesc: {[id: string]: SignalDescription;} = {};
+    static signalsDesc: {[id: string]: SignalDescription;} = {};
     private signalsReady: boolean = false;
     /** All available widgets */
     private widgetConfigurations: {[signal: string]:  { [id: string] : WidgetConfig; };} = {};
 
     /** Used DataCollection */
     private dataCollection: DataCollection;
-
     private dashboard: Dashboard;
 
     cnt: number = 0;
-
 
     /**
      * The Constructor of the widget factory saves some objects
@@ -42,13 +39,18 @@ class WidgetFactory{
      * @returns {Widget} The created Widget
      */
     createWidget(widgetTagName: string, signal: string): Widget{
+
         var widgetConfig = this.widgetConfigurations["default"][widgetTagName];
-        var signalConfig = this.signalsDesc[signal];
+        var signalConfig = WidgetFactory.signalsDesc[signal];
         var model: Model = this.dataCollection.getOrCreate(signalConfig);
 
-        if(signalConfig)
-            model.set({name: signalConfig.name, description: signalConfig.description,
-            maxValue: signalConfig.maxValue, minValue: signalConfig.minValue, ticks:signalConfig.ticks});
+        if(!signalConfig){
+            console.log("We are sorry but there was no configuration with that signal name found.")
+            return null;
+        }
+
+        model.set({name: signalConfig.name, description: signalConfig.description,
+        maxValue: signalConfig.maxValue, minValue: signalConfig.minValue, ticks:signalConfig.ticks});
 
         if(widgetConfig != null){
             return widgetConfig.newInstance({model: model});
@@ -82,11 +84,12 @@ class WidgetFactory{
 
     /**
      * Returns all the available signal options
+     * But only if all of them have been added to the
      * @returns {{}} A map of the options
      */
     getSignals():{[id: string]: SignalDescription;}{
         if(!this.signalsReady) return null;
-        return this.signalsDesc;
+        return WidgetFactory.signalsDesc;
     }
 
     /**
@@ -101,7 +104,7 @@ class WidgetFactory{
             }
         }.bind(this);
 
-        xhttp.open("GET", "signals.xml", true);
+        xhttp.open("GET", "/src/tsnode/ui/signals.xml", true);
         xhttp.send();
 
     }
@@ -150,10 +153,6 @@ class WidgetFactory{
 
 
             for (var j = 0; j < highlightse.length; j++) {
-              /*  var h: string = highlightse[j].textContent;
-                var sepI: number = h.indexOf(";");
-                var sepC : number = h.indexOf(":");
-                highlights[j] = {start: parseInt(h.substring(0, sepI)), end: parseInt(h.substring(sepI + 1, sepC)), color: h.substring(sepC + 1, h.length).split(' ').join('')}*/
 
                 var h = highlightse[j];
 
@@ -166,10 +165,6 @@ class WidgetFactory{
 
             this.addWidget(name, new TextWidgetConfig());
             for (var j = 0; j < widgetse.length; j++) {
-                /*  var h: string = highlightse[j].textContent;
-                 var sepI: number = h.indexOf(";");
-                 var sepC : number = h.indexOf(":");
-                 highlights[j] = {start: parseInt(h.substring(0, sepI)), end: parseInt(h.substring(sepI + 1, sepC)), color: h.substring(sepC + 1, h.length).split(' ').join('')}*/
 
                 var h = widgetse[j].textContent;
 
@@ -181,10 +176,12 @@ class WidgetFactory{
                     default: break;
                 }
             }
-            this.signalsDesc[tagName] = new SignalDescription(name, tagName, unit, maxValue, minValue, desc, ticks, ticksmin, highlights);
+            WidgetFactory.signalsDesc[tagName] = new SignalDescription(name, tagName, unit, maxValue, minValue, desc, ticks, ticksmin, highlights);
         }
 
-        if(this.dashboard) this.dashboard.updateSignalSelector(this.signalsDesc);
+        this.signalsReady = true;
+        if(this.dashboard) this.dashboard.updateSignalSelector(WidgetFactory.signalsDesc);
+
     }
 
 
@@ -217,9 +214,6 @@ class SignalDescription{
         this.ticksmin = ticksmin;
         this.highlights = highlights;
 
-     //   console.log(highlights);
-
     }
 }
 
-export{SignalDescription, WidgetFactory};
