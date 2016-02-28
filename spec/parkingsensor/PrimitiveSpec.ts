@@ -134,4 +134,4 @@ describe("Primitive", function () {
         expect(polygon3600.getSegmentCount()).toEqual(3600);
 
     });
-}
+});

@@ -324,7 +324,7 @@ class DDSlickOptions{
     imageSrc:string;
 }
 
-
+//
 //var terminal = new Terminal();
 //var dashboard: Dashboard = new Dashboard();
 //dashboard.widgetFactory.addWidget("default", new SpeedGaugeWidgetConfig());

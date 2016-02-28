@@ -1,4 +1,30 @@
 {
+  "name": "vinjab",
+  "version": "1.0.0",
+  "description": "VINJAB is not just a boardcomputer",
+  "main": "",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "mocha",
+    "start": "node src/tsnode/ServerStarter.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/SpringVaS/VINJAB.git"
+  },
+  "keywords": [
+    "BoardComputer",
+    "VINJAB"
+  ],
+  "author": "Jonas Haas, Nicolas Schreiber, Valentin Springsklee, Yimeng Zhu, David Grajzel",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/SpringVaS/VINJAB/issues"
+  },
+  "homepage": "https://github.com/SpringVaS/VINJAB#readme",
+
   "devDependencies": {
     "apache-server-configs": "2.14.0",
     "archiver": "^0.14.3",
@@ -39,7 +65,6 @@
     "underscore": "~1.8.3"
   },
   "dependencies": {
-    "bluetooth-obd": "^0.2.2",
     "bower": "^1.7.7",
     "chartjs": "^0.3.1",
     "es6-collections": "^0.5.5",
@@ -58,10 +83,6 @@
   "engines": {
     "node": ">=0.10.0"
   },
-  "browserify-shim": {
-    "jquery": "$",
-    "three": "global:THREE"
-  },
   "h5bp-configs": {
     "directories": {
       "archive": "archive",
@@ -69,17 +90,5 @@
       "src": "src",
       "test": "test"
     }
-  },
-  "homepage": "https://html5boilerplate.com/",
-  "license": {
-    "type": "MIT",
-    "url": "https://github.com/h5bp/html5-boilerplate/blob/master/LICENSE.txt"
-  },
-  "name": "html5-boilerplate",
-  "private": true,
-  "scripts": {
-    "build": "gulp build",
-    "test": "gulp archive && mocha --reporter spec --timeout 5000"
-  },
-  "version": "5.2.0"
+  }
 }
