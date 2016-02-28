@@ -4,7 +4,7 @@
 /// <reference path="./../parkingsensor/Communicator.ts"/>
 /// <reference path="./SettingsData.ts"/>
 /// <reference path="./CompositeStructure.ts"/>
-/// <reference path="../messages.ts" />
+/// <reference path="../messages.b.ts" />
 
 
 /**

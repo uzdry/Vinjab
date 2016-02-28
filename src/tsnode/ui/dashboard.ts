@@ -19,9 +19,13 @@ class Dashboard{
     widgetFactory: WidgetFactory;
     grid: Grid;
 
+    /** HTML Elements and JQuery elements */
     button:HTMLButtonElement;
     deleteCheck: HTMLInputElement;
     startButton:HTMLButtonElement;
+    dSignal:JQuery =  $('#dSignals');
+    dWidgets:JQuery = $('#dWidgets');
+    dDrives:JQuery = $('#dDrives');
 
     options:string[];
 
@@ -138,8 +142,8 @@ class Dashboard{
      */
     private addWidget(){
         console.log("CLICKED");
-        var signalName = $('#dSignals').data('ddslick');
-        var widgetName = $('#dWidgets').data('ddslick');
+        var signalName = this.dSignal.data('ddslick');
+        var widgetName = this.dWidgets.data('ddslick');
 
         if(signalName.selectedIndex < 0) return;
         if(widgetName.selectedIndex < 0) return;
@@ -183,10 +187,10 @@ class Dashboard{
             signalsData.push(option);
         }
 
-        $('#dSignals').ddslick('destroy');
+        this.dSignal.ddslick('destroy');
 
         //Demo 1---------------------
-        $('#dSignals').ddslick({
+        this.dSignal.ddslick({
             data: signalsData,
             selectText: "Select the Signal to be shown",
             onSelected: function(data){
@@ -215,9 +219,9 @@ class Dashboard{
             widgetData.push(option);
         }
 
-        $('#dWidgets').ddslick('destroy');
+        this.dWidgets.ddslick('destroy');
 
-        $('#dWidgets').ddslick({
+        this.dWidgets.ddslick({
             data: widgetData,
             selectText: "select option",
             defaultSelectedIndex: 0
@@ -243,9 +247,9 @@ class Dashboard{
             drivesOption.push(option);
         }
 
-        $('#dDrives').ddslick('destroy');
+        this.dDrives.ddslick('destroy');
 
-        $('#dDrives').ddslick({
+        this.dDrives.ddslick({
             data: drivesOption,
             selectText: 'Wähle die zu anzeigende Fahrt'
         });

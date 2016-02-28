@@ -136,7 +136,7 @@ class FuelConsumption extends BusDevice implements Aggregation {
 
 class FuelDisplay extends BusDevice implements Aggregation {
 
-    fuelph: Value
+    fuelph: Value;
 
     constructor() {
         super();

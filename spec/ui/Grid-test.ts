@@ -2,6 +2,7 @@
 /// <reference path="../typings/jasmine-jquery/jasmine-jquery.d.ts" />
 /// <reference path="../../src/tsnode/ui/grid.ts" />
 /// <reference path="../../src/tsnode/ui/dashboard.ts" />
+/// <reference path="../../src/tsnode/messages.b.ts" />
 
 describe("Test of Grid class", () => {
 
@@ -14,13 +15,12 @@ describe("Test of Grid class", () => {
         '7,\"size_x\":5,\"size_y\":5,\"name\":\"PercentGauge\",\"valueID\":\"value.fuel\"},{\"row\":8,' +
         '\"col\":12,\"size_x\":6,\"size_y\":2,\"name\":\"TextWidget\",\"valueID\":' +
         '\"value.aggregated.fuel consumption\"},{\"row\":10,\"col\":12,\"size_x\":6,\"size_y\":2,' +
-        '\"name\":\"TextWidget\",\"valueID\":\"value.temperature outside\"}]'
+        '\"name\":\"TextWidget\",\"valueID\":\"value.temperature outside\"}]';
 
     beforeAll(()=> {
 
-        jasmine.getFixtures().fixturesPath = "base/"
-        var f = readFixtures("spec/ui/test.html");
-        loadFixtures("spec/ui/test.html");
+        jasmine.getFixtures().fixturesPath = "base/";
+        readFixtures("spec/ui/test.html");
 
         dashboard = new Dashboard();
         expect(dashboard).not.toBeNull();
@@ -63,14 +63,31 @@ describe("Test of Grid class", () => {
         postal.channel("values").publish(Topic.REPLAY_INFO.name, new ReplayInfoMessage([21504,148836,426733,485968,270479,170778,44903,9538,85714,93586,8683,90553,59805,3071552,17192,10964]));
     });
 
+    it("check if the grid added the widgets like demanded", ()=>{
+        var conf = dashboard.grid.serialize();
+        console.log(conf);
+        expect(conf).toBe(dashconfig);
+    })
+
 
 });
 
+/**
+ * Function calculates a random integer between min and max
+ * @param min minimal value
+ * @param max maximal value
+ * @returns {number} random integer between minimal and maximal
+ */
 function randomIntFromInterval(min,max)
 {
     return Math.floor(Math.random()*(max-min+1)+min);
 }
 
+/**
+ * Calculates the size of an Associative Array
+ * @param array the array, of which the size is to measure
+ * @returns {number} the true length of the array
+ */
 function sizeOfAssocArray(array){
     var size = 0, key;
     for (key in array) {

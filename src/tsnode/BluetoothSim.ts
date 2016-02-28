@@ -6,17 +6,17 @@ import {Value} from "./messages";
 
 
 class BluetoothSim extends BusDevice {
-    rpm: number
-    gasTankpercent: number
+    rpm: number;
+    gasTankpercent: number;
     acc: boolean;
-    steeringAngle: number
+    steeringAngle: number;
     speed: number;
 
     constructor() {
         super();
 
         this.rpm = 1200;
-        this.speed = 0
+        this.speed = 0;
 
         this.gasTankpercent = 100;
 

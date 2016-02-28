@@ -267,7 +267,7 @@ describe("Test the widgets using a widgetFactory", ()=>{
 
         // Inject necessary code
         document.body.insertAdjacentHTML('afterbegin', fixture);
-        jasmine.getFixtures().fixturesPath = "base/"
+        jasmine.getFixtures().fixturesPath = "base/";
         var f = readFixtures("src/tsnode/ui/signals.xml");
         expect(f).not.toBeNull();
 

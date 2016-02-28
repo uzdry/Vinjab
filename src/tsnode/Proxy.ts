@@ -42,7 +42,6 @@ class Proxy extends BusDevice {
     /**
      * Distribute the message to the end devices
      * @param message the message should be delivered
-     * @param socket the connection
      */
     public handleMessage(message: Message): void {
         //Check if the device is currently in replay mode

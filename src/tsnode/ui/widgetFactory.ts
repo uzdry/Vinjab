@@ -45,7 +45,7 @@ class WidgetFactory{
         var model: Model = this.dataCollection.getOrCreate(signalConfig);
 
         if(!signalConfig){
-            console.log("We are sorry but there was no configuration with that signal name found.")
+            console.log("We are sorry but there was no configuration with that signal name found.");
             return null;
         }
 

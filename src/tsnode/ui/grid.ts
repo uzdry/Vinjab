@@ -119,7 +119,7 @@ class Grid {
         }
 
         for(var w in this.widgets){
-            if(! this.widgets.hasOwnProperty(w))
+            if(! this.widgets.hasOwnProperty(w)) continue;
             this.widgets[w].movable(m);
         }
 

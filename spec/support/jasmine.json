@@ -4,10 +4,7 @@
         "../src/tsnode/**/*.js"
     ],
     "spec_files": [
-      "**/BusSpec.js",
-      "**/Grid-test.js",
-      "**/Widget-test.js"
-
+      "**/BusSpec.js"
     ],
 
   "stopSpecOnExpectationFailure": false,
