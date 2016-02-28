@@ -153,7 +153,7 @@ class LevelDBAccess {
 
         this.deleteInProcess = false;
         // initializes or opens the LevelUP-instance on a specified path
-        this.db = levelup('./testDB', function(err, db){
+        this.db = levelup('../VINJAB-DB', function(err, db){
             if(err) console.log("Error in opening the Database: " + err);
             this.db = db;
         });
@@ -199,7 +199,6 @@ class LevelDBAccess {
                 }
             }
         }.bind(this)).on('end', function () {
-            console.log(stringify(this.replayInfo));
             /*while(this.replayInfo.finishTime[0] == null && this.replayInfo.finishTime.length != 0){
                 this.replayInfo.finishTime.shift();
                 this.replayInfo.driveNr.shift();
@@ -212,6 +211,7 @@ class LevelDBAccess {
      * Writes a value with its corresponding topic to the database, using the current date and drive# as the key.
      * @param topicID: The topic corresponding to the given value
      * @param value: The value that is to be written to the db
+     * @param unit: The unit corresponding to the given value
      */
     putSensorValue(topicID: string, value: any, unit: string) {
         //initializes the key
@@ -510,7 +510,7 @@ class Replay extends BusDevice {
     private cnt: number;
     private slp: number;
     private vals: SensorValueEntry[];
-    private times: number[];
+    private times: ValueEntryKey[];
     private callerID: string;
     private stop: boolean;
 
@@ -549,14 +549,14 @@ class Replay extends BusDevice {
      * @param vals: An array of SensorValueEntries; the values that will be put on the bus.
      * @param times: An array of timestamps (in ms) corresponding to the SensorValueEntriesl.
      */
-    public replay(vals: SensorValueEntry[], times: number[]) {
+    public replay(vals: SensorValueEntry[], times: ValueEntryKey[]) {
         this.vals = vals;
         this.times = times;
         setTimeout(this.send.bind(this), this.slp);
     }
 
     /**
-     * ASends a new SensorValueMessage to the Bus containing the next value. It calls itself in intervals
+     * Sends a new SensorValueMessage to the Bus containing the next value. It calls itself in intervals
      * according to the temporal difference between the timestamps of two sensor values.
      */
     private send() {
@@ -566,7 +566,7 @@ class Replay extends BusDevice {
         if(this.cnt + 1 == this.times.length || this.stop) {
             return
         } else {
-            this.slp = this.times[this.cnt + 1] - this.times[this.cnt];
+            this.slp = this.times[this.cnt + 1].time - this.times[this.cnt].time;
             setTimeout(this.send.bind(this), this.slp);
         }
     }
