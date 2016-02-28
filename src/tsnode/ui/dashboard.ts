@@ -324,14 +324,14 @@ class DDSlickOptions{
     imageSrc:string;
 }
 
-//
-//var terminal = new Terminal();
-//var dashboard: Dashboard = new Dashboard();
-//dashboard.widgetFactory.addWidget("default", new SpeedGaugeWidgetConfig());
-//dashboard.widgetFactory.addWidget("default", new TextWidgetConfig());
-//dashboard.widgetFactory.addWidget("default", new PercentGaugeWidgetConfig());
-//dashboard.widgetFactory.addWidget("default", new LineChartWidgetConfig());
-//dashboard.widgetFactory.addWidget("default", new GoogleMapWidgetConfig());
+
+var terminal = new Terminal();
+var dashboard: Dashboard = new Dashboard();
+dashboard.widgetFactory.addWidget("default", new SpeedGaugeWidgetConfig());
+dashboard.widgetFactory.addWidget("default", new TextWidgetConfig());
+dashboard.widgetFactory.addWidget("default", new PercentGaugeWidgetConfig());
+dashboard.widgetFactory.addWidget("default", new LineChartWidgetConfig());
+dashboard.widgetFactory.addWidget("default", new GoogleMapWidgetConfig());
 
 
 //==========================
