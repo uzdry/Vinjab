@@ -4,7 +4,6 @@
     "archiver": "^0.14.3",
     "backbone": "~1.2.3",
     "browserify": "~13.0.0",
-    "browserify-istanbul": "^1.0.0",
     "del": "^1.1.1",
     "eslint": "~1.10.3",
     "eslint-config-google": "~0.3.0",
@@ -24,10 +23,14 @@
     "jasmine": "^2.4.1",
     "jquery": "1.11.3",
     "jshint-stylish": "^1.0.1",
+    "karma": "^0.13.21",
     "karma-bro": "^0.11.1",
+    "karma-browserify": "^5.0.2",
     "karma-chrome-launcher": "^0.2.2",
+    "karma-coverage": "^0.5.3",
     "karma-firefox-launcher": "^0.1.7",
     "karma-jasmine": "^0.3.7",
+    "karma-jasmine-jquery": "^0.1.1",
     "mocha": "^2.2.4",
     "normalize.css": "3.0.3",
     "run-sequence": "^1.0.2",
@@ -55,9 +58,9 @@
     "node": ">=0.10.0"
   },
   "browserify-shim": {
-    "jquery": "$", 
+    "jquery": "$",
     "three": "global:THREE"
-  }, 
+  },
   "h5bp-configs": {
     "directories": {
       "archive": "archive",
