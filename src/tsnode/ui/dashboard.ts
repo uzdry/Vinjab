@@ -142,8 +142,8 @@ class Dashboard{
      */
     private addWidget(){
         console.log("CLICKED");
-        var signalName = this.dSignal.data('ddslick');
-        var widgetName = this.dWidgets.data('ddslick');
+        var signalName = $("#dSignals").data('ddslick');
+        var widgetName = $("#dWidgets").data('ddslick');
 
         if(signalName.selectedIndex < 0) return;
         if(widgetName.selectedIndex < 0) return;

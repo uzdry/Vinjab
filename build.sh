@@ -1,1 +1,1 @@
-tsc --noImplicitUseStrict >log.txt
+tsc >log.txt

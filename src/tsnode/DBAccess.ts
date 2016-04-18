@@ -156,7 +156,7 @@ class LevelDBAccess {
         this.db = levelup('../VINJAB-DB', function(err, db){
             if(err) console.log("Error in opening the Database: " + err);
             this.db = db;
-        });
+        }.bind(this));
 
         /*
          * initializes the DBInfoEntry: The DBInfoEntry is fetched from the database. If there is no DBInfoEntry in the
